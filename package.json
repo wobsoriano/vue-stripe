@@ -36,6 +36,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "update-deps": "taze -w && pnpm i",
+    "release": "pnpm build && changeset release",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.7.1",
+    "@changesets/cli": "^2.27.8",
     "@stripe/stripe-js": "^4.5.0",
     "bumpp": "^9.5.2",
     "eslint": "^9.11.0",
