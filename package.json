@@ -1,0 +1,56 @@
+{
+  "name": "stripe-vue",
+  "type": "module",
+  "version": "0.0.0",
+  "packageManager": "pnpm@9.11.0",
+  "description": "",
+  "author": "Your Name <youremail@mail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/username/stripe-vue#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/stripe-vue.git"
+  },
+  "bugs": "https://github.com/username/stripe-vue/issues",
+  "keywords": [],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsup --watch --onSuccess \"pnpm build:dts\"",
+    "build": "tsup --env.NODE_ENV production --onSuccess \"pnpm build:dts\"",
+    "build:dts": "vue-tsc --declaration --emitDeclarationOnly",
+    "prepublishOnly": "pnpm build",
+    "test": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "update-deps": "taze -w && pnpm i",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@stripe/stripe-js": "^1.44.1 || ^2.0.0 || ^3.0.0 || ^4.0.0",
+    "vue": "^3.2.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^3.7.1",
+    "@stripe/stripe-js": "^4.5.0",
+    "bumpp": "^9.5.2",
+    "eslint": "^9.11.0",
+    "tsup": "8.0.1",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1",
+    "vue": "^3.5.8",
+    "vue-tsc": "^2.1.6"
+  }
+}
