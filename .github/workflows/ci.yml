@@ -39,7 +39,7 @@ jobs:
         run: pnpm lint
 
       - name: Typecheck
-        run: pnpm --filter typecheck
+        run: pnpm typecheck
 
       - name: Build
         run: pnpm build
