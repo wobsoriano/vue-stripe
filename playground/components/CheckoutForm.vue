@@ -1,32 +1,10 @@
-# stripe-vue
-
-Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) with full TypeScript support.
-
-> [!NOTE]
-> The aim of this module is to have `@stripe/react-stripe-js` for Vue with feature parity. You should be able to follow the react docs and examples using this module.
-
-## Installation
-
-```bash
-npm install stripe-vue @stripe/stripe-js
-```
-
-## Usage
-
-An example `CheckoutForm` component:
-
-```vue
-<script setup>
-import {
-  PaymentElement,
-  useElements,
-  useStripe,
-} from 'stripe-vue'
+<script setup lang="ts">
+import { PaymentElement, useElements, useStripe } from 'stripe-vue'
 
 const stripe = useStripe()
 const elements = useElements()
 
-const errorMessage = ref(null)
+const errorMessage = ref<string | null>(null)
 
 async function handleSubmit() {
   if (elements.value === null) {
@@ -37,7 +15,7 @@ async function handleSubmit() {
   const { error: submitError } = await elements.value.submit()
   if (submitError) {
     // Show error to your customer
-    errorMessage.value = submitError.message
+    errorMessage.value = submitError.message!
     return
   }
 
@@ -47,7 +25,7 @@ async function handleSubmit() {
   })
   const { client_secret: clientSecret } = await res.json()
 
-  const { error } = await stripe.value.confirmPayment({
+  const { error } = await stripe.value!.confirmPayment({
     // `Elements` instance that was used to create the Payment Element
     elements: elements.value,
     clientSecret,
@@ -60,7 +38,7 @@ async function handleSubmit() {
     // This point will only be reached if there is an immediate error when
     // confirming the payment. Show error to your customer (for example, payment
     // details incomplete)
-    errorMessage.value = error.message
+    errorMessage.value = error.message!
   }
   else {
     // Your customer will be redirected to your `return_url`. For some payment
@@ -81,28 +59,3 @@ async function handleSubmit() {
     </div>
   </form>
 </template>
-```
-
-```vue
-<script setup>
-import { loadStripe } from '@stripe/stripe-js'
-import { Elements } from 'stripe-vue'
-import CheckoutForm from './CheckoutForm.vue'
-
-const stripe = ref(null)
-
-onMounted(async () => {
-  stripe.value = await loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
-})
-</script>
-
-<template>
-  <Elements :stripe="stripe">
-    <CheckoutForm />
-  </Elements>
-</template>
-```
-
-## License
-
-MIT

@@ -733,8 +733,15 @@ declare module '@stripe/stripe-js' {
 
 export interface UnknownOptions { [k: string]: unknown }
 
+type RemoveOnPrefix<S extends string> = S extends `on${infer R}` ? Uncapitalize<R> : S
+
 type ExtractEventNames<T> = {
-  [K in keyof T as K extends `on${Capitalize<string>}` ? Uncapitalize<K extends `on${infer R}` ? R : never> : never]: (...args: any[]) => any
+  [K in keyof T as K extends `on${Capitalize<string>}`
+    ? Lowercase<RemoveOnPrefix<K & string>>
+    : never
+  ]: T[K] extends (...args: any[]) => any
+    ? (...args: Parameters<T[K]>) => true
+    : never
 }
 
 export type Component<Props extends Record<string, any>> = DefineSetupFnComponent<

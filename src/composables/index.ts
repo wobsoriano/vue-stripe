@@ -36,7 +36,7 @@ export function useAttachEvent<A extends unknown[]>(
   element: ShallowRef<StripeElement | null>,
   event: string,
   cb?: (...args: A) => any,
-  emit?: (event: string, ...args: A) => void,
+  emit?: (event: any, ...args: A) => void,
 ) {
   watchEffect((onInvalidate) => {
     if (!element.value) {

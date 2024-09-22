@@ -1,5 +1,5 @@
 import type { StripeElement, StripeElementType } from '@stripe/stripe-js'
-import type { Component, ElementProps } from '../types'
+import type { Component, ElementProps, UnknownOptions } from '../types'
 import { defineComponent, h, ref, watchEffect } from 'vue'
 import { useAttachEvent, useElements } from '../composables'
 
@@ -21,7 +21,7 @@ interface PrivateElementProps {
   onCancel?: UnknownCallback
   onShippingAddressChange?: UnknownCallback
   onShippingRateChange?: UnknownCallback
-  options?: Record<string, unknown>
+  options?: UnknownOptions
 }
 
 export function createElementComponent({
@@ -69,7 +69,21 @@ export function createElementComponent({
     })
   }, {
     inheritAttrs: false,
-    props: ['id', 'class', 'onChange', 'onBlur', 'onFocus', 'onEscape', 'onReady', 'onClick', 'onLoadError', 'onLoaderStart', 'onNetworksChange', 'onConfirm', 'onCancel', 'onShippingAddressChange', 'onShippingRateChange', 'options'],
+    props: ['id', 'class', 'options'],
+    emits: [
+      'blur',
+      'focus',
+      'escape',
+      'click',
+      'loaderror',
+      'loaderstart',
+      'networkschange',
+      'confirm',
+      'cancel',
+      'shippingaddresschange',
+      'shippingratechange',
+      'change',
+    ],
   })
 
   ;(Element as any).__elementType = type
