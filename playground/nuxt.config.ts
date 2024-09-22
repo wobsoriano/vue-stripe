@@ -4,7 +4,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   runtimeConfig: {
     public: {
-      stripePublicKey: process.env.NUXT_PUBLIC_STRIPE_PUBLIC_KEY
-    }
-  }
+      // eslint-disable-next-line node/prefer-global/process
+      stripePublicKey: process.env.NUXT_PUBLIC_STRIPE_PUBLIC_KEY,
+    },
+  },
 })
