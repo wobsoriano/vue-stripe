@@ -1,9 +1,9 @@
 # stripe-vue
 
-Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js).
+Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) with full TypeScript support.
 
 > [!NOTE]
-> The aim of this module is to have `@stripe/react-stripe-js` for vue with feature parity. You should be able to follow the react docs and examples using this module.
+> The aim of this module is to have `@stripe/react-stripe-js` for Vue with feature parity. You should be able to follow the react docs and examples using this module.
 
 ## Installation
 
