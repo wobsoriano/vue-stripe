@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "packageManager": "pnpm@9.11.0",
-  "description": "",
+  "description": "Vue components for Stripe.js and Stripe Elements",
   "author": "Your Name <youremail@mail.com>",
   "license": "MIT",
   "homepage": "https://github.com/username/stripe-vue#readme",
