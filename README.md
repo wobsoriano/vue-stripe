@@ -103,6 +103,20 @@ onMounted(async () => {
 </template>
 ```
 
+To listen for events, use the `@eventname` directive:
+
+Do this
+
+```vue
+<PaymentElement @loaderstart={onLoaderStart}>
+```
+
+Don't do this
+
+```vue
+<PaymentElement onLoaderStart={onLoaderStart}>
+```
+
 ## License
 
 MIT
