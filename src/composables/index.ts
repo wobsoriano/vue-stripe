@@ -35,7 +35,6 @@ export function useElements() {
 export function useAttachEvent<A extends unknown[]>(
   element: ShallowRef<StripeElement | null>,
   event: string,
-  cb?: (...args: A) => any,
   emit?: (event: any, ...args: A) => void,
 ) {
   watchEffect((onInvalidate) => {
@@ -44,7 +43,6 @@ export function useAttachEvent<A extends unknown[]>(
     }
 
     function cbWithEmit(...args: A) {
-      cb?.(...args)
       emit?.(event, ...args)
     }
 

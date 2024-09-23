@@ -1,6 +1,6 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import { defineComponent, h, ref, watchEffect } from 'vue'
-import { useElements } from '../composables'
+import { useAttachEvent, useElements } from '../composables'
 
 export function createElementComponent<Props extends Record<string, any>, Emits extends { (e: any, value: any): void }>(
   type: stripeJs.StripeElementType,
@@ -9,7 +9,7 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
     id?: string
     class?: string
     options?: Props
-  }, { slots }) => {
+  }, { slots, emit }) => {
     const elements = useElements()
     const element = ref<stripeJs.StripeElement | null>(null)
     const domRef = ref<HTMLDivElement | null>(null)
@@ -28,6 +28,19 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
         newElement.unmount()
       })
     })
+
+    useAttachEvent(element, 'blur', emit)
+    useAttachEvent(element, 'focus', emit)
+    useAttachEvent(element, 'escape', emit)
+    useAttachEvent(element, 'click', emit)
+    useAttachEvent(element, 'loaderror', emit)
+    useAttachEvent(element, 'loaderstart', emit)
+    useAttachEvent(element, 'networkschange', emit)
+    useAttachEvent(element, 'confirm', emit)
+    useAttachEvent(element, 'cancel', emit)
+    useAttachEvent(element, 'shippingaddresschange', emit)
+    useAttachEvent(element, 'shippingratechange', emit)
+    useAttachEvent(element, 'change', emit)
 
     return () => h('div', {
       id: props.id,
