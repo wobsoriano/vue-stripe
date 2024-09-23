@@ -1,37 +1,17 @@
-import type { StripeElement, StripeElementType } from '@stripe/stripe-js'
-import type { Component, ElementProps, UnknownOptions } from '../types'
+import type * as stripeJs from '@stripe/stripe-js'
 import { defineComponent, h, ref, watchEffect } from 'vue'
-import { useAttachEvent, useElements } from '../composables'
+import { useElements } from '../composables'
 
-type UnknownCallback = (...args: unknown[]) => any
-
-interface PrivateElementProps {
-  id?: string
-  class?: string
-  onChange?: UnknownCallback
-  onBlur?: UnknownCallback
-  onFocus?: UnknownCallback
-  onEscape?: UnknownCallback
-  onReady?: UnknownCallback
-  onClick?: UnknownCallback
-  onLoadError?: UnknownCallback
-  onLoaderStart?: UnknownCallback
-  onNetworksChange?: UnknownCallback
-  onConfirm?: UnknownCallback
-  onCancel?: UnknownCallback
-  onShippingAddressChange?: UnknownCallback
-  onShippingRateChange?: UnknownCallback
-  options?: UnknownOptions
-}
-
-export function createElementComponent({
-  type,
-}: {
-  type: StripeElementType
-}) {
-  const Element = defineComponent((props: PrivateElementProps, { emit }) => {
+export function createElementComponent<Props extends Record<string, any>, Emits extends { (e: any, value: any): void }>(
+  type: stripeJs.StripeElementType,
+) {
+  const wrapper = defineComponent((props: {
+    id?: string
+    class?: string
+    options?: Props
+  }, { slots }) => {
     const elements = useElements()
-    const element = ref<StripeElement | null>(null)
+    const element = ref<stripeJs.StripeElement | null>(null)
     const domRef = ref<HTMLDivElement | null>(null)
 
     watchEffect((onInvalidate) => {
@@ -49,44 +29,16 @@ export function createElementComponent({
       })
     })
 
-    useAttachEvent(element, 'blur', props.onBlur, emit)
-    useAttachEvent(element, 'focus', props.onFocus, emit)
-    useAttachEvent(element, 'escape', props.onEscape, emit)
-    useAttachEvent(element, 'click', props.onClick, emit)
-    useAttachEvent(element, 'loaderror', props.onLoadError, emit)
-    useAttachEvent(element, 'loaderstart', props.onLoaderStart, emit)
-    useAttachEvent(element, 'networkschange', props.onNetworksChange, emit)
-    useAttachEvent(element, 'confirm', props.onConfirm, emit)
-    useAttachEvent(element, 'cancel', props.onCancel, emit)
-    useAttachEvent(element, 'shippingaddresschange', props.onShippingAddressChange, emit)
-    useAttachEvent(element, 'shippingratechange', props.onShippingRateChange, emit)
-    useAttachEvent(element, 'change', props.onChange, emit)
-
     return () => h('div', {
-      ref: domRef,
       id: props.id,
       class: props.class,
-    })
-  }, {
-    inheritAttrs: false,
-    props: ['id', 'class', 'options'],
-    emits: [
-      'blur',
-      'focus',
-      'escape',
-      'click',
-      'loaderror',
-      'loaderstart',
-      'networkschange',
-      'confirm',
-      'cancel',
-      'shippingaddresschange',
-      'shippingratechange',
-      'change',
-    ],
+      ref: domRef,
+    }, slots)
   })
 
-  ;(Element as any).__elementType = type
-
-  return Element as Component<ElementProps>
+  return wrapper as typeof wrapper & {
+    new (...args: any): {
+      $emit: Emits
+    }
+  }
 }

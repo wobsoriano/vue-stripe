@@ -20,15 +20,18 @@ async function handleSubmit() {
   }
 
   // Create the PaymentIntent and obtain clientSecret from your server endpoint
-  const res = await fetch('/create-intent', {
+  const { client_secret: clientSecret } = await $fetch('/api/create-intent', {
     method: 'POST',
+    body: {
+      amount: 1099,
+      currency: 'usd',
+    },
   })
-  const { client_secret: clientSecret } = await res.json()
 
   const { error } = await stripe.value!.confirmPayment({
     // `Elements` instance that was used to create the Payment Element
     elements: elements.value,
-    clientSecret,
+    clientSecret: clientSecret!,
     confirmParams: {
       return_url: 'https://example.com/order/123/complete',
     },
@@ -46,14 +49,18 @@ async function handleSubmit() {
     // site first to authorize the payment, then redirected to the `return_url`.
   }
 }
+
+function loaderStart() {
+  console.log('hello')
+}
 </script>
 
 <template>
   <form @submit.prevent="handleSubmit">
-    <PaymentElement />
     <button type="submit" :disabled="!stripe || !elements">
       Pay
     </button>
+    <PaymentElement @loaderstart="loaderStart" />
     <div v-if="errorMessage">
       {{ errorMessage }}
     </div>
