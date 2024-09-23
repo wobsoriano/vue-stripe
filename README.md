@@ -11,7 +11,7 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 npm install stripe-vue @stripe/stripe-js
 ```
 
-## Usage
+## Minimal example
 
 An example `CheckoutForm` component:
 
@@ -94,10 +94,20 @@ const stripe = ref(null)
 onMounted(async () => {
   stripe.value = await loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
 })
+
+const options = {
+  mode: 'payment',
+  amount: 1099,
+  currency: 'usd',
+  // Fully customizable with appearance API.
+  appearance: {
+    /*...*/
+  },
+};
 </script>
 
 <template>
-  <Elements :stripe="stripe">
+  <Elements :stripe="stripe" :options="options">
     <CheckoutForm />
   </Elements>
 </template>
