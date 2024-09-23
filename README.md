@@ -101,9 +101,9 @@ const options = {
   currency: 'usd',
   // Fully customizable with appearance API.
   appearance: {
-    /*...*/
+    /* ... */
   },
-};
+}
 </script>
 
 <template>
