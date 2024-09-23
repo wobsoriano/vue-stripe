@@ -12,7 +12,11 @@
     "url": "git+https://github.com/username/stripe-vue.git"
   },
   "bugs": "https://github.com/username/stripe-vue/issues",
-  "keywords": [],
+  "keywords": [
+    "vue",
+    "stripe",
+    "elements"
+  ],
   "sideEffects": false,
   "exports": {
     ".": {
