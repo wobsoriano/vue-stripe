@@ -2,4 +2,4 @@
 "stripe-vue": patch
 ---
 
-Update event usage docs
+Add event usage

@@ -114,7 +114,7 @@ Do this
 Don't do this
 
 ```vue
-<PaymentElement onLoaderStart={onLoaderStart}>
+<PaymentElement :onLoaderStart="onLoaderStart">
 ```
 
 ## License
