@@ -1,6 +1,6 @@
-import type * as stripeJs from "@stripe/stripe-js";
-import { computed, defineComponent, inject, onMounted, provide, ref, watchEffect } from "vue";
-import { CustomCheckoutKey } from "../keys";
+import type * as stripeJs from '@stripe/stripe-js'
+import { computed, defineComponent, inject, provide, ref, watchEffect } from 'vue'
+import { CustomCheckoutKey } from '../keys'
 
 export const CustomCheckoutProvider = defineComponent((props: {
   stripe: stripeJs.Stripe | null
@@ -16,7 +16,7 @@ export const CustomCheckoutProvider = defineComponent((props: {
           customCheckoutSdk.value = value
           customCheckoutSdk.value.on('change', (value) => {
             session.value = value
-          });
+          })
         }
       })
     }
@@ -28,41 +28,38 @@ export const CustomCheckoutProvider = defineComponent((props: {
 
   return () => slots.default?.()
 }, {
-  props: ['stripe', 'options']
+  props: ['stripe', 'options'],
 })
 
 type StripeCustomCheckoutActions = Omit<
   Omit<stripeJs.StripeCustomCheckout, 'session'>,
   'on'
->;
+>
 
 export interface CustomCheckoutContextValue
   extends StripeCustomCheckoutActions,
-    stripeJs.StripeCustomCheckoutSession {}
+  stripeJs.StripeCustomCheckoutSession {}
 
-const extractCustomCheckoutContextValue = (
-  customCheckoutSdk: stripeJs.StripeCustomCheckout | null,
-  sessionState: stripeJs.StripeCustomCheckoutSession | null
-): CustomCheckoutContextValue | null => {
+function extractCustomCheckoutContextValue(customCheckoutSdk: stripeJs.StripeCustomCheckout | null, sessionState: stripeJs.StripeCustomCheckoutSession | null): CustomCheckoutContextValue | null {
   if (!customCheckoutSdk) {
-    return null;
+    return null
   }
 
-  const {on: _on, session: _session, ...actions} = customCheckoutSdk;
+  const { on: _on, session: _session, ...actions } = customCheckoutSdk
   if (!sessionState) {
-    return {...actions, ...customCheckoutSdk.session()};
+    return { ...actions, ...customCheckoutSdk.session() }
   }
 
-  return {...actions, ...sessionState};
+  return { ...actions, ...sessionState }
 }
 
 export function useCustomCheckout() {
-  const customCheckout = inject(CustomCheckoutKey);
+  const customCheckout = inject(CustomCheckoutKey)
 
   if (!customCheckout) {
     throw new Error(
-      'Could not find CustomCheckout Context; You need to wrap the part of your app that calls useCustomCheckout() in an <CustomCheckoutProvider> provider.'
-    );
+      'Could not find CustomCheckout Context; You need to wrap the part of your app that calls useCustomCheckout() in an <CustomCheckoutProvider> provider.',
+    )
   }
 
   return customCheckout
