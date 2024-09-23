@@ -36,7 +36,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "update-deps": "taze -w && pnpm i",
-    "release": "pnpm build && changeset release",
+    "release": "pnpm build && changeset publish",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
