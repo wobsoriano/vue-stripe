@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.1.2
+
+### Patch Changes
+
+- 27efada: Package info updates
+
 ## 0.1.1
 
 ### Patch Changes
