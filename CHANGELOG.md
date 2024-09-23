@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.1.3
+
+### Patch Changes
+
+- 4ab08f9: Update readme
+
 ## 0.1.2
 
 ### Patch Changes
