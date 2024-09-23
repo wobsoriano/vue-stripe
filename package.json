@@ -1,7 +1,7 @@
 {
   "name": "stripe-vue",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packageManager": "pnpm@9.11.0",
   "description": "Vue components for Stripe.js and Stripe Elements",
   "author": "Your Name <youremail@mail.com>",
