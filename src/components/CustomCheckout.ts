@@ -79,8 +79,8 @@ function extractCustomCheckoutContextValue(customCheckoutSdk: stripeJs.StripeCus
 }
 
 export function useElementsOrCustomCheckoutSdkContextWithUseCase(useCaseString: string) {
-  const customCheckoutSdkContext = inject(CustomCheckoutSdkKey)
-  const elementsContext = inject(ElementsKey)
+  const customCheckoutSdkContext = inject(CustomCheckoutSdkKey, undefined)
+  const elementsContext = inject(ElementsKey, undefined)
 
   if (customCheckoutSdkContext && elementsContext) {
     throw new Error(

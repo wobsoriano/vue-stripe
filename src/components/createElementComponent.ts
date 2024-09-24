@@ -13,7 +13,7 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
     id?: string
     class?: string
     options?: Props
-  }, { slots, emit }) => {
+  }, { emit }) => {
     const ctx = useElementsOrCustomCheckoutSdkContextWithUseCase(`mounts <${displayName}>`)
     const elements = 'elements' in ctx ? ctx.elements : null
     const customCheckoutSdk = 'customCheckoutSdk' in ctx ? ctx.customCheckoutSdk : null
@@ -59,7 +59,7 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
       id: props.id,
       class: props.class,
       ref: domRef,
-    }, slots)
+    })
   }, {
     name: displayName,
   })
