@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.2.2
+
+### Patch Changes
+
+- f0c383d: Fix custom checkout and elements contextx
+
 ## 0.2.1
 
 ### Patch Changes
