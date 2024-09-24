@@ -116,6 +116,9 @@ export {
   useElements,
 } from './components/Elements'
 
+export { EmbeddedCheckout } from './components/EmbeddedCheckout'
+
+export { EmbeddedCheckoutProvider } from './components/EmbeddedCheckoutProvider'
 export {
   useStripe,
 } from './components/useStripe'

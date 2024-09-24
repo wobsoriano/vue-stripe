@@ -53,6 +53,7 @@ export const CustomCheckoutProvider = defineComponent((props: {
 
   return () => slots.default?.()
 }, {
+  inheritAttrs: false,
   props: ['stripe', 'options'],
 })
 
