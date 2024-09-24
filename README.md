@@ -135,7 +135,7 @@ Don't do this
 
 ## Acknowledgements
 
-The repository for this module is currently private. While there are several well-known Vue libraries that provide Stripe.js integration, such as [`vue-stripe-js`](https://www.npmjs.com/package/vue-stripe-js) and [`@vue-stripe/vue-stripe`](https://www.npmjs.com/package/@vue-stripe/vue-stripe), consider using this library if you're looking for a 1:1 correspondence in API and usage with `@stripe/react-stripe-js`. If you don't need that specific React-like API, the existing libraries may suit your needs.
+The repository for this module is currently private. There are well-known Vue libraries that provide Stripe.js integration, such as [`vue-stripe-js`](https://www.npmjs.com/package/vue-stripe-js) and [`@vue-stripe/vue-stripe`](https://www.npmjs.com/package/@vue-stripe/vue-stripe), which may suit your needs. Consider using this library if you're looking for a 1:1 correspondence in API and usage with @stripe/react-stripe-js.
 
 ## License
 
