@@ -2,4 +2,4 @@
 "stripe-vue": minor
 ---
 
-Remove deprecated ShippingAddressElement component
+Remove deprecated `ShippingAddressElement` component
