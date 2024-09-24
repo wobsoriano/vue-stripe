@@ -9,7 +9,7 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 
 - [x] [Elements](https://docs.stripe.com/payments/elements)
 - [x] [Custom Checkout](https://docs.stripe.com/checkout/custom-checkout/overview)
-- [ ] Embedded Checkout
+- [x] [Embedded Checkout](https://docs.stripe.com/checkout/embedded/quickstart)
 
 ## Installation
 
@@ -135,7 +135,9 @@ Don't do this
 
 ## Acknowledgements
 
-The repository for this module is currently private. There are well-known Vue libraries that provide Stripe.js integration, such as [`vue-stripe-js`](https://www.npmjs.com/package/vue-stripe-js) and [`@vue-stripe/vue-stripe`](https://www.npmjs.com/package/@vue-stripe/vue-stripe), which may suit your needs. Consider using this library if you're looking for a 1:1 correspondence in API and usage with @stripe/react-stripe-js.
+The repository for this module is currently private. There are well-known Vue libraries that provide Stripe.js integration, such as [`vue-stripe-js`](https://www.npmjs.com/package/vue-stripe-js) and [`@vue-stripe/vue-stripe`](https://www.npmjs.com/package/@vue-stripe/vue-stripe), which may suit your needs. Consider using this library if you're looking for a 1:1 correspondence in API and usage with `@stripe/react-stripe-js`.
+
+Still think opening this repo to public might be useful? Let [me](https://robsoriano.com) know!
 
 ## License
 

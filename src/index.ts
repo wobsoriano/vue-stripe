@@ -37,8 +37,6 @@ import type {
   PaymentMethodMessagingElementProps,
   PaymentRequestButtonElementEmits,
   PaymentRequestButtonElementProps,
-  ShippingAddressElementEmits,
-  ShippingAddressElementProps,
 } from './types'
 import { createElementComponent } from './components/createElementComponent'
 
@@ -57,7 +55,6 @@ export const PaymentElement = createElementComponent<PaymentElementProps, Paymen
 export const ExpressCheckoutElement = createElementComponent<ExpressCheckoutElementProps, ExpressCheckoutElementEmits>('expressCheckout')
 export const PaymentRequestButtonElement = createElementComponent<PaymentRequestButtonElementProps, PaymentRequestButtonElementEmits>('paymentRequestButton')
 export const AddressElement = createElementComponent<AddressElementProps, AddressElementEmits>('address')
-export const ShippingAddressElement = createElementComponent<ShippingAddressElementProps, ShippingAddressElementEmits>('shippingAddress')
 export const PaymentMethodMessagingElement = createElementComponent<PaymentMethodMessagingElementProps, PaymentMethodMessagingElementEmits>('paymentMethodMessaging')
 export const AffirmMessageElement = createElementComponent<AffirmMessageElementProps, AffirmMessageElementEmits>('affirmMessage')
 export const AfterpayClearpayMessageElement = createElementComponent<AfterpayClearpayMessageElementProps, AfterpayClearpayMessageElementEmits>('afterpayClearpayMessage')
@@ -77,7 +74,6 @@ type PaymentElementComponent = ComponentInstance<typeof PaymentElement>
 type ExpressCheckoutElementComponent = ComponentInstance<typeof ExpressCheckoutElement>
 type PaymentRequestButtonElementComponent = ComponentInstance<typeof PaymentRequestButtonElement>
 type AddressElementComponent = ComponentInstance<typeof AddressElement>
-type ShippingAddressElementComponent = ComponentInstance<typeof ShippingAddressElement>
 type PaymentMethodMessagingElementComponent = ComponentInstance<typeof PaymentMethodMessagingElement>
 type AffirmMessageElementComponent = ComponentInstance<typeof AffirmMessageElement>
 type AfterpayClearpayMessageElementComponent = ComponentInstance<typeof AfterpayClearpayMessageElement>
@@ -99,7 +95,6 @@ declare module '@stripe/stripe-js' {
     getElement(component: ExpressCheckoutElementComponent): stripeJs.StripeExpressCheckoutElement | null
     getElement(component: PaymentRequestButtonElementComponent): stripeJs.StripePaymentRequestButtonElement | null
     getElement(component: AddressElementComponent): stripeJs.StripeAddressElement | null
-    getElement(component: ShippingAddressElementComponent): stripeJs.StripeShippingAddressElement | null
     getElement(component: PaymentMethodMessagingElementComponent): stripeJs.StripePaymentMethodMessagingElement | null
     getElement(component: AffirmMessageElementComponent): stripeJs.StripeAffirmMessageElement | null
     getElement(component: AfterpayClearpayMessageElementComponent): stripeJs.StripeAfterpayClearpayMessageElement | null
@@ -116,6 +111,9 @@ export {
   useElements,
 } from './components/Elements'
 
+export { EmbeddedCheckout } from './components/EmbeddedCheckout'
+
+export { EmbeddedCheckoutProvider } from './components/EmbeddedCheckoutProvider'
 export {
   useStripe,
 } from './components/useStripe'

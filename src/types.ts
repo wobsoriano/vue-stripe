@@ -177,18 +177,6 @@ export interface AddressElementEmits extends BaseElementEmits {
   (e: 'loaderstart', event: { elementType: 'address' }): void
 }
 
-export interface ShippingAddressElementProps extends ElementProps {
-  options?: stripeJs.StripeShippingAddressElementOptions
-}
-
-export interface ShippingAddressElementEmits extends BaseElementEmits {
-  (e: 'change', event: stripeJs.StripeShippingAddressElementChangeEvent): void
-  (e: 'ready', element: stripeJs.StripeShippingAddressElement): void
-  (e: 'escape'): void
-  (e: 'loaderror', event: { elementType: 'shippingAddress', error: stripeJs.StripeError }): void
-  (e: 'loaderstart', event: { elementType: 'shippingAddress' }): void
-}
-
 export interface PaymentMethodMessagingElementProps extends ElementProps {
   options?: stripeJs.StripePaymentMethodMessagingElementOptions
 }
