@@ -1,5 +1,12 @@
 # stripe-vue
 
+## 0.2.3
+
+### Patch Changes
+
+- a671fe5: Add current features to README
+- 7b31290: Remove rendered slot in element component
+
 ## 0.2.2
 
 ### Patch Changes
