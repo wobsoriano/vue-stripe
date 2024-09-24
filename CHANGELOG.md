@@ -1,5 +1,12 @@
 # stripe-vue
 
+## 0.3.0
+
+### Minor Changes
+
+- ce23cd0: Add embedded checkout
+- 5944686: Remove deprecated `ShippingAddressElement` component
+
 ## 0.2.4
 
 ### Patch Changes
