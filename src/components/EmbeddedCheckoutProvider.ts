@@ -13,7 +13,7 @@ export interface EmbeddedCheckoutContextValue {
 }
 
 export function useEmbeddedCheckoutContext(): Ref<EmbeddedCheckoutContextValue> {
-  const ctx = inject(EmbeddedCheckoutKey)
+  const ctx = inject(EmbeddedCheckoutKey, undefined)
   if (!ctx) {
     throw new Error(
       '<EmbeddedCheckout> must be used within <EmbeddedCheckoutProvider>',
