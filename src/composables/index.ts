@@ -32,18 +32,24 @@ export function useElements() {
   return elements.elements
 }
 
-export function useAttachEvent<A extends unknown[]>(
+export function useAttachEvent(
   element: ShallowRef<StripeElement | null>,
   event: string,
-  emit?: (event: any, ...args: A) => void,
+  emit: (event: any, ...args: unknown[]) => void,
+  shouldEmitElement = false,
 ) {
   watchEffect((onInvalidate) => {
     if (!element.value) {
       return
     }
 
-    function cbWithEmit(...args: A) {
-      emit?.(event, ...args)
+    function cbWithEmit(...args: unknown[]) {
+      if (shouldEmitElement) {
+        emit(event, element.value)
+      }
+      else {
+        emit(event, ...args)
+      }
     }
 
     ;(element.value as any).on(event, cbWithEmit)

@@ -107,6 +107,11 @@ declare module '@stripe/stripe-js' {
 }
 
 export {
+  CustomCheckoutProvider,
+  useCustomCheckout,
+} from './components/CustomCheckout'
+
+export {
   Elements,
 } from './components/Elements'
 
