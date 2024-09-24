@@ -9,7 +9,7 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 
 - [x] [Elements](https://docs.stripe.com/payments/elements)
 - [x] [Custom Checkout](https://docs.stripe.com/checkout/custom-checkout/overview)
-- [ ] Embedded Checkout
+- [x] [Embedded Checkout](https://docs.stripe.com/checkout/embedded/quickstart)
 
 ## Installation
 
