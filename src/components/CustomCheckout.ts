@@ -26,7 +26,10 @@ export const CustomCheckoutProvider = defineComponent((props: {
 
   provide(CustomCheckoutKey, customCheckoutContextValue)
 
-  return () => slots.default?.()
+  return () => slots.default?.({
+    stripe: computed(() => props.stripe),
+    checkout: customCheckoutContextValue,
+  })
 }, {
   props: ['stripe', 'options'],
 })

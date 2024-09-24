@@ -15,12 +15,14 @@ export const Elements = defineComponent((props: {
     }
   })
 
+  const wrappedStripe = computed(() => props.stripe)
+
   provide(ElementsKey, {
-    stripe: computed(() => props.stripe),
+    stripe: wrappedStripe,
     elements,
   })
 
-  return () => slots.default?.()
+  return () => slots.default?.({ stripe: wrappedStripe, elements })
 }, {
   props: ['stripe', 'options'],
 })
