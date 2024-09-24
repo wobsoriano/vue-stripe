@@ -1,5 +1,5 @@
 import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js'
-import { computed, defineComponent, provide, shallowRef, watchEffect } from 'vue'
+import { defineComponent, provide, shallowRef, toRef, watchEffect } from 'vue'
 import { ElementsKey } from '../keys'
 
 export const Elements = defineComponent((props: {
@@ -15,7 +15,7 @@ export const Elements = defineComponent((props: {
     }
   })
 
-  const wrappedStripe = computed(() => props.stripe)
+  const wrappedStripe = toRef(props, 'stripe')
 
   provide(ElementsKey, {
     stripe: wrappedStripe,

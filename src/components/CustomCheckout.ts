@@ -1,5 +1,5 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import { computed, defineComponent, inject, provide, ref, watchEffect } from 'vue'
+import { computed, defineComponent, inject, provide, ref, toRef, watchEffect } from 'vue'
 import { CustomCheckoutKey } from '../keys'
 
 export const CustomCheckoutProvider = defineComponent((props: {
@@ -27,7 +27,7 @@ export const CustomCheckoutProvider = defineComponent((props: {
   provide(CustomCheckoutKey, customCheckoutContextValue)
 
   return () => slots.default?.({
-    stripe: computed(() => props.stripe),
+    stripe: toRef(props, 'stripe'),
     checkout: customCheckoutContextValue,
   })
 }, {
