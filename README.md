@@ -133,6 +133,10 @@ Don't do this
 <PaymentElement :onLoaderStart="onLoaderStart">
 ```
 
+## Acknowledgements
+
+The repo for this module is private for now as there are a few other more famous Vue libraries that provide Stripe.js and Vue integration like [`vue-stripe-js`](https://www.npmjs.com/package/vue-stripe-js) and [`@vue-stripe/vue-stripe`](https://www.npmjs.com/package/@vue-stripe/vue-stripe) but this one tries to keep the API and usage 1:1 with `@stripe/react-stripe-js`.
+
 ## License
 
 MIT
