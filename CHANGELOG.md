@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.2.4
+
+### Patch Changes
+
+- 1e58790: Add acknowledgments section
+
 ## 0.2.3
 
 ### Patch Changes
