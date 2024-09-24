@@ -12,7 +12,7 @@ export const CustomCheckoutProvider = defineComponent((props: {
   watchEffect(() => {
     if (props.stripe) {
       props.stripe.initCustomCheckout(props.options).then((value) => {
-        if (customCheckoutSdk) {
+        if (value) {
           customCheckoutSdk.value = value
           customCheckoutSdk.value.on('change', (value) => {
             session.value = value
