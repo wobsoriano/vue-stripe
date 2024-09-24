@@ -1,10 +1,7 @@
-import type { Stripe, StripeElements } from '@stripe/stripe-js'
-import type { ComputedRef, InjectionKey, Ref, ShallowRef } from 'vue'
-import type { CustomCheckoutContextValue } from './components/CustomCheckout'
+import type { ComputedRef, InjectionKey } from 'vue'
+import type { CustomCheckoutContextValue, CustomCheckoutSdkContextValue } from './components/CustomCheckout'
+import type { ElementsContextValue } from './components/Elements'
 
-export const ElementsKey = Symbol('stripe elements') as InjectionKey<{
-  stripe: Ref<Stripe | null>
-  elements: ShallowRef<StripeElements | null>
-}>
-
+export const ElementsKey = Symbol('elements') as InjectionKey<ElementsContextValue>
+export const CustomCheckoutSdkKey = Symbol('custom checkout sdk') as InjectionKey<CustomCheckoutSdkContextValue>
 export const CustomCheckoutKey = Symbol('custom checkout') as InjectionKey<ComputedRef<CustomCheckoutContextValue | null>>
