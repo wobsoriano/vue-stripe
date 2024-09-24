@@ -113,9 +113,9 @@ export {
 
 export {
   Elements,
+  useElements,
 } from './components/Elements'
 
 export {
-  useElements,
   useStripe,
-} from './composables'
+} from './components/useStripe'

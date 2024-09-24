@@ -1,29 +1,33 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import { defineComponent, h, ref, watchEffect } from 'vue'
-import { useAttachEvent, useElements } from '../composables'
-import { useCustomCheckout } from './CustomCheckout'
+import { useAttachEvent } from '../composables'
+import { useElementsOrCustomCheckoutSdkContextWithUseCase } from './CustomCheckout'
+
+const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
 export function createElementComponent<Props extends Record<string, any>, Emits extends { (e: any, value: any): void }>(
   type: stripeJs.StripeElementType,
 ) {
+  const displayName = `${capitalized(type)}Element`
   const wrapper = defineComponent((props: {
     id?: string
     class?: string
     options?: Props
   }, { slots, emit }) => {
-    const elements = useElements()
-    const customCheckoutSdk = useCustomCheckout()
+    const ctx = useElementsOrCustomCheckoutSdkContextWithUseCase(`mounts <${displayName}>`)
+    const elements = 'elements' in ctx ? ctx.elements : null
+    const customCheckoutSdk = 'customCheckoutSdk' in ctx ? ctx.customCheckoutSdk : null
     const element = ref<stripeJs.StripeElement | null>(null)
     const domRef = ref<HTMLDivElement | null>(null)
 
     watchEffect(() => {
-      if (element.value === null && domRef.value !== null && (customCheckoutSdk.value || elements.value)) {
+      if (element.value === null && domRef.value !== null && (customCheckoutSdk?.value || elements?.value)) {
         let newElement: stripeJs.StripeElement | null = null
 
-        if (customCheckoutSdk.value) {
+        if (customCheckoutSdk?.value) {
           newElement = customCheckoutSdk.value.createElement(type as any, props.options)
         }
-        else if (elements.value) {
+        else if (elements?.value) {
           newElement = elements.value.create(type as any, props.options)
         }
 
@@ -56,6 +60,8 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
       class: props.class,
       ref: domRef,
     }, slots)
+  }, {
+    name: displayName,
   })
 
   return wrapper as typeof wrapper & {
