@@ -7,9 +7,9 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 
 ## Features
 
-- [x] [Elements](https://docs.stripe.com/payments/elements)
-- [x] [Custom Checkout](https://docs.stripe.com/checkout/custom-checkout/overview)
-- [x] [Embedded Checkout](https://docs.stripe.com/checkout/embedded/quickstart)
+- [x] All [Stripe Web Elements](https://docs.stripe.com/payments/elements) components
+- [x] [Custom Checkout](https://docs.stripe.com/checkout/custom-checkout/overview) with the [`<CustomCheckoutProvider>`](https://docs.stripe.com/js/custom_checkout/react/custom_checkout_provider) component and [`useCustomCheckout()`](https://docs.stripe.com/js/custom_checkout/react/use_custom_checkout) composable.
+- [x] [Embedded Checkout](https://docs.stripe.com/checkout/embedded/quickstart) with the [`<EmbeddedCheckoutProvider>`](https://docs.stripe.com/checkout/embedded/quickstart?client=react) and `<EmbeddedCheckout>` components.
 
 ## Installation
 
