@@ -1,6 +1,6 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { Ref } from 'vue'
-import { computed, defineComponent, inject, provide, ref, toRef, watchEffect } from 'vue'
+import { computed, defineComponent, inject, provide, ref, toRef, watch, watchEffect } from 'vue'
 import { CustomCheckoutKey, CustomCheckoutSdkKey, ElementsKey } from '../keys'
 import { parseElementsContext } from './Elements'
 
@@ -31,7 +31,7 @@ export const CustomCheckoutProvider = defineComponent((props: {
   const stripe = toRef(props, 'stripe')
 
   watchEffect(() => {
-    if (stripe.value) {
+    if (stripe.value && !customCheckoutSdk.value) {
       stripe.value.initCustomCheckout(props.options).then((value) => {
         if (value) {
           customCheckoutSdk.value = value
@@ -42,6 +42,15 @@ export const CustomCheckoutProvider = defineComponent((props: {
       })
     }
   })
+
+  watch(() => props.options.elementsOptions?.appearance, (appearance) => {
+    if (!customCheckoutSdk.value || !appearance) {
+      return
+    }
+
+    customCheckoutSdk.value.changeAppearance(appearance)
+  }, { flush: 'sync' })
+
 
   const customCheckoutContextValue = computed(() => extractCustomCheckoutContextValue(customCheckoutSdk.value, session.value))
 

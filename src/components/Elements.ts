@@ -1,6 +1,6 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { Ref, ShallowRef } from 'vue'
-import { defineComponent, inject, provide, shallowRef, toRef, watchEffect } from 'vue'
+import { computed, defineComponent, inject, provide, shallowRef, toRef, watch, watchEffect } from 'vue'
 import { ElementsKey } from '../keys'
 
 export interface ElementsContextValue {
@@ -28,11 +28,24 @@ export const Elements = defineComponent((props: {
   const elements = shallowRef<stripeJs.StripeElements | null>(null)
 
   watchEffect(() => {
-    if (props.stripe) {
+    if (props.stripe && !elements.value) {
       const instance = props.stripe.elements(props.options as any)
       elements.value = instance
     }
   })
+
+  const stripeElementUpdateOptions = computed(() => {
+    // @ts-expect-error: Need only updateable options
+    const { clientSecret, fonts, ...rest } = props.options
+    return rest
+  })
+  watch(stripeElementUpdateOptions, (updatedOptions) => {
+    if (!elements.value) {
+      return
+    }
+
+    elements.value?.update(updatedOptions)
+  }, { flush: 'sync' })
 
   const wrappedStripe = toRef(props, 'stripe')
 

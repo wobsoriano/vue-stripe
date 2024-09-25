@@ -55,7 +55,11 @@ export const EmbeddedCheckoutProvider = defineComponent((props: EmbeddedCheckout
   })
 
   watchEffect((onInvalidate) => {
-    if (props.stripe) {
+    if (
+      props.stripe
+      && !ctx.value.embeddedCheckout
+      && (props.options.clientSecret || props.options.fetchClientSecret)
+    ) {
       props.stripe.initEmbeddedCheckout(props.options as any).then((embeddedCheckout) => {
         ctx.value.embeddedCheckout = embeddedCheckout
       })

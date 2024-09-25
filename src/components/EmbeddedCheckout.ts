@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, watchEffect } from 'vue'
+import { defineComponent, h, shallowRef, watchEffect } from 'vue'
 import { useEmbeddedCheckoutContext } from './EmbeddedCheckoutProvider'
 
 interface EmbeddedCheckoutProps {
@@ -15,17 +15,18 @@ interface EmbeddedCheckoutProps {
 
 export const EmbeddedCheckout = defineComponent((props: EmbeddedCheckoutProps) => {
   const ctx = useEmbeddedCheckoutContext()
-  const domNode = ref<HTMLDivElement | null>(null)
+  const isMounted = shallowRef(false)
+  const domNode = shallowRef<HTMLDivElement | null>(null)
 
   watchEffect((onInvalidate) => {
-    if (ctx.value.embeddedCheckout && domNode.value !== null) {
+    if (!isMounted.value && ctx.value.embeddedCheckout && domNode.value !== null) {
+      isMounted.value = true
       ctx.value.embeddedCheckout.mount(domNode.value)
     }
 
     onInvalidate(() => {
-      if (ctx.value.embeddedCheckout) {
-        ctx.value.embeddedCheckout.unmount()
-      }
+      ctx.value.embeddedCheckout?.unmount()
+      isMounted.value = false
     })
   })
 
