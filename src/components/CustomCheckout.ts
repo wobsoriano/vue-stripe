@@ -51,7 +51,6 @@ export const CustomCheckoutProvider = defineComponent((props: {
     customCheckoutSdk.value.changeAppearance(appearance)
   }, { flush: 'sync' })
 
-
   const customCheckoutContextValue = computed(() => extractCustomCheckoutContextValue(customCheckoutSdk.value, session.value))
 
   provide(CustomCheckoutKey, customCheckoutContextValue)
