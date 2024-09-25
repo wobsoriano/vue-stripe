@@ -35,8 +35,7 @@ export const Elements = defineComponent((props: {
   })
 
   const stripeElementUpdateOptions = computed(() => {
-    // @ts-expect-error: Need only updateable options
-    const { clientSecret, fonts, ...rest } = props.options
+    const { clientSecret, fonts, ...rest } = props.options ?? {}
     return rest
   })
   watch(stripeElementUpdateOptions, (updatedOptions) => {
