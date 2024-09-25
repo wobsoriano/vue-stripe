@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.3.1
+
+### Patch Changes
+
+- 3ed6f5a: Improve prop updates
+
 ## 0.3.0
 
 ### Minor Changes
