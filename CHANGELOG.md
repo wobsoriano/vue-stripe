@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.3.2
+
+### Patch Changes
+
+- 3966bf0: Fix undefined destructure props
+
 ## 0.3.1
 
 ### Patch Changes
