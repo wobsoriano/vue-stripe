@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.3.3
+
+### Patch Changes
+
+- 872a4a0: Add unit tests for Elements component
+
 ## 0.3.2
 
 ### Patch Changes
