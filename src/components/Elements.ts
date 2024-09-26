@@ -59,7 +59,7 @@ export const Elements = defineComponent((props: {
 })
 
 export function useElementsContextWithUseCase(useCaseMessage: string): ElementsContextValue {
-  const ctx = inject(ElementsKey)
+  const ctx = inject(ElementsKey, undefined)
   return parseElementsContext(ctx, useCaseMessage)
 }
 
