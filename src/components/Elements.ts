@@ -1,6 +1,6 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { Ref, ShallowRef } from 'vue'
-import { computed, defineComponent, inject, provide, shallowRef, toRef, watch, watchEffect } from 'vue'
+import { defineComponent, inject, provide, shallowRef, toRef, watch, watchEffect } from 'vue'
 import { ElementsKey } from '../keys'
 
 export interface ElementsContextValue {
@@ -34,11 +34,10 @@ export const Elements = defineComponent((props: {
     }
   })
 
-  const stripeElementUpdateOptions = computed(() => {
+  watch(() => {
     const { clientSecret, fonts, ...rest } = props.options ?? {}
     return rest
-  })
-  watch(stripeElementUpdateOptions, (updatedOptions) => {
+  }, (updatedOptions) => {
     if (!elements.value) {
       return
     }
@@ -59,7 +58,7 @@ export const Elements = defineComponent((props: {
 })
 
 export function useElementsContextWithUseCase(useCaseMessage: string): ElementsContextValue {
-  const ctx = inject(ElementsKey)
+  const ctx = inject(ElementsKey, undefined)
   return parseElementsContext(ctx, useCaseMessage)
 }
 

@@ -105,13 +105,13 @@ export function useElementsOrCustomCheckoutSdkContextWithUseCase(useCaseString: 
 }
 
 export function useCustomCheckoutSdkContextWithUseCase(useCaseString: string): CustomCheckoutSdkContextValue {
-  const ctx = inject(CustomCheckoutSdkKey)
+  const ctx = inject(CustomCheckoutSdkKey, undefined)
   return parseCustomCheckoutSdkContext(ctx, useCaseString)
 }
 
 export function useCustomCheckout() {
   useCustomCheckoutSdkContextWithUseCase('calls useCustomCheckout()')
-  const ctx = inject(CustomCheckoutSdkKey)
+  const ctx = inject(CustomCheckoutSdkKey, undefined)
   if (!ctx) {
     throw new Error(
       'Could not find CustomCheckout Context; You need to wrap the part of your app that calls useCustomCheckout() in an <CustomCheckoutProvider> provider.',
