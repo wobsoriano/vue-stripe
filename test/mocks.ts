@@ -10,7 +10,7 @@ export function mockElement() {
 }
 
 export function mockElements() {
-  const elements = {}
+  const elements: Record<string, ReturnType<typeof mockElement>> = {}
   return {
     create: vi.fn((type) => {
       elements[type] = mockElement()
@@ -42,7 +42,7 @@ export function mockCustomCheckoutSession() {
 }
 
 export function mockCustomCheckoutSdk() {
-  const elements = {}
+  const elements: Record<string, ReturnType<typeof mockElement>> = {}
 
   return {
     changeAppearance: vi.fn(),
