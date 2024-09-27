@@ -20,10 +20,9 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
     const element = ref<stripeJs.StripeElement | null>(null)
     const domRef = ref<HTMLDivElement | null>(null)
 
-    watchEffect(() => {
+    watchEffect((onInvalidate) => {
       if (element.value === null && domRef.value !== null && (customCheckoutSdk?.value || elements?.value)) {
         let newElement: stripeJs.StripeElement | null = null
-
         if (customCheckoutSdk?.value) {
           newElement = customCheckoutSdk.value.createElement(type as any, props.options)
         }
@@ -37,6 +36,12 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
           newElement.mount(domRef.value)
         }
       }
+
+      onInvalidate(() => {
+        if (element.value && typeof element.value.destroy === 'function') {
+          element.value.destroy()
+        }
+      })
     })
 
     useAttachEvent(element, 'blur', emit)
@@ -61,8 +66,12 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
       ref: domRef,
     })
   }, {
+    inheritAttrs: false,
     name: displayName,
+    props: ['id', 'class', 'options'],
   })
+
+  ;(wrapper as any).__elementType = type
 
   return wrapper as typeof wrapper & {
     new (...args: any): {
