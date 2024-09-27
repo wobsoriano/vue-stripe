@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.3.4
+
+### Patch Changes
+
+- 046f4be: Fix missing \_\_elementType
+
 ## 0.3.3
 
 ### Patch Changes
