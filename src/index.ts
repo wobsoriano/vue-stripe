@@ -1,5 +1,4 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { ComponentInstance } from 'vue'
 import type {
   AddressElementEmits,
   AddressElementProps,
@@ -59,45 +58,26 @@ export const PaymentMethodMessagingElement = createElementComponent<PaymentMetho
 export const AffirmMessageElement = createElementComponent<AffirmMessageElementProps, AffirmMessageElementEmits>('affirmMessage')
 export const AfterpayClearpayMessageElement = createElementComponent<AfterpayClearpayMessageElementProps, AfterpayClearpayMessageElementEmits>('afterpayClearpayMessage')
 
-type AuBankAccountElementComponent = ComponentInstance<typeof AuBankAccountElement>
-type CardElementComponent = ComponentInstance<typeof CardElement>
-type CardNumberElementComponent = ComponentInstance<typeof CardNumberElement>
-type CardExpiryElementComponent = ComponentInstance<typeof CardExpiryElement>
-type CardCvcElementComponent = ComponentInstance<typeof CardCvcElement>
-type FpxBankElementComponent = ComponentInstance<typeof FpxBankElement>
-type IbanElementComponent = ComponentInstance<typeof IbanElement>
-type IdealBankElementComponent = ComponentInstance<typeof IdealBankElement>
-type P24BankElementComponent = ComponentInstance<typeof P24BankElement>
-type EpsBankElementComponent = ComponentInstance<typeof EpsBankElement>
-type LinkAuthenticationElementComponent = ComponentInstance<typeof LinkAuthenticationElement>
-type PaymentElementComponent = ComponentInstance<typeof PaymentElement>
-type ExpressCheckoutElementComponent = ComponentInstance<typeof ExpressCheckoutElement>
-type PaymentRequestButtonElementComponent = ComponentInstance<typeof PaymentRequestButtonElement>
-type AddressElementComponent = ComponentInstance<typeof AddressElement>
-type PaymentMethodMessagingElementComponent = ComponentInstance<typeof PaymentMethodMessagingElement>
-type AffirmMessageElementComponent = ComponentInstance<typeof AffirmMessageElement>
-type AfterpayClearpayMessageElementComponent = ComponentInstance<typeof AfterpayClearpayMessageElement>
-
 declare module '@stripe/stripe-js' {
   interface StripeElements {
-    getElement(component: AuBankAccountElementComponent): stripeJs.StripeAuBankAccountElement | null
-    getElement(component: CardElementComponent): stripeJs.StripeCardElement | null
-    getElement(component: CardNumberElementComponent): stripeJs.StripeCardNumberElement | null
-    getElement(component: CardExpiryElementComponent): stripeJs.StripeCardExpiryElement | null
-    getElement(component: CardCvcElementComponent): stripeJs.StripeCardCvcElement | null
-    getElement(component: FpxBankElementComponent): stripeJs.StripeFpxBankElement | null
-    getElement(component: IbanElementComponent): stripeJs.StripeIbanElement | null
-    getElement(component: IdealBankElementComponent): stripeJs.StripeIdealBankElement | null
-    getElement(component: P24BankElementComponent): stripeJs.StripeP24BankElement | null
-    getElement(component: EpsBankElementComponent): stripeJs.StripeEpsBankElement | null
-    getElement(component: LinkAuthenticationElementComponent): stripeJs.StripeLinkAuthenticationElement | null
-    getElement(component: PaymentElementComponent): stripeJs.StripePaymentElement | null
-    getElement(component: ExpressCheckoutElementComponent): stripeJs.StripeExpressCheckoutElement | null
-    getElement(component: PaymentRequestButtonElementComponent): stripeJs.StripePaymentRequestButtonElement | null
-    getElement(component: AddressElementComponent): stripeJs.StripeAddressElement | null
-    getElement(component: PaymentMethodMessagingElementComponent): stripeJs.StripePaymentMethodMessagingElement | null
-    getElement(component: AffirmMessageElementComponent): stripeJs.StripeAffirmMessageElement | null
-    getElement(component: AfterpayClearpayMessageElementComponent): stripeJs.StripeAfterpayClearpayMessageElement | null
+    getElement(component: typeof AuBankAccountElement): stripeJs.StripeAuBankAccountElement | null
+    getElement(component: typeof CardElement): stripeJs.StripeCardElement | null
+    getElement(component: typeof CardNumberElement): stripeJs.StripeCardNumberElement | null
+    getElement(component: typeof CardExpiryElement): stripeJs.StripeCardExpiryElement | null
+    getElement(component: typeof CardCvcElement): stripeJs.StripeCardCvcElement | null
+    getElement(component: typeof FpxBankElement): stripeJs.StripeFpxBankElement | null
+    getElement(component: typeof IbanElement): stripeJs.StripeIbanElement | null
+    getElement(component: typeof IdealBankElement): stripeJs.StripeIdealBankElement | null
+    getElement(component: typeof P24BankElement): stripeJs.StripeP24BankElement | null
+    getElement(component: typeof EpsBankElement): stripeJs.StripeEpsBankElement | null
+    getElement(component: typeof LinkAuthenticationElement): stripeJs.StripeLinkAuthenticationElement | null
+    getElement(component: typeof PaymentElement): stripeJs.StripePaymentElement | null
+    getElement(component: typeof ExpressCheckoutElement): stripeJs.StripeExpressCheckoutElement | null
+    getElement(component: typeof PaymentRequestButtonElement): stripeJs.StripePaymentRequestButtonElement | null
+    getElement(component: typeof AddressElement): stripeJs.StripeAddressElement | null
+    getElement(component: typeof PaymentMethodMessagingElement): stripeJs.StripePaymentMethodMessagingElement | null
+    getElement(component: typeof AffirmMessageElement): stripeJs.StripeAffirmMessageElement | null
+    getElement(component: typeof AfterpayClearpayMessageElement): stripeJs.StripeAfterpayClearpayMessageElement | null
   }
 }
 
