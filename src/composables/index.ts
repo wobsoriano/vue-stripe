@@ -1,6 +1,6 @@
 import type { StripeElement } from '@stripe/stripe-js'
 import type { ShallowRef } from 'vue'
-import { watchEffect } from 'vue'
+import { toRaw, watchEffect } from 'vue'
 
 export function useAttachEvent(
   element: ShallowRef<StripeElement | null>,
@@ -15,7 +15,7 @@ export function useAttachEvent(
 
     function cbWithEmit(...args: unknown[]) {
       if (shouldEmitElement) {
-        emit(event, element.value)
+        emit(event, toRaw(element.value))
       }
       else {
         emit(event, ...args)
