@@ -10,7 +10,7 @@ const runtimeConfig = useRuntimeConfig()
 onMounted(async () => {
   stripe.value = await loadStripe(runtimeConfig.public.stripePublicKey)
   clientSecret.value = await $fetch('/api/create-checkout-session', {
-    method: 'POST'
+    method: 'POST',
   })
 })
 </script>

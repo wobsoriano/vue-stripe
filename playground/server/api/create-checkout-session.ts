@@ -14,7 +14,7 @@ async function createTestPriceId() {
   return price.id
 }
 
-export default eventHandler(async (event) => {
+export default eventHandler(async () => {
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
     line_items: [

@@ -1,5 +1,5 @@
 <template>
-    <div>
+  <div>
     return page
-    </div>
+  </div>
 </template>
