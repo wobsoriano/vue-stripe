@@ -116,7 +116,7 @@ describe('createElementComponent', () => {
 
     const elementContainer = container.firstElementChild as Element
 
-    expect(elementContainer.className).toBe('bar')
+    expect(elementContainer).toHaveClass('bar')
   })
 
   it('creates the element with options', async () => {
