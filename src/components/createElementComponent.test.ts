@@ -5,6 +5,7 @@ import * as mocks from '../../test/mocks'
 import * as CheckoutModule from './CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
 import * as ElementsModule from './Elements'
+import type { UnknownOptions } from '../types'
 
 const { Elements } = ElementsModule
 
@@ -635,5 +636,118 @@ describe('createElementComponent', () => {
     simulateEvent('shippingratechange', shippingRateChangeEventMock)
     expect(mockHandler2).toHaveBeenCalledWith(shippingRateChangeEventMock)
     expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('updates the Element when options change', async () => {
+    const options = ref({ style: { base: { fontSize: '20px' } } })
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, { options: options.value }))
+      },
+    })
+
+    render(parent)
+
+    options.value.style.base.fontSize = '30px'
+    await nextTick()
+
+    expect(mockElement.update).toHaveBeenCalledWith({
+      style: { base: { fontSize: '30px' } },
+    })
+
+    options.value = { style: { base: { fontSize: '40px' } } }
+    await nextTick()
+
+    expect(mockElement.update).toHaveBeenCalledWith({
+      style: { base: { fontSize: '40px' } },
+    })
+  })
+
+  it('does not trigger unnecessary updates', async () => {
+    const options = ref({ style: { base: { fontSize: '20px' } } })
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, { options: options.value }))
+      },
+    })
+
+    render(parent)
+
+    options.value.style.base.fontSize = '20px'
+    await nextTick()
+
+    expect(mockElement.update).not.toHaveBeenCalled()
+  })
+
+  it.todo('warns on changes to non-updatable options', () => { })
+
+  it('destroys an existing Element when the component unmounts', async () => {
+    const component = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: null,
+        }, () => h(CardElement))
+      },
+    })
+    const { unmount } = render(component)
+    unmount()
+
+    // not called when Element has not been mounted (because stripe is still loading)
+    expect(mockElement.destroy).not.toHaveBeenCalled()
+
+    const component2 = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement))
+      },
+    })
+    const { unmount: unmount2 } = render(component2)
+    await nextTick()
+    unmount2()
+    expect(mockElement.destroy).toHaveBeenCalled()
+  })
+
+  it('destroys an existing Element when the component unmounts with an async stripe prop', async () => {
+    const stripePromise = Promise.resolve(mockStripe)
+
+    const component = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: stripePromise as any,
+        }, () => h(CardElement))
+      },
+    })
+    const { unmount } = render(component)
+
+    await nextTick()
+    await stripePromise
+
+    unmount()
+    expect(mockElement.destroy).toHaveBeenCalled()
+  })
+
+  it('updates the Element when options change from null to non-null value', async () => {
+    const options = ref<UnknownOptions | null>(null)
+    const component = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+          // @ts-expect-error: options is required
+        }, () => h(CardElement, { options: options.value }))
+      },
+    })
+    render(component)
+
+    options.value = { style: { base: { fontSize: '30px' } } }
+    await nextTick()
+
+    expect(mockElement.update).toHaveBeenCalledWith({
+      style: { base: { fontSize: '30px' } },
+    })
   })
 })

@@ -75,7 +75,7 @@ export const Elements = defineComponent({
       }
 
       elements.value.update(stripeElementUpdateOptions)
-    })
+    }, { deep: true })
 
     provide(ElementsKey, {
       stripe: computed(() => stripe.value),

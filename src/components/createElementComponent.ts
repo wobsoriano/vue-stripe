@@ -88,7 +88,7 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
 
       // @ts-expect-error: TODO, why is update method not typed
       elementRef.value.update(options)
-    })
+    }, { deep: true })
 
     // For every event where the merchant provides a callback, call element.on
     // with that callback. If the merchant ever changes the callback, removes
