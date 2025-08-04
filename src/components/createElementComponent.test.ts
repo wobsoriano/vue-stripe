@@ -1,7 +1,7 @@
 import { render } from '@testing-library/vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
+import { computed, defineComponent, h, nextTick, ref, shallowRef } from 'vue'
 import * as mocks from '../../test/mocks'
 import * as CheckoutModule from './CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
@@ -251,5 +251,85 @@ describe('createElementComponent', () => {
     const changeEventMock = Symbol('change')
     simulateEvent('change', changeEventMock)
     expect(mockHandler).toHaveBeenCalledWith(changeEventMock)
+  })
+
+  it('removes event handler when removed on re-render', async () => {
+    const mockHandler = vi.fn()
+    const rerenderCount = ref(0)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+          key: rerenderCount.value,
+        }, () => h(CardElement, {
+          onChange: mockHandler,
+        }))
+      },
+    })
+
+    render(parent)
+    await nextTick()
+
+    expect(simulateOn).toBeCalledWith('change', expect.any(Function))
+    expect(simulateOff).not.toBeCalled()
+
+    rerenderCount.value++
+    await nextTick()
+
+    expect(simulateOff).toBeCalledWith('change', expect.any(Function))
+  })
+
+  it('does not call on/off when an event handler changes', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onChange = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onChange: onChange.value,
+        }))
+      },
+    })
+
+    render(parent)
+    await nextTick()
+
+    expect(simulateOn).toBeCalledWith('change', expect.any(Function))
+
+    onChange.value = mockHandler2
+    await nextTick()
+
+    expect(simulateOn).toBeCalledTimes(1)
+    expect(simulateOff).not.toBeCalled()
+  })
+
+  it('propagates the Element`s ready event to the current onReady prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onReady = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onReady: onReady.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onReady.value = mockHandler2
+    await nextTick()
+
+    const mockEvent = Symbol('ready')
+    simulateEvent('ready', mockEvent)
+    expect(mockHandler2).toHaveBeenCalledWith(mockElement)
+    expect(mockHandler).not.toHaveBeenCalled()
   })
 })
