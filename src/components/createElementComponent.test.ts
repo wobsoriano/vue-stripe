@@ -1,11 +1,13 @@
-import { render } from '@testing-library/vue';
+import { render } from '@testing-library/vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, ref, watchEffect } from 'vue'
+import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
 import * as mocks from '../../test/mocks'
+import * as CheckoutModule from './CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
+import * as ElementsModule from './Elements'
 
-import { Elements } from './Elements'
+const { Elements } = ElementsModule
 
 describe('createElementComponent', () => {
   let mockStripe: any
@@ -156,29 +158,24 @@ describe('createElementComponent', () => {
     expect(Object.keys(emitted()).length).toBe(0)
   })
 
-  it.only('does not create and mount until Elements has been instantiated', async () => {
+  it('does not create and mount until Elements has been instantiated', async () => {
+    const stripe = shallowRef(null)
+
     const component = defineComponent({
-      props: {
-        stripe: {
-          type: Object,
-          required: false,
-        }
-      },
-      setup(props) {
+      setup() {
         return () => h(Elements, {
-          stripe: props.stripe || null,
+          stripe: stripe.value,
         }, () => h(CardElement))
       },
     })
 
-    const { rerender } = render(component)
+    render(component)
 
     expect(mockElement.mount).not.toHaveBeenCalled()
     expect(mockElements.create).not.toHaveBeenCalled()
 
-    await rerender({
-      stripe: mockStripe
-    })
+    stripe.value = mockStripe
+    await nextTick()
 
     expect(mockElement.mount).toHaveBeenCalled()
     expect(mockElements.create).toHaveBeenCalled()
@@ -209,8 +206,47 @@ describe('createElementComponent', () => {
       },
     })
 
-    mount(parent)
+    render(parent)
     await nextTick()
+
+    const changeEventMock = Symbol('change')
+    simulateEvent('change', changeEventMock)
+    expect(mockHandler).toHaveBeenCalledWith(changeEventMock)
+  })
+
+  it('attaches event listeners once the element is created', async () => {
+    const elementsRef = shallowRef(null)
+    const stripeRef = shallowRef(null)
+
+    vi.spyOn(CheckoutModule, 'useElementsOrCheckoutSdkContextWithUseCase').mockReturnValue({ elements: elementsRef, stripe: stripeRef })
+
+    const mockHandler = vi.fn()
+
+    // This won't create the element, since elements is undefined on this render
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onChange: mockHandler,
+        }))
+      },
+    })
+    // This won't create the element, since elements is undefined on this render
+    render(parent)
+    expect(mockElements.create).not.toBeCalled()
+
+    expect(simulateOn).not.toBeCalled()
+
+    // This creates the element now that elements is defined
+    elementsRef.value = mockElements
+    stripeRef.value = mockStripe
+    await nextTick()
+
+    expect(mockElements.create).toBeCalled()
+
+    expect(simulateOn).toBeCalledWith('change', expect.any(Function))
+    expect(simulateOff).not.toBeCalled()
 
     const changeEventMock = Symbol('change')
     simulateEvent('change', changeEventMock)

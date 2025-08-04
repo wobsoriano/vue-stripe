@@ -62,6 +62,7 @@ export const Elements = defineComponent({
       else if (parsed.value.tag === 'sync' && !stripe.value) {
         // Or, handle a sync stripe instance going from null -> populated
         stripe.value = parsed.value.stripe
+        elements.value = parsed.value.stripe.elements(props.options as UnknownOptions)
       }
     })
 

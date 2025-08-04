@@ -26,7 +26,6 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
     watchEffect(() => {
       if (elementRef.value === null && domNode.value !== null && (elements?.value || checkoutSdk?.value)) {
         let newElement: stripeJs.StripeElement | null = null
-        console.log('I AM INSIDE')
 
         if (checkoutSdk?.value) {
           switch (type) {
