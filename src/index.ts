@@ -81,19 +81,11 @@ declare module '@stripe/stripe-js' {
   }
 }
 
-export {
-  CustomCheckoutProvider,
-  useCustomCheckout,
-} from './components/CustomCheckout'
-
+export { CheckoutProvider, useCheckout } from './components/CheckoutProvider'
 export {
   Elements,
   useElements,
 } from './components/Elements'
-
 export { EmbeddedCheckout } from './components/EmbeddedCheckout'
-
 export { EmbeddedCheckoutProvider } from './components/EmbeddedCheckoutProvider'
-export {
-  useStripe,
-} from './components/useStripe'
+export { useStripe } from './components/useStripe'
