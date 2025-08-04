@@ -15,8 +15,8 @@ importers:
         specifier: ^2.27.8
         version: 2.27.8
       '@stripe/stripe-js':
-        specifier: ^4.5.0
-        version: 4.5.0
+        specifier: ^7.8.0
+        version: 7.8.0
       '@vitejs/plugin-vue':
         specifier: ^5.1.4
         version: 5.1.4(vite@5.0.12(@types/node@22.5.5)(terser@5.33.0))(vue@3.5.8(typescript@5.5.4))
@@ -1398,8 +1398,8 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
-  '@stripe/stripe-js@4.5.0':
-    resolution: {integrity: sha512-dMOzc58AOlsF20nYM/avzV8RFhO/vgYTY7ajLMH6mjlnZysnOHZxsECQvjEmL8Q/ukPwHkOnxSPW/QGCCnp7XA==}
+  '@stripe/stripe-js@7.8.0':
+    resolution: {integrity: sha512-DNXRfYUgkZlrniQORbA/wH8CdFRhiBSE0R56gYU0V5vvpJ9WZwvGrz9tBAZmfq2aTgw6SK7mNpmTizGzLWVezw==}
     engines: {node: '>=12.16'}
 
   '@stylistic/eslint-plugin@2.8.0':
@@ -6566,7 +6566,7 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
-  '@stripe/stripe-js@4.5.0': {}
+  '@stripe/stripe-js@7.8.0': {}
 
   '@stylistic/eslint-plugin@2.8.0(eslint@9.11.0(jiti@1.21.6))(typescript@5.5.4)':
     dependencies:

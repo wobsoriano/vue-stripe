@@ -200,3 +200,5 @@ export interface AfterpayClearpayMessageElementProps extends ElementProps {
 export interface AfterpayClearpayMessageElementEmits extends BaseElementEmits {
   (e: 'ready', element: stripeJs.StripeAfterpayClearpayMessageElement): void
 }
+
+export type UnknownOptions = { [k: string]: unknown }

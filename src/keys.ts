@@ -1,9 +1,9 @@
 import type { ComputedRef, InjectionKey, Ref } from 'vue'
-import type { CustomCheckoutContextValue, CustomCheckoutSdkContextValue } from './components/CustomCheckout'
+import type { CheckoutSdkContextValue, CheckoutContextValue } from './components/CheckoutProvider'
 import type { ElementsContextValue } from './components/Elements'
 import type { EmbeddedCheckoutContextValue } from './components/EmbeddedCheckoutProvider'
 
 export const ElementsKey = Symbol('elements') as InjectionKey<ElementsContextValue>
-export const CustomCheckoutSdkKey = Symbol('custom checkout sdk') as InjectionKey<CustomCheckoutSdkContextValue>
-export const CustomCheckoutKey = Symbol('custom checkout') as InjectionKey<ComputedRef<CustomCheckoutContextValue | null>>
+export const CheckoutSdkKey = Symbol('checkout sdk') as InjectionKey<CheckoutSdkContextValue>
+export const CheckoutKey = Symbol('checkout') as InjectionKey<ComputedRef<CheckoutContextValue | null>>
 export const EmbeddedCheckoutKey = Symbol('embedded checkout') as InjectionKey<Ref<EmbeddedCheckoutContextValue>>
