@@ -52,7 +52,7 @@ export const CheckoutProvider = defineComponent({
     options: {
       type: Object as PropType<stripeJs.StripeCheckoutOptions>,
       required: true,
-    }
+    },
   },
   setup(props, { slots }) {
     const checkoutSdk = shallowRef<stripeJs.StripeCheckout | null>(null)
@@ -88,7 +88,7 @@ export const CheckoutProvider = defineComponent({
     })
 
     return () => slots.default?.()
-  }
+  },
 })
 
 export function useElementsOrCheckoutSdkContextWithUseCase(useCaseString: string) {
