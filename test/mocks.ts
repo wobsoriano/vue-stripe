@@ -23,7 +23,7 @@ export function mockElements() {
   }
 }
 
-export function mockCustomCheckoutSession() {
+export function mockCheckoutSession() {
   return {
     lineItems: [],
     currency: 'usd',
@@ -41,19 +41,41 @@ export function mockCustomCheckoutSession() {
   }
 }
 
-export function mockCustomCheckoutSdk() {
+export function mockCheckoutSdk() {
   const elements: Record<string, ReturnType<typeof mockElement>> = {}
 
   return {
     changeAppearance: vi.fn(),
-    createElement: vi.fn((type) => {
-      elements[type] = mockElement()
-      return elements[type]
+    loadFonts: vi.fn(),
+    createPaymentElement: vi.fn(() => {
+      elements.payment = mockElement()
+      return elements.payment
     }),
-    getElement: vi.fn((type) => {
-      return elements[type] || null
+    createBillingAddressElement: vi.fn(() => {
+      elements.billingAddress = mockElement()
+      return elements.billingAddress
     }),
-    session: vi.fn(() => mockCustomCheckoutSession()),
+    createShippingAddressElement: vi.fn(() => {
+      elements.shippingAddress = mockElement()
+      return elements.shippingAddress
+    }),
+    createExpressCheckoutElement: vi.fn(() => {
+      elements.expressCheckout = mockElement()
+      return elements.expressCheckout
+    }),
+    getPaymentElement: vi.fn(() => {
+      return elements.payment || null
+    }),
+    getBillingAddressElement: vi.fn(() => {
+      return elements.billingAddress || null
+    }),
+    getShippingAddressElement: vi.fn(() => {
+      return elements.shippingAddress || null
+    }),
+    getExpressCheckoutElement: vi.fn(() => {
+      return elements.expressCheckout || null
+    }),
+    session: vi.fn(() => mockCheckoutSession()),
     applyPromotionCode: vi.fn(),
     removePromotionCode: vi.fn(),
     updateShippingAddress: vi.fn(),
@@ -76,7 +98,7 @@ export function mockEmbeddedCheckout() {
 }
 
 export function mockStripe() {
-  const customCheckoutSdk = mockCustomCheckoutSdk()
+  const checkoutSdk = mockCheckoutSdk()
   return {
     elements: vi.fn(() => mockElements()),
     createToken: vi.fn(),
@@ -87,7 +109,7 @@ export function mockStripe() {
     paymentRequest: vi.fn(),
     registerAppInfo: vi.fn(),
     _registerWrapper: vi.fn(),
-    initCustomCheckout: vi.fn().mockResolvedValue(customCheckoutSdk),
+    initCheckout: vi.fn().mockResolvedValue(checkoutSdk),
     initEmbeddedCheckout: vi.fn(() =>
       Promise.resolve(mockEmbeddedCheckout()),
     ),

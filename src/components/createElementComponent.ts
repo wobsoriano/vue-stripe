@@ -16,16 +16,17 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
 ) {
   const displayName = `${capitalized(type)}Element`
 
-  const Element = defineComponent((props: PrivateElementProps<Props>, { emit }) => {
+  const Element = defineComponent((props: PrivateElementProps<Props>, { emit, attrs }) => {
     const ctx = useElementsOrCheckoutSdkContextWithUseCase(`mounts <${displayName}>`)
     const elements = 'elements' in ctx ? ctx.elements : null
     const checkoutSdk = 'checkoutSdk' in ctx ? ctx.checkoutSdk : null
     const elementRef = shallowRef<stripeJs.StripeElement | null>(null)
-    const domRef = ref<HTMLDivElement | null>(null)
+    const domNode = ref<HTMLDivElement | null>(null)
 
     watchEffect(() => {
-      if (elementRef.value === null && domRef.value !== null && (elements?.value || checkoutSdk?.value)) {
+      if (elementRef.value === null && domNode.value !== null && (elements?.value || checkoutSdk?.value)) {
         let newElement: stripeJs.StripeElement | null = null
+        console.log('I AM INSIDE')
 
         if (checkoutSdk?.value) {
           switch (type) {
@@ -76,7 +77,7 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
         elementRef.value = newElement
 
         if (newElement) {
-          newElement.mount(domRef.value)
+          newElement.mount(domNode.value)
         }
       }
     })
@@ -93,21 +94,21 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
     // For every event where the merchant provides a callback, call element.on
     // with that callback. If the merchant ever changes the callback, removes
     // the old callback with element.off and then call element.on with the new one.
-    useAttachEvent(elementRef, 'blur', emit)
-    useAttachEvent(elementRef, 'focus', emit)
-    useAttachEvent(elementRef, 'escape', emit)
-    useAttachEvent(elementRef, 'click', emit)
-    useAttachEvent(elementRef, 'loaderror', emit)
-    useAttachEvent(elementRef, 'loaderstart', emit)
-    useAttachEvent(elementRef, 'networkschange', emit)
-    useAttachEvent(elementRef, 'confirm', emit)
-    useAttachEvent(elementRef, 'cancel', emit)
-    useAttachEvent(elementRef, 'shippingaddresschange', emit)
-    useAttachEvent(elementRef, 'shippingratechange', emit)
-    useAttachEvent(elementRef, 'change', emit)
+    useAttachEvent(elementRef, 'blur', emit, Boolean(attrs.onBlur))
+    useAttachEvent(elementRef, 'focus', emit, Boolean(attrs.onFocus))
+    useAttachEvent(elementRef, 'escape', emit, Boolean(attrs.onEscape))
+    useAttachEvent(elementRef, 'click', emit, Boolean(attrs.onClick))
+    useAttachEvent(elementRef, 'loaderror', emit, Boolean(attrs.onLoaderror))
+    useAttachEvent(elementRef, 'loaderstart', emit, Boolean(attrs.onLoaderstart))
+    useAttachEvent(elementRef, 'networkschange', emit, Boolean(attrs.onNetworkschange))
+    useAttachEvent(elementRef, 'confirm', emit, Boolean(attrs.onConfirm))
+    useAttachEvent(elementRef, 'cancel', emit, Boolean(attrs.onCancel))
+    useAttachEvent(elementRef, 'shippingaddresschange', emit, Boolean(attrs.onShippingaddresschange))
+    useAttachEvent(elementRef, 'shippingratechange', emit, Boolean(attrs.onShippingratechange))
+    useAttachEvent(elementRef, 'change', emit, Boolean(attrs.onChange))
 
-    const emitElement = type !== 'expressCheckout'
-    useAttachEvent(elementRef, 'ready', emit, emitElement)
+    const shouldEmitElement = type !== 'expressCheckout'
+    useAttachEvent(elementRef, 'ready', emit, Boolean(attrs.onReady), shouldEmitElement)
 
     onUnmounted(() => {
       const currentElement = elementRef.value
@@ -122,7 +123,7 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
     return () => h('div', {
       id: props.id,
       class: props.class,
-      ref: domRef,
+      ref: domNode,
     })
   }, {
     inheritAttrs: false,
@@ -143,10 +144,13 @@ export function useAttachEvent(
   element: ShallowRef<stripeJs.StripeElement | null>,
   event: string,
   emit: (event: any, ...args: unknown[]) => void,
+  // Whether to listen for the event
+  isListeningForEvent: boolean,
+  // Emit with the element as payload
   shouldEmitElement = false,
 ) {
   watchEffect((onInvalidate) => {
-    if (!element.value) {
+    if (!element.value || !isListeningForEvent) {
       return
     }
 

@@ -1,6 +1,7 @@
+import { render } from '@testing-library/vue';
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, ref } from 'vue'
+import { defineComponent, h, nextTick, ref, watchEffect } from 'vue'
 import * as mocks from '../../test/mocks'
 import { createElementComponent } from './createElementComponent'
 
@@ -10,7 +11,7 @@ describe('createElementComponent', () => {
   let mockStripe: any
   let mockElements: any
   let mockElement: any
-  let mockCustomCheckoutSdk: any
+  let mockCheckoutSdk: any
 
   let simulateElementsEvents: Record<string, any[]>
   let simulateOn: any
@@ -22,12 +23,15 @@ describe('createElementComponent', () => {
   beforeEach(() => {
     mockStripe = mocks.mockStripe()
     mockElements = mocks.mockElements()
-    mockCustomCheckoutSdk = mocks.mockCustomCheckoutSdk()
+    mockCheckoutSdk = mocks.mockCheckoutSdk()
     mockElement = mocks.mockElement()
     mockStripe.elements.mockReturnValue(mockElements)
     mockElements.create.mockReturnValue(mockElement)
-    mockStripe.initCustomCheckout.mockResolvedValue(mockCustomCheckoutSdk)
-    mockCustomCheckoutSdk.createElement.mockReturnValue(mockElement)
+    mockStripe.initCheckout.mockResolvedValue(mockCheckoutSdk)
+    mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement)
+    mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement)
+    mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement)
+    mockCheckoutSdk.createExpressCheckoutElement.mockReturnValue(mockElement)
 
     simulateElementsEvents = {}
     simulateOn = vi.fn((event, fn) => {
@@ -52,7 +56,7 @@ describe('createElementComponent', () => {
 
   const CardElement = createElementComponent('card')
 
-  it.todo('can remove and add CardElement at the same time', () => {
+  it('can remove and add CardElement at the same time', () => {
     let cardMounted = false
     mockElement.mount.mockImplementation(() => {
       if (cardMounted) {
@@ -89,102 +93,92 @@ describe('createElementComponent', () => {
   })
 
   it('passes id to the wrapping DOM element', () => {
-    const child = defineComponent(() => {
-      return () => h(CardElement, { id: 'foo' })
-    }, { name: 'Child' })
-
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(child))
-      },
+    const parent = defineComponent(() => {
+      return () => h(Elements, { stripe: mockStripe }, () => h(CardElement, { id: 'foo' }))
     })
 
-    const wrapper = mount(parent)
+    const { container } = render(parent)
 
-    expect(wrapper.findComponent({ name: 'Child' }).element.id).toBe('foo')
+    const elementContainer = container.firstElementChild as Element
+
+    expect(elementContainer.id).toBe('foo')
   })
 
   it('passes class to the wrapping DOM element', () => {
-    const child = defineComponent(() => {
-      return () => h(CardElement, { class: 'bar' })
-    }, { name: 'Child' })
-
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(child))
-      },
+    const parent = defineComponent(() => {
+      return () => h(Elements, { stripe: mockStripe }, () => h(CardElement, { class: 'bar' }))
     })
 
-    const wrapper = mount(parent)
-    expect(wrapper.findComponent({ name: 'Child' }).classes('bar')).toBe(true)
+    const { container } = render(parent)
+
+    const elementContainer = container.firstElementChild as Element
+
+    expect(elementContainer.className).toBe('bar')
   })
 
   it('creates the element with options', async () => {
     const options: any = { foo: 'foo' }
-    const child = defineComponent(() => {
-      return () => h(CardElement, { options })
-    })
 
     const parent = defineComponent({
       setup() {
         return () => h(Elements, {
           stripe: mockStripe,
-        }, () => h(child))
+        }, () => h(CardElement, { options }))
       },
     })
 
-    const wrapper = mount(parent)
+    const wrapper = render(parent)
 
     await nextTick()
     expect(mockElements.create).toHaveBeenCalledWith('card', options)
+
     expect(Object.keys(wrapper.emitted()).length).toBe(0)
+    expect(simulateOn).not.toBeCalled()
+    expect(simulateOff).not.toBeCalled()
   })
 
-  it.todo('mounts the element', async () => {
-    const child = defineComponent(() => {
-      return () => h(CardElement)
-    }, { name: 'Child' })
-
-    const parent = defineComponent({
+  it('mounts the element', async () => {
+    const component = defineComponent({
       setup() {
         return () => h(Elements, {
           stripe: mockStripe,
-        }, () => h(child))
+        }, () => h(CardElement))
       },
     })
 
-    const wrapper = mount(parent)
-    expect(mockElement.mount).toHaveBeenCalledWith(wrapper.findComponent({ name: 'Child' }).element)
+    const { container, emitted } = render(component)
 
-    // expect(Object.keys(wrapper.emitted()).length).toBe(0)
+    // TODO: Fix this line
+    expect(mockElement.mount).toHaveBeenCalledWith(container.firstElementChild)
+
+    expect(simulateOn).not.toBeCalled()
+    expect(simulateOff).not.toBeCalled()
+    expect(Object.keys(emitted()).length).toBe(0)
   })
 
-  it('does not create and mount until Elements has been instantiated', async () => {
-    const child = defineComponent(() => {
-      return () => h(CardElement)
-    }, { name: 'Child' })
-
-    const stripe = ref(null)
-    const parent = defineComponent({
-      setup() {
+  it.only('does not create and mount until Elements has been instantiated', async () => {
+    const component = defineComponent({
+      props: {
+        stripe: {
+          type: Object,
+          required: false,
+        }
+      },
+      setup(props) {
         return () => h(Elements, {
-          stripe: stripe.value,
-        }, () => h(child))
+          stripe: props.stripe || null,
+        }, () => h(CardElement))
       },
     })
 
-    mount(parent)
+    const { rerender } = render(component)
 
     expect(mockElement.mount).not.toHaveBeenCalled()
     expect(mockElements.create).not.toHaveBeenCalled()
 
-    stripe.value = mockStripe
-
-    await nextTick()
+    await rerender({
+      stripe: mockStripe
+    })
 
     expect(mockElement.mount).toHaveBeenCalled()
     expect(mockElements.create).toHaveBeenCalled()

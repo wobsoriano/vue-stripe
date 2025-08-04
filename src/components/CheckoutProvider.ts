@@ -1,5 +1,5 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { PropType, Ref } from 'vue'
+import type { ComputedRef, PropType, Ref } from 'vue'
 import { computed, defineComponent, inject, provide, shallowRef, watch, watchEffect } from 'vue'
 import { CheckoutKey, CheckoutSdkKey, ElementsKey } from '../keys'
 import { parseElementsContext } from './Elements'
@@ -24,7 +24,7 @@ export function parseCheckoutSdkContext(
 
 type StripeCheckoutActions = Omit<Omit<stripeJs.StripeCheckout, 'session'>, 'on'>
 
-interface CheckoutContextValue extends StripeCheckoutActions, stripeJs.StripeCheckoutSession {}
+export interface CheckoutContextValue extends StripeCheckoutActions, stripeJs.StripeCheckoutSession {}
 
 export function extractCheckoutContextValue(
   checkoutSdk: stripeJs.StripeCheckout | null,
@@ -113,10 +113,10 @@ export function useCheckoutSdkContextWithUseCase(useCaseString: string): Checkou
   return parseCheckoutSdkContext(ctx, useCaseString)
 }
 
-export function useCheckout() {
+export function useCheckout(): ComputedRef<CheckoutContextValue | null> {
   // ensure it's in CheckoutProvider
   useCheckoutSdkContextWithUseCase('calls useCheckout()')
-  const ctx = inject(CheckoutSdkKey, undefined)
+  const ctx = inject(CheckoutKey, undefined)
   if (!ctx) {
     throw new Error(
       'Could not find Checkout Context; You need to wrap the part of your app that calls useCheckout() in an <CheckoutProvider> provider.',

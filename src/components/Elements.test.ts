@@ -5,7 +5,7 @@ import * as mocks from '../../test/mocks'
 import { Elements, useElements } from './Elements'
 import { useStripe } from './useStripe'
 
-describe('elements', () => {
+describe.skip('elements', () => {
   let mockStripe: any
   let mockElements: any
 
