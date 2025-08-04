@@ -1,13 +1,13 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { PropType, ShallowRef } from 'vue'
+import type { ComputedRef, PropType } from 'vue'
 import type { UnknownOptions } from '../types'
 import { computed, defineComponent, inject, provide, shallowRef, watch, watchEffect } from 'vue'
 import { ElementsKey } from '../keys'
 import { parseStripeProp } from '../utils/parseStripeProp'
 
 export interface ElementsContextValue {
-  stripe: ShallowRef<stripeJs.Stripe | null>
-  elements: ShallowRef<stripeJs.StripeElements | null>
+  stripe: ComputedRef<stripeJs.Stripe | null>
+  elements: ComputedRef<stripeJs.StripeElements | null>
 }
 
 export function parseElementsContext(
@@ -78,8 +78,8 @@ export const Elements = defineComponent({
     }, { deep: true })
 
     provide(ElementsKey, {
-      stripe,
-      elements,
+      stripe: computed(() => stripe.value),
+      elements: computed(() => elements.value),
     })
 
     return () => slots.default?.()

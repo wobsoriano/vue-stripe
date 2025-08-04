@@ -1268,7 +1268,7 @@ describe('createElementComponent', () => {
       expect(mockElement.destroy).toHaveBeenCalled()
     })
 
-    it.skip('destroys an existing Element when the component unmounts with an async stripe prop', async () => {
+    it('destroys an existing Element when the component unmounts with an async stripe prop', async () => {
       const stripePromise = Promise.resolve(mockStripe)
 
       const component = defineComponent({

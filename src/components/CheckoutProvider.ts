@@ -1,12 +1,13 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { ComputedRef, PropType, Ref } from 'vue'
-import { computed, defineComponent, inject, provide, shallowRef, watch, watchEffect } from 'vue'
+import type { ComputedRef, PropType } from 'vue'
+import { computed, defineComponent, inject, provide, reactive, shallowRef, watch, watchEffect } from 'vue'
 import { CheckoutKey, CheckoutSdkKey, ElementsKey } from '../keys'
+import { parseStripeProp } from '../utils/parseStripeProp'
 import { parseElementsContext } from './Elements'
 
 export interface CheckoutSdkContextValue {
-  checkoutSdk: Ref<stripeJs.StripeCheckout | null>
-  stripe: Ref<stripeJs.Stripe | null>
+  checkoutSdk: ComputedRef<stripeJs.StripeCheckout | null>
+  stripe: ComputedRef<stripeJs.Stripe | null>
 }
 
 export function parseCheckoutSdkContext(
@@ -42,6 +43,9 @@ export function extractCheckoutContextValue(
   return Object.assign(sessionState, actions)
 }
 
+const INVALID_STRIPE_ERROR
+  = 'Invalid prop `stripe` supplied to `CheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.'
+
 export const CheckoutProvider = defineComponent({
   inheritAttrs: false,
   props: {
@@ -55,16 +59,55 @@ export const CheckoutProvider = defineComponent({
     },
   },
   setup(props, { slots }) {
-    const checkoutSdk = shallowRef<stripeJs.StripeCheckout | null>(null)
+    const parsed = computed(() => parseStripeProp(props.stripe, INVALID_STRIPE_ERROR))
+
     const session = shallowRef<stripeJs.StripeCheckoutSession | null>(null)
 
+    const ctx = reactive<{
+      stripe: stripeJs.Stripe | null
+      checkoutSdk: stripeJs.StripeCheckout | null
+    }>({
+      stripe: parsed.value.tag === 'sync' ? parsed.value.stripe : null,
+      checkoutSdk: null,
+    })
+
+    const safeSetContext = (
+      stripe: stripeJs.Stripe,
+      checkoutSdk: stripeJs.StripeCheckout,
+    ) => {
+      if (ctx.stripe && ctx.checkoutSdk) {
+        return
+      }
+
+      ctx.stripe = stripe
+      ctx.checkoutSdk = checkoutSdk
+    }
+
     watchEffect(() => {
-      if (props.stripe && !checkoutSdk.value) {
-        props.stripe.initCheckout(props.options).then((value) => {
-          if (value) {
-            checkoutSdk.value = value
-            checkoutSdk.value.on('change', (value) => {
-              session.value = value
+      if (parsed.value.tag === 'async' && !ctx.stripe) {
+        parsed.value.stripePromise.then((stripe) => {
+          if (stripe) {
+            stripe.initCheckout(props.options).then((checkoutSdk) => {
+              if (checkoutSdk) {
+                safeSetContext(stripe, checkoutSdk)
+                checkoutSdk.on('change', (payload) => {
+                  session.value = payload
+                })
+              }
+            })
+          }
+        })
+      }
+      else if (
+        parsed.value.tag === 'sync'
+        && parsed.value.stripe
+      ) {
+        parsed.value.stripe.initCheckout(props.options).then((checkoutSdk) => {
+          if (checkoutSdk) {
+            // @ts-expect-error - stripe type is missing
+            safeSetContext(parsed.value.stripe, checkoutSdk)
+            checkoutSdk.on('change', (payload) => {
+              session.value = payload
             })
           }
         })
@@ -72,18 +115,30 @@ export const CheckoutProvider = defineComponent({
     })
 
     watch(() => props.options.elementsOptions?.appearance, (appearance) => {
-      if (!checkoutSdk.value || !appearance) {
+      if (!ctx.checkoutSdk) {
         return
       }
 
-      checkoutSdk.value.changeAppearance(appearance)
+      if (appearance) {
+        ctx.checkoutSdk.changeAppearance(appearance)
+      }
     })
 
-    const checkoutContextValue = computed(() => extractCheckoutContextValue(checkoutSdk.value, session.value))
+    watch(() => props.options.elementsOptions?.fonts, (fonts) => {
+      if (!ctx.checkoutSdk) {
+        return
+      }
+
+      if (fonts) {
+        ctx.checkoutSdk.loadFonts(fonts)
+      }
+    })
+
+    const checkoutContextValue = computed(() => extractCheckoutContextValue(ctx.checkoutSdk, session.value))
 
     provide(CheckoutKey, checkoutContextValue)
     provide(CheckoutSdkKey, {
-      checkoutSdk,
+      checkoutSdk: computed(() => ctx.checkoutSdk),
       stripe: computed(() => props.stripe),
     })
 
