@@ -95,11 +95,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from 'stripe-vue'
 import CheckoutForm from './CheckoutForm.vue'
 
-const stripe = ref(null)
-
-onMounted(async () => {
-  stripe.value = await loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
-})
+const stripe = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
 
 const options = {
   mode: 'payment',
