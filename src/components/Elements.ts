@@ -78,7 +78,7 @@ export const Elements = defineComponent({
     }, { deep: true })
 
     provide(ElementsKey, {
-      stripe: computed(() => stripe.value),
+      stripe,
       elements,
     })
 

@@ -26,15 +26,16 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
     watchEffect(() => {
       if (elementRef.value === null && domNode.value !== null && (elements?.value || checkoutSdk?.value)) {
         let newElement: stripeJs.StripeElement | null = null
+        const options = props.options || {}
 
         if (checkoutSdk?.value) {
           switch (type) {
             case 'payment':
-              newElement = checkoutSdk.value.createPaymentElement(props.options)
+              newElement = checkoutSdk.value.createPaymentElement(options)
               break
             case 'address':
-              if ('mode' in props.options!) {
-                const { mode, ...restOptions } = props.options
+              if ('mode' in options) {
+                const { mode, ...restOptions } = options
                 if (mode === 'shipping') {
                   newElement = checkoutSdk.value.createShippingAddressElement(restOptions)
                 }
@@ -60,7 +61,7 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
               newElement = checkoutSdk.value.createCurrencySelectorElement()
               break
             case 'taxId':
-              newElement = checkoutSdk.value.createTaxIdElement(props.options)
+              newElement = checkoutSdk.value.createTaxIdElement(options)
               break
             default:
               throw new Error(
@@ -69,7 +70,7 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
           }
         }
         else if (elements?.value) {
-          newElement = elements.value.create(type as any, props.options)
+          newElement = elements.value.create(type as any, options)
         }
 
         // Store element in state to facilitate event listener attachment
@@ -81,8 +82,8 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
       }
     })
 
-    watch(() => props.options, (options) => {
-      if (!elementRef.value || !options) {
+    watch(() => props.options || {}, (options) => {
+      if (!elementRef.value) {
         return
       }
 
