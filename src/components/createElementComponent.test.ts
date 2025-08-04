@@ -1,7 +1,6 @@
 import { render } from '@testing-library/vue'
-import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { computed, defineComponent, h, nextTick, ref, shallowRef } from 'vue'
+import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
 import * as mocks from '../../test/mocks'
 import * as CheckoutModule from './CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
@@ -58,7 +57,7 @@ describe('createElementComponent', () => {
 
   const CardElement = createElementComponent('card')
 
-  it('can remove and add CardElement at the same time', () => {
+  it('can remove and add CardElement at the same time', async () => {
     let cardMounted = false
     mockElement.mount.mockImplementation(() => {
       if (cardMounted) {
@@ -71,21 +70,20 @@ describe('createElementComponent', () => {
     })
 
     const key = ref(1)
-    const child = defineComponent(() => {
-      return () => h(CardElement, { key: key.value })
-    })
-
     const parent = defineComponent({
       setup() {
         return () => h(Elements, {
           stripe: mockStripe,
-        }, () => h(child))
+          key: key.value,
+        }, () => h(CardElement))
       },
     })
 
-    mount(parent)
+    render(parent)
+    await nextTick()
 
     key.value++
+    await nextTick()
 
     expect(mockElement.mount).toHaveBeenCalledTimes(2)
   })
@@ -150,7 +148,7 @@ describe('createElementComponent', () => {
 
     const { container, emitted } = render(component)
 
-    // TODO: Fix this line
+    await nextTick()
     expect(mockElement.mount).toHaveBeenCalledWith(container.firstElementChild)
 
     expect(simulateOn).not.toBeCalled()
@@ -187,7 +185,7 @@ describe('createElementComponent', () => {
     (console.error as any).mockImplementation(() => {})
 
     expect(() => {
-      mount(CardElement)
+      render(CardElement)
     }).toThrow(
       'Could not find Elements context; You need to wrap the part of your app that mounts <CardElement> in an <Elements> provider.',
     )
@@ -255,13 +253,13 @@ describe('createElementComponent', () => {
 
   it('removes event handler when removed on re-render', async () => {
     const mockHandler = vi.fn()
-    const rerenderCount = ref(0)
+    const key = ref(0)
 
     const parent = defineComponent({
       setup() {
         return () => h(Elements, {
           stripe: mockStripe,
-          key: rerenderCount.value,
+          key: key.value,
         }, () => h(CardElement, {
           onChange: mockHandler,
         }))
@@ -274,7 +272,7 @@ describe('createElementComponent', () => {
     expect(simulateOn).toBeCalledWith('change', expect.any(Function))
     expect(simulateOff).not.toBeCalled()
 
-    rerenderCount.value++
+    key.value++
     await nextTick()
 
     expect(simulateOff).toBeCalledWith('change', expect.any(Function))
@@ -330,6 +328,312 @@ describe('createElementComponent', () => {
     const mockEvent = Symbol('ready')
     simulateEvent('ready', mockEvent)
     expect(mockHandler2).toHaveBeenCalledWith(mockElement)
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s change event to the current onChange prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onChange = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onChange: onChange.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onChange.value = mockHandler2
+    await nextTick()
+
+    const changeEventMock = Symbol('change')
+    simulateEvent('change', changeEventMock)
+    expect(mockHandler2).toHaveBeenCalledWith(changeEventMock)
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s blur event to the current onBlur prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onBlur = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onBlur: onBlur.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onBlur.value = mockHandler2
+    await nextTick()
+
+    simulateEvent('blur')
+    expect(mockHandler2).toHaveBeenCalledWith()
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s focus event to the current onFocus prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onFocus = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onFocus: onFocus.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onFocus.value = mockHandler2
+    await nextTick()
+
+    simulateEvent('focus')
+    expect(mockHandler2).toHaveBeenCalledWith()
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s escape event to the current onEscape prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onEscape = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onEscape: onEscape.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onEscape.value = mockHandler2
+    await nextTick()
+
+    simulateEvent('escape')
+    expect(mockHandler2).toHaveBeenCalledWith()
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s click event to the current onClick prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onClick = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onClick: onClick.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onClick.value = mockHandler2
+    await nextTick()
+
+    simulateEvent('click')
+    expect(mockHandler2).toHaveBeenCalledWith()
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s loaderror event to the current onLoaderror prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onLoadError = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onLoaderror: onLoadError.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onLoadError.value = mockHandler2
+    await nextTick()
+
+    const loadErrorEventMock = Symbol('loaderror')
+    simulateEvent('loaderror', loadErrorEventMock)
+    expect(mockHandler2).toHaveBeenCalledWith(loadErrorEventMock)
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s loaderstart event to the current onLoaderstart prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onLoaderStart = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onLoaderstart: onLoaderStart.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onLoaderStart.value = mockHandler2
+    await nextTick()
+
+    simulateEvent('loaderstart')
+    expect(mockHandler2).toHaveBeenCalledWith()
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s networkschange event to the current onNetworkschange prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onNetworksChange = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onNetworkschange: onNetworksChange.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onNetworksChange.value = mockHandler2
+    await nextTick()
+
+    simulateEvent('networkschange')
+    expect(mockHandler2).toHaveBeenCalledWith()
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s confirm event to the current onConfirm prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onConfirm = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onConfirm: onConfirm.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onConfirm.value = mockHandler2
+    await nextTick()
+
+    const confirmEventMock = Symbol('confirm')
+    simulateEvent('confirm', confirmEventMock)
+    expect(mockHandler2).toHaveBeenCalledWith(confirmEventMock)
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s cancel event to the current onCancel prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onCancel = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onCancel: onCancel.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onCancel.value = mockHandler2
+    await nextTick()
+
+    const cancelEventMock = Symbol('cancel')
+    simulateEvent('cancel', cancelEventMock)
+    expect(mockHandler2).toHaveBeenCalledWith(cancelEventMock)
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s shippingaddresschange event to the current onShippingaddresschange prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onShippingAddressChange = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onShippingaddresschange: onShippingAddressChange.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onShippingAddressChange.value = mockHandler2
+    await nextTick()
+
+    const shippingAddressChangeEventMock = Symbol('shippingaddresschange')
+    simulateEvent('shippingaddresschange', shippingAddressChangeEventMock)
+    expect(mockHandler2).toHaveBeenCalledWith(shippingAddressChangeEventMock)
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Element`s shippingratechange event to the current onShippingratechange prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onShippingRateChange = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CardElement, {
+          onShippingratechange: onShippingRateChange.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onShippingRateChange.value = mockHandler2
+    await nextTick()
+
+    const shippingRateChangeEventMock = Symbol('shippingratechange')
+    simulateEvent('shippingratechange', shippingRateChangeEventMock)
+    expect(mockHandler2).toHaveBeenCalledWith(shippingRateChangeEventMock)
     expect(mockHandler).not.toHaveBeenCalled()
   })
 })
