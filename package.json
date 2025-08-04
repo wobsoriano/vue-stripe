@@ -18,22 +18,19 @@
     "elements"
   ],
   "sideEffects": false,
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "dev": "tsup --watch --onSuccess \"pnpm build:dts\"",
-    "build": "tsup --env.NODE_ENV production",
+    "dev": "tsdown --watch --onSuccess \"pnpm build:dts\"",
+    "build": "tsdown --env.NODE_ENV production",
     "prepublishOnly": "pnpm build",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -55,7 +52,7 @@
     "@vue/test-utils": "^2.4.6",
     "eslint": "^9.11.0",
     "jsdom": "^25.0.1",
-    "tsup": "8.0.1",
+    "tsdown": "^0.13.2",
     "typescript": "^5.5.4",
     "vitest": "^2.1.1",
     "vue": "^3.5.8"

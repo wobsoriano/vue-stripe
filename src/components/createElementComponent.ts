@@ -5,7 +5,7 @@ import { useElementsOrCheckoutSdkContextWithUseCase } from './CheckoutProvider'
 
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
-interface PrivateElementProps<T> {
+export interface PrivateElementProps<T> {
   id?: string
   class?: string
   options?: T

@@ -1,17 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es2018",
-    "lib": ["esnext", "DOM"],
-    "module": "esnext",
-    "moduleResolution": "node",
+    "target": "esnext",
+    "lib": ["es2023", "DOM"],
+    "moduleDetection": "force",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    "types": ["node"],
     "strict": true,
-    "strictNullChecks": true,
+    "noUnusedLocals": true,
     "declaration": true,
-    "declarationDir": "./dist",
     "esModuleInterop": true,
-    "skipDefaultLibCheck": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"]
+  "include": ["src", "tests"]
 }
