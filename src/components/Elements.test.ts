@@ -5,14 +5,23 @@ import * as mocks from '../../test/mocks'
 import { Elements, useElements } from './Elements'
 import { useStripe } from './useStripe'
 
-describe.skip('elements', () => {
+describe('elements', () => {
   let mockStripe: any
+  let mockStripePromise: any
   let mockElements: any
+  let consoleError: any
+  let consoleWarn: any
 
   beforeEach(() => {
     mockStripe = mocks.mockStripe()
+    mockStripePromise = Promise.resolve(mockStripe)
     mockElements = mocks.mockElements()
     mockStripe.elements.mockReturnValue(mockElements)
+
+    vi.spyOn(console, 'error')
+    vi.spyOn(console, 'warn')
+    consoleError = console.error
+    consoleWarn = console.warn
   })
 
   afterEach(() => {
@@ -149,6 +158,67 @@ describe.skip('elements', () => {
     expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
 
     stripeProp.value = mockStripe
+    await nextTick()
+    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(mockElements)
+  })
+
+  it('works with a Promise resolving to a valid Stripe object', async () => {
+    const child = defineComponent({
+      name: 'Child',
+      template: '<div />',
+      setup() {
+        const elements = useElements()
+
+        return {
+          elements,
+        }
+      },
+    })
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripePromise,
+        }, () => h(child))
+      },
+    })
+
+    const wrapper = mount(parent)
+    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
+
+    await nextTick()
+    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(mockElements)
+  })
+
+  it('allows a transition from null to a valid Promise', async () => {
+    const stripeProp = ref(null)
+    const child = defineComponent({
+      name: 'Child',
+      template: '<div />',
+      setup() {
+        const elements = useElements()
+
+        return {
+          elements,
+        }
+      },
+    })
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: stripeProp.value,
+        }, () => h(child))
+      },
+    })
+
+    const wrapper = mount(parent)
+    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
+
+    stripeProp.value = mockStripePromise
+    await nextTick()
+    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
+
     await nextTick()
     expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(mockElements)
   })

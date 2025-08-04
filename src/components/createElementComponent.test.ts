@@ -1,3 +1,4 @@
+import type { UnknownOptions } from '../types'
 import { render } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
@@ -5,7 +6,6 @@ import * as mocks from '../../test/mocks'
 import * as CheckoutModule from './CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
 import * as ElementsModule from './Elements'
-import type { UnknownOptions } from '../types'
 
 const { Elements } = ElementsModule
 
