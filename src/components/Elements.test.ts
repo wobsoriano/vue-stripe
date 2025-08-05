@@ -4,6 +4,7 @@ import { defineComponent, h, nextTick, onMounted, ref } from 'vue'
 import * as mocks from '../../test/mocks'
 import { Elements, useElements } from './Elements'
 import { useStripe } from './useStripe'
+import { render } from '@testing-library/vue'
 
 describe('elements', () => {
   let mockStripe: any
@@ -225,49 +226,36 @@ describe('elements', () => {
 
   it('throws when trying to call useElements outside of Elements context', () => {
     const parent = defineComponent({
-      name: 'Child',
-      template: '<div />',
       setup() {
-        const elements = useElements()
+        useElements()
 
-        return {
-          elements,
-        }
+        return {}
       },
     })
 
     expect(() => {
-      mount(parent)
+      render(parent)
     }).toThrow('Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.')
   })
 
   it('throws when trying to call useStripe outside of Elements context', () => {
     const parent = defineComponent({
-      name: 'Child',
-      template: '<div />',
       setup() {
-        const stripe = useStripe()
+        useStripe()
 
-        return {
-          stripe,
-        }
+        return {}
       },
     })
 
     expect(() => {
-      mount(parent)
+      render(parent)
     }).toThrow('Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.')
   })
 
-  it('allows changes to options via elements.update', async () => {
+  it('allows changes to options via elements.update after setting the Stripe object', async () => {
+    const options = ref<Record<string, string>>({ foo: 'foo' })
     const parent = defineComponent({
       setup() {
-        const options = ref<Record<string, any>>({ foo: 'foo' })
-
-        onMounted(() => {
-          options.value = { bar: 'bar' }
-        })
-
         return () => h(Elements, {
           stripe: mockStripe,
           options: options.value,
@@ -275,10 +263,16 @@ describe('elements', () => {
       },
     })
 
-    mount(parent)
+    render(parent)
+
+    options.value = { bar: 'bar' }
 
     expect(mockStripe.elements).toHaveBeenCalledWith({ foo: 'foo' })
+    expect(mockStripe.elements).toHaveBeenCalledTimes(1)
+
     await nextTick()
+
     expect(mockElements.update).toHaveBeenCalledWith({ bar: 'bar' })
+    expect(mockStripe.elements).toHaveBeenCalledTimes(1)
   })
 })
