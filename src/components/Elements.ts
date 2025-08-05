@@ -44,7 +44,7 @@ export const Elements = defineComponent({
         ? parsed.value.stripe.elements(
           props.options as UnknownOptions,
         )
-        : null)
+        : null),
     }
 
     watchEffect(() => {

@@ -54,7 +54,7 @@ export const EmbeddedCheckoutProvider = defineComponent({
     const loadedStripe = shallowRef<stripeJs.Stripe | null>(null)
 
     const ctx = {
-      embeddedCheckout: shallowRef<EmbeddedCheckoutPublicInterface | null>(null)
+      embeddedCheckout: shallowRef<EmbeddedCheckoutPublicInterface | null>(null),
     }
 
     watchEffect((onInvalidate) => {

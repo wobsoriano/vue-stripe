@@ -65,7 +65,7 @@ export const CheckoutProvider = defineComponent({
 
     const ctx = {
       stripe: shallowRef<stripeJs.Stripe | null>(parsed.value.tag === 'sync' ? parsed.value.stripe : null),
-      checkoutSdk: shallowRef<stripeJs.StripeCheckout | null>(null)
+      checkoutSdk: shallowRef<stripeJs.StripeCheckout | null>(null),
     }
 
     const safeSetContext = (
