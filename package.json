@@ -51,7 +51,6 @@
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^5.1.4",
-    "@vue/test-utils": "^2.4.6",
     "eslint": "^9.11.0",
     "jsdom": "^25.0.1",
     "tsdown": "^0.13.2",

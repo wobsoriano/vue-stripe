@@ -1,8 +1,8 @@
 import { render } from '@testing-library/vue'
-import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import * as mocks from '../../test/mocks'
+import { renderComposable } from '../../test/utils'
 import { Elements, useElements } from './Elements'
 import { useStripe } from './useStripe'
 
@@ -30,82 +30,48 @@ describe('elements', () => {
   })
 
   it('injects elements with the useElements composable', () => {
-    const child = defineComponent({
-      name: 'Child',
-      template: '<div />',
-      setup() {
-        const elements = useElements()
-
-        return {
-          elements,
-        }
-      },
+    const { result } = renderComposable(() => useElements(), {
+      wrapper: defineComponent({
+        setup(_, { slots }) {
+          return () => h(Elements, {
+            stripe: mockStripe,
+          }, () => slots.default?.())
+        },
+      })
     })
 
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(child))
-      },
-    })
-
-    const wrapper = mount(parent)
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toStrictEqual(mockElements)
+    expect(result.value).toStrictEqual(mockElements)
   })
 
   it('only creates elements once', () => {
-    const child = defineComponent({
-      name: 'Child',
-      template: '<div />',
-      setup() {
-        const _ = useElements()
-
-        return {}
-      },
+    renderComposable(() => useElements(), {
+      wrapper: defineComponent({
+        setup(_, { slots }) {
+          return () => h(Elements, {
+            stripe: mockStripe,
+          }, () => slots.default?.())
+        },
+      })
     })
-
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(child))
-      },
-    })
-
-    mount(parent)
 
     expect(mockStripe.elements).toHaveBeenCalledTimes(1)
   })
 
   it('injects stripe with the useStripe composable', () => {
-    const child = defineComponent({
-      name: 'Child',
-      template: '<div />',
-      setup() {
-        const stripe = useStripe()
-
-        return {
-          stripe,
-        }
-      },
+    const { result } = renderComposable(() => useStripe(), {
+      wrapper: defineComponent({
+        setup(_, { slots }) {
+          return () => h(Elements, {
+            stripe: mockStripe,
+          }, () => slots.default?.())
+        },
+      })
     })
-
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(child))
-      },
-    })
-
-    const wrapper = mount(parent)
-    expect(wrapper.findComponent({ name: 'Child' }).vm.stripe).toStrictEqual(mockStripe)
+    expect(result.value).toStrictEqual(mockStripe)
   })
 
   it('provides given stripe instance on mount', () => {
     const child = defineComponent({
-      name: 'Child',
       template: '<div />',
       setup() {
         const stripe = useStripe()
@@ -129,103 +95,74 @@ describe('elements', () => {
     })
 
     expect(() => {
-      mount(parent)
+      render(parent)
     }).not.toThrow('Stripe instance is null')
   })
 
   it('allows a transition from null to a valid Stripe object', async () => {
     const stripeProp = ref(null)
-    const child = defineComponent({
-      name: 'Child',
-      template: '<div />',
-      setup() {
-        const elements = useElements()
 
-        return {
-          elements,
-        }
-      },
+    const { result } = renderComposable(() => useElements(), {
+      wrapper: defineComponent({
+        setup(_, { slots }) {
+          return () => h(Elements, {
+            stripe: stripeProp.value,
+          }, () => slots.default?.())
+        },
+      })
     })
 
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: stripeProp.value,
-        }, () => h(child))
-      },
-    })
-
-    const wrapper = mount(parent)
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
+    expect(result.value).toBe(null)
 
     stripeProp.value = mockStripe
     await nextTick()
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toStrictEqual(mockElements)
+    expect(result.value).toStrictEqual(mockElements)
   })
 
   it('works with a Promise resolving to a valid Stripe object', async () => {
-    const child = defineComponent({
-      name: 'Child',
-      template: '<div />',
-      setup() {
-        const elements = useElements()
-
-        return {
-          elements,
-        }
-      },
+    const { result } = renderComposable(() => useElements(), {
+      wrapper: defineComponent({
+        setup(_, { slots }) {
+          return () => h(Elements, {
+            stripe: mockStripePromise,
+          }, () => slots.default?.())
+        },
+      }),
     })
 
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripePromise,
-        }, () => h(child))
-      },
-    })
-
-    const wrapper = mount(parent)
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
+    expect(result.value).toBe(null)
 
     await nextTick()
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toStrictEqual(mockElements)
+    await nextTick()
+    expect(result.value).toStrictEqual(mockElements)
   })
 
   it('allows a transition from null to a valid Promise', async () => {
     const stripeProp = ref(null)
-    const child = defineComponent({
-      name: 'Child',
-      template: '<div />',
-      setup() {
-        const elements = useElements()
-
-        return {
-          elements,
-        }
-      },
+    const { result } = renderComposable(() => useElements(), {
+      wrapper: defineComponent({
+        setup(_, { slots }) {
+          return () => h(Elements, {
+            stripe: stripeProp.value,
+          }, () => slots.default?.())
+        },
+      }),
     })
 
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: stripeProp.value,
-        }, () => h(child))
-      },
-    })
-
-    const wrapper = mount(parent)
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
+    expect(result.value).toBe(null)
 
     stripeProp.value = mockStripePromise
     await nextTick()
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
+    expect(result.value).toBe(null)
 
     await nextTick()
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toStrictEqual(mockElements)
+    expect(result.value).toStrictEqual(mockElements)
   })
 
   it('throws when trying to call useElements outside of Elements context', () => {
+    vi.spyOn(console, 'warn').mockImplementationOnce(() => {})
     const parent = defineComponent({
+      template: '<div />',
       setup() {
         useElements()
 
@@ -239,7 +176,9 @@ describe('elements', () => {
   })
 
   it('throws when trying to call useStripe outside of Elements context', () => {
+    vi.spyOn(console, 'warn').mockImplementationOnce(() => {})
     const parent = defineComponent({
+      template: '<div />',
       setup() {
         useStripe()
 

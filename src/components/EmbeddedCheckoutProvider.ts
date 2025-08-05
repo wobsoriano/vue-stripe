@@ -30,7 +30,7 @@ const INVALID_STRIPE_ERROR
 export const EmbeddedCheckoutProvider = defineComponent({
   props: {
     stripe: {
-      type: Object as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
+      type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
       required: true,
     },
     options: {
