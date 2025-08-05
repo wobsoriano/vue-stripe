@@ -53,7 +53,9 @@ export const EmbeddedCheckoutProvider = defineComponent({
     )
     const loadedStripe = shallowRef<stripeJs.Stripe | null>(null)
 
-    const embeddedCheckout = shallowRef<EmbeddedCheckoutPublicInterface | null>(null)
+    const ctx = {
+      embeddedCheckout: shallowRef<EmbeddedCheckoutPublicInterface | null>(null)
+    }
 
     watchEffect((onInvalidate) => {
       // Don't support any ctx updates once embeddedCheckout or stripe is set.
@@ -68,8 +70,8 @@ export const EmbeddedCheckoutProvider = defineComponent({
         loadedStripe.value = stripe
         embeddedCheckoutPromise.value = loadedStripe.value
           .initEmbeddedCheckout(props.options as UnknownOptions)
-          .then((value) => {
-            embeddedCheckout.value = value
+          .then((embeddedCheckout) => {
+            ctx.embeddedCheckout.value = embeddedCheckout
           })
       }
 
@@ -95,9 +97,9 @@ export const EmbeddedCheckoutProvider = defineComponent({
       }
 
       onInvalidate(() => {
-        if (embeddedCheckout.value) {
+        if (ctx.embeddedCheckout.value) {
           embeddedCheckoutPromise.value = null
-          embeddedCheckout.value.destroy()
+          ctx.embeddedCheckout.value.destroy()
         }
         else if (embeddedCheckoutPromise.value) {
           // If embedded checkout is still initializing, destroy it once
@@ -105,8 +107,8 @@ export const EmbeddedCheckoutProvider = defineComponent({
           // after mounting.
           embeddedCheckoutPromise.value.then(() => {
             embeddedCheckoutPromise.value = null
-            if (embeddedCheckout.value) {
-              embeddedCheckout.value.destroy()
+            if (ctx.embeddedCheckout.value) {
+              ctx.embeddedCheckout.value.destroy()
             }
           })
         }
@@ -114,7 +116,7 @@ export const EmbeddedCheckoutProvider = defineComponent({
     })
 
     provide(EmbeddedCheckoutKey, {
-      embeddedCheckout: readonly(embeddedCheckout),
+      embeddedCheckout: readonly(ctx.embeddedCheckout),
     })
 
     return () => slots.default?.()

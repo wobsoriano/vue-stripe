@@ -38,31 +38,29 @@ export const Elements = defineComponent({
   setup(props, { slots }) {
     const parsed = computed(() => parseStripeProp(props.stripe))
 
-    const stripe = shallowRef(
-      parsed.value.tag === 'sync' ? parsed.value.stripe : null,
-    )
-    const elements = shallowRef<stripeJs.StripeElements | null>(
-      parsed.value.tag === 'sync'
+    const ctx = {
+      stripe: shallowRef(parsed.value.tag === 'sync' ? parsed.value.stripe : null),
+      elements: shallowRef<stripeJs.StripeElements | null>(parsed.value.tag === 'sync'
         ? parsed.value.stripe.elements(
           props.options as UnknownOptions,
         )
-        : null,
-    )
+        : null)
+    }
 
     watchEffect(() => {
       // For an async stripePromise, store it in context once resolved
-      if (parsed.value.tag === 'async' && !stripe.value) {
+      if (parsed.value.tag === 'async' && !ctx.stripe.value) {
         parsed.value.stripePromise.then((loadedStripe) => {
           if (loadedStripe) {
-            stripe.value = loadedStripe
-            elements.value = loadedStripe.elements(props.options as UnknownOptions)
+            ctx.stripe.value = loadedStripe
+            ctx.elements.value = loadedStripe.elements(props.options as UnknownOptions)
           }
         })
       }
-      else if (parsed.value.tag === 'sync' && !stripe.value) {
+      else if (parsed.value.tag === 'sync' && !ctx.stripe.value) {
         // Or, handle a sync stripe instance going from null -> populated
-        stripe.value = parsed.value.stripe
-        elements.value = parsed.value.stripe.elements(props.options as UnknownOptions)
+        ctx.stripe.value = parsed.value.stripe
+        ctx.elements.value = parsed.value.stripe.elements(props.options as UnknownOptions)
       }
     })
 
@@ -70,16 +68,16 @@ export const Elements = defineComponent({
       const { clientSecret, fonts, ...rest } = props.options ?? {}
       return rest
     }, (stripeElementUpdateOptions) => {
-      if (!elements.value) {
+      if (!ctx.elements.value) {
         return
       }
 
-      elements.value.update(stripeElementUpdateOptions)
+      ctx.elements.value.update(stripeElementUpdateOptions)
     }, { deep: true })
 
     provide(ElementsKey, {
-      stripe: readonly(stripe),
-      elements: readonly(elements),
+      stripe: readonly(ctx.stripe),
+      elements: readonly(ctx.elements),
     })
 
     return () => slots.default?.()

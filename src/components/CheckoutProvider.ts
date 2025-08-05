@@ -1,13 +1,13 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { ComputedRef, PropType } from 'vue'
-import { computed, defineComponent, inject, provide, reactive, shallowRef, watch, watchEffect } from 'vue'
+import type { ComputedRef, DeepReadonly, PropType, ShallowRef } from 'vue'
+import { computed, defineComponent, inject, provide, readonly, shallowRef, watch, watchEffect } from 'vue'
 import { CheckoutKey, CheckoutSdkKey, ElementsKey } from '../keys'
 import { parseStripeProp } from '../utils/parseStripeProp'
 import { parseElementsContext } from './Elements'
 
 export interface CheckoutSdkContextValue {
-  checkoutSdk: ComputedRef<stripeJs.StripeCheckout | null>
-  stripe: ComputedRef<stripeJs.Stripe | null>
+  checkoutSdk: DeepReadonly<ShallowRef<stripeJs.StripeCheckout | null>>
+  stripe: DeepReadonly<ShallowRef<stripeJs.Stripe | null>>
 }
 
 export function parseCheckoutSdkContext(
@@ -63,24 +63,21 @@ export const CheckoutProvider = defineComponent({
 
     const session = shallowRef<stripeJs.StripeCheckoutSession | null>(null)
 
-    const ctx = reactive<{
-      stripe: stripeJs.Stripe | null
-      checkoutSdk: stripeJs.StripeCheckout | null
-    }>({
-      stripe: parsed.value.tag === 'sync' ? parsed.value.stripe : null,
-      checkoutSdk: null,
-    })
+    const ctx = {
+      stripe: shallowRef<stripeJs.Stripe | null>(parsed.value.tag === 'sync' ? parsed.value.stripe : null),
+      checkoutSdk: shallowRef<stripeJs.StripeCheckout | null>(null)
+    }
 
     const safeSetContext = (
       stripe: stripeJs.Stripe,
       checkoutSdk: stripeJs.StripeCheckout,
     ) => {
-      if (ctx.stripe && ctx.checkoutSdk) {
+      if (ctx.stripe.value && ctx.checkoutSdk.value) {
         return
       }
 
-      ctx.stripe = stripe
-      ctx.checkoutSdk = checkoutSdk
+      ctx.stripe.value = stripe
+      ctx.checkoutSdk.value = checkoutSdk
     }
 
     watchEffect(() => {
@@ -115,34 +112,36 @@ export const CheckoutProvider = defineComponent({
     })
 
     watch(() => props.options.elementsOptions?.appearance, (appearance) => {
-      if (!ctx.checkoutSdk) {
+      const checkoutSdk = ctx.checkoutSdk.value
+      if (!checkoutSdk) {
         return
       }
 
       if (appearance) {
-        ctx.checkoutSdk.changeAppearance(appearance)
+        checkoutSdk.changeAppearance(appearance)
       }
     })
 
     watch(() => props.options.elementsOptions?.fonts, (fonts) => {
-      if (!ctx.checkoutSdk) {
+      const checkoutSdk = ctx.checkoutSdk.value
+      if (!checkoutSdk) {
         return
       }
 
       if (fonts) {
-        ctx.checkoutSdk.loadFonts(fonts)
+        checkoutSdk.loadFonts(fonts)
       }
     })
 
-    const checkoutContextValue = computed(() => extractCheckoutContextValue(ctx.checkoutSdk, session.value))
+    const checkoutContextValue = computed(() => extractCheckoutContextValue(ctx.checkoutSdk.value, session.value))
 
     provide(CheckoutKey, checkoutContextValue)
     provide(CheckoutSdkKey, {
-      checkoutSdk: computed(() => ctx.checkoutSdk),
-      stripe: computed(() => props.stripe),
+      checkoutSdk: readonly(ctx.checkoutSdk),
+      stripe: readonly(ctx.stripe),
     })
 
-    return () => slots.default?.()
+    return () => ctx.checkoutSdk.value ? slots.default?.() : null
   },
 })
 
