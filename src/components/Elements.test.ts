@@ -10,7 +10,7 @@ describe('elements', () => {
   let mockStripe: any
   let mockStripePromise: any
   let mockElements: any
-  let consoleError: any
+  // let consoleError: any
   let consoleWarn: any
 
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe('elements', () => {
 
     vi.spyOn(console, 'error')
     vi.spyOn(console, 'warn')
-    consoleError = console.error
+    // consoleError = console.error
     consoleWarn = console.warn
   })
 
@@ -37,7 +37,7 @@ describe('elements', () => {
             stripe: mockStripe,
           }, () => slots.default?.())
         },
-      })
+      }),
     })
 
     expect(result.value).toStrictEqual(mockElements)
@@ -51,7 +51,7 @@ describe('elements', () => {
             stripe: mockStripe,
           }, () => slots.default?.())
         },
-      })
+      }),
     })
 
     expect(mockStripe.elements).toHaveBeenCalledTimes(1)
@@ -65,7 +65,7 @@ describe('elements', () => {
             stripe: mockStripe,
           }, () => slots.default?.())
         },
-      })
+      }),
     })
     expect(result.value).toStrictEqual(mockStripe)
   })
@@ -109,7 +109,7 @@ describe('elements', () => {
             stripe: stripeProp.value,
           }, () => slots.default?.())
         },
-      })
+      }),
     })
 
     expect(result.value).toBe(null)
@@ -160,7 +160,8 @@ describe('elements', () => {
   })
 
   it('throws when trying to call useElements outside of Elements context', () => {
-    vi.spyOn(console, 'warn').mockImplementationOnce(() => {})
+    // Silence console output so test output is less noisy
+    consoleWarn.mockImplementation(() => {})
     const parent = defineComponent({
       template: '<div />',
       setup() {
@@ -176,7 +177,8 @@ describe('elements', () => {
   })
 
   it('throws when trying to call useStripe outside of Elements context', () => {
-    vi.spyOn(console, 'warn').mockImplementationOnce(() => {})
+    // Silence console output so test output is less noisy
+    consoleWarn.mockImplementation(() => {})
     const parent = defineComponent({
       template: '<div />',
       setup() {

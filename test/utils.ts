@@ -25,7 +25,7 @@ export function renderComposable<T>(composable: () => T, options: Options) {
 
   return {
     result,
-    unmount
+    unmount,
   }
 }
 
