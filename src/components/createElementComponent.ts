@@ -54,7 +54,7 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
               break
             case 'expressCheckout':
               newElement = checkoutSdk.value.createExpressCheckoutElement(
-                props.options as any,
+                props.options as unknown as stripeJs.StripeCheckoutExpressCheckoutElementOptions,
               ) as stripeJs.StripeExpressCheckoutElement
               break
             case 'currencySelector':

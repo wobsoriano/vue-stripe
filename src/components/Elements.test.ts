@@ -1,10 +1,10 @@
+import { render } from '@testing-library/vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, onMounted, ref } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import * as mocks from '../../test/mocks'
 import { Elements, useElements } from './Elements'
 import { useStripe } from './useStripe'
-import { render } from '@testing-library/vue'
 
 describe('elements', () => {
   let mockStripe: any
@@ -51,7 +51,7 @@ describe('elements', () => {
     })
 
     const wrapper = mount(parent)
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(mockElements)
+    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toStrictEqual(mockElements)
   })
 
   it('only creates elements once', () => {
@@ -100,7 +100,7 @@ describe('elements', () => {
     })
 
     const wrapper = mount(parent)
-    expect(wrapper.findComponent({ name: 'Child' }).vm.stripe).toBe(mockStripe)
+    expect(wrapper.findComponent({ name: 'Child' }).vm.stripe).toStrictEqual(mockStripe)
   })
 
   it('provides given stripe instance on mount', () => {
@@ -160,7 +160,7 @@ describe('elements', () => {
 
     stripeProp.value = mockStripe
     await nextTick()
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(mockElements)
+    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toStrictEqual(mockElements)
   })
 
   it('works with a Promise resolving to a valid Stripe object', async () => {
@@ -188,7 +188,7 @@ describe('elements', () => {
     expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
 
     await nextTick()
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(mockElements)
+    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toStrictEqual(mockElements)
   })
 
   it('allows a transition from null to a valid Promise', async () => {
@@ -221,7 +221,7 @@ describe('elements', () => {
     expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(null)
 
     await nextTick()
-    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toBe(mockElements)
+    expect(wrapper.findComponent({ name: 'Child' }).vm.elements).toStrictEqual(mockElements)
   })
 
   it('throws when trying to call useElements outside of Elements context', () => {

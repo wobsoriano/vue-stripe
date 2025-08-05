@@ -1,6 +1,6 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { UnknownOptions } from '../types'
-import { computed, defineComponent, inject, type PropType, provide, ref, type Ref, shallowRef, watchEffect } from 'vue'
+import { computed, type DeepReadonly, defineComponent, inject, type PropType, provide, readonly, type ShallowRef, shallowRef, watchEffect } from 'vue'
 import { EmbeddedCheckoutKey } from '../keys'
 import { parseStripeProp } from '../utils/parseStripeProp'
 
@@ -11,10 +11,10 @@ interface EmbeddedCheckoutPublicInterface {
 }
 
 export interface EmbeddedCheckoutContextValue {
-  embeddedCheckout: EmbeddedCheckoutPublicInterface | null
+  embeddedCheckout: DeepReadonly<ShallowRef<EmbeddedCheckoutPublicInterface | null>>
 }
 
-export function useEmbeddedCheckoutContext(): Ref<EmbeddedCheckoutContextValue> {
+export function useEmbeddedCheckoutContext(): EmbeddedCheckoutContextValue {
   const ctx = inject(EmbeddedCheckoutKey, undefined)
   if (!ctx) {
     throw new Error(
@@ -30,7 +30,7 @@ const INVALID_STRIPE_ERROR
 export const EmbeddedCheckoutProvider = defineComponent({
   props: {
     stripe: {
-      type: Object as PropType<stripeJs.Stripe | null>,
+      type: Object as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
       required: true,
     },
     options: {
@@ -53,9 +53,7 @@ export const EmbeddedCheckoutProvider = defineComponent({
     )
     const loadedStripe = shallowRef<stripeJs.Stripe | null>(null)
 
-    const ctx = ref<EmbeddedCheckoutContextValue>({
-      embeddedCheckout: null,
-    })
+    const embeddedCheckout = shallowRef<EmbeddedCheckoutPublicInterface | null>(null)
 
     watchEffect((onInvalidate) => {
       // Don't support any ctx updates once embeddedCheckout or stripe is set.
@@ -70,8 +68,8 @@ export const EmbeddedCheckoutProvider = defineComponent({
         loadedStripe.value = stripe
         embeddedCheckoutPromise.value = loadedStripe.value
           .initEmbeddedCheckout(props.options as UnknownOptions)
-          .then((embeddedCheckout) => {
-            ctx.value.embeddedCheckout = embeddedCheckout
+          .then((value) => {
+            embeddedCheckout.value = value
           })
       }
 
@@ -97,9 +95,9 @@ export const EmbeddedCheckoutProvider = defineComponent({
       }
 
       onInvalidate(() => {
-        if (ctx.value.embeddedCheckout) {
+        if (embeddedCheckout.value) {
           embeddedCheckoutPromise.value = null
-          ctx.value.embeddedCheckout.destroy()
+          embeddedCheckout.value.destroy()
         }
         else if (embeddedCheckoutPromise.value) {
           // If embedded checkout is still initializing, destroy it once
@@ -107,15 +105,17 @@ export const EmbeddedCheckoutProvider = defineComponent({
           // after mounting.
           embeddedCheckoutPromise.value.then(() => {
             embeddedCheckoutPromise.value = null
-            if (ctx.value.embeddedCheckout) {
-              ctx.value.embeddedCheckout.destroy()
+            if (embeddedCheckout.value) {
+              embeddedCheckout.value.destroy()
             }
           })
         }
       })
     })
 
-    provide(EmbeddedCheckoutKey, ctx)
+    provide(EmbeddedCheckoutKey, {
+      embeddedCheckout: readonly(embeddedCheckout),
+    })
 
     return () => slots.default?.()
   },

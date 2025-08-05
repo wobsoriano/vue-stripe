@@ -1,13 +1,13 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { ComputedRef, PropType } from 'vue'
+import type { DeepReadonly, PropType, ShallowRef } from 'vue'
 import type { UnknownOptions } from '../types'
-import { computed, defineComponent, inject, provide, shallowRef, watch, watchEffect } from 'vue'
+import { computed, defineComponent, inject, provide, readonly, shallowRef, watch, watchEffect } from 'vue'
 import { ElementsKey } from '../keys'
 import { parseStripeProp } from '../utils/parseStripeProp'
 
 export interface ElementsContextValue {
-  stripe: ComputedRef<stripeJs.Stripe | null>
-  elements: ComputedRef<stripeJs.StripeElements | null>
+  stripe: DeepReadonly<ShallowRef<stripeJs.Stripe | null>>
+  elements: DeepReadonly<ShallowRef<stripeJs.StripeElements | null>>
 }
 
 export function parseElementsContext(
@@ -26,7 +26,7 @@ export function parseElementsContext(
 export const Elements = defineComponent({
   props: {
     stripe: {
-      type: Object as PropType<stripeJs.Stripe | null>,
+      type: Object as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
       required: true,
     },
     options: {
@@ -78,8 +78,8 @@ export const Elements = defineComponent({
     }, { deep: true })
 
     provide(ElementsKey, {
-      stripe: computed(() => stripe.value),
-      elements: computed(() => elements.value),
+      stripe: readonly(stripe),
+      elements: readonly(elements),
     })
 
     return () => slots.default?.()

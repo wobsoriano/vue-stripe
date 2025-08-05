@@ -19,13 +19,13 @@ export const EmbeddedCheckout = defineComponent({
     const isMounted = shallowRef(false)
 
     watchEffect((onInvalidate) => {
-      if (!isMounted.value && ctx.value.embeddedCheckout && domNode.value !== null) {
+      if (!isMounted.value && ctx.embeddedCheckout.value && domNode.value !== null) {
         isMounted.value = true
-        ctx.value.embeddedCheckout.mount(domNode.value)
+        ctx.embeddedCheckout.value.mount(domNode.value)
       }
 
       onInvalidate(() => {
-        const { embeddedCheckout } = ctx.value
+        const embeddedCheckout = ctx.embeddedCheckout.value
         if (isMounted.value && embeddedCheckout) {
           try {
             embeddedCheckout.unmount()

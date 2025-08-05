@@ -50,7 +50,7 @@ export const CheckoutProvider = defineComponent({
   inheritAttrs: false,
   props: {
     stripe: {
-      type: Object as PropType<stripeJs.Stripe | null>,
+      type: Object as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
       required: true,
     },
     options: {
