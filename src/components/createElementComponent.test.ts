@@ -11,7 +11,7 @@ import * as ElementsModule from './Elements'
 const { Elements } = ElementsModule
 const { CheckoutProvider } = CheckoutModule
 
-describe.skip('createElementComponent', () => {
+describe('createElementComponent', () => {
   let mockStripe: any
   let mockElements: any
   let mockElement: any
