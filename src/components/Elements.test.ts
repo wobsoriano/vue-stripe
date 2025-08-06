@@ -1,8 +1,8 @@
 import { render } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
+import { renderComposable } from 'vue-composable-testing'
 import * as mocks from '../../test/mocks'
-import { renderComposable } from '../../test/utils'
 import { Elements, useElements } from './Elements'
 import { useStripe } from './useStripe'
 

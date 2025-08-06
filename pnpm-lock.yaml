@@ -44,6 +44,9 @@ importers:
       vue:
         specifier: ^3.5.8
         version: 3.5.8(typescript@5.5.4)
+      vue-composable-testing:
+        specifier: ^0.2.0
+        version: 0.2.0(vue@3.5.8(typescript@5.5.4))
 
   playground:
     dependencies:
@@ -5520,6 +5523,11 @@ packages:
 
   vue-component-type-helpers@2.1.6:
     resolution: {integrity: sha512-ng11B8B/ZADUMMOsRbqv0arc442q7lifSubD0v8oDXIFoMg/mXwAPUunrroIDkY+mcD0dHKccdaznSVp8EoX3w==}
+
+  vue-composable-testing@0.2.0:
+    resolution: {integrity: sha512-5wDxPKCIb8wZ2HkYK6BDeRW2OAdiMIVKuywXgRDXqGc63Bwsa+qCeGOQZ/Q3B1hzYJXSRO02IswdA7SZjRMoyg==}
+    peerDependencies:
+      vue: ^3.2.0
 
   vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
@@ -11789,6 +11797,10 @@ snapshots:
       ufo: 1.5.4
 
   vue-component-type-helpers@2.1.6: {}
+
+  vue-composable-testing@0.2.0(vue@3.5.8(typescript@5.5.4)):
+    dependencies:
+      vue: 3.5.8(typescript@5.5.4)
 
   vue-devtools-stub@0.1.0: {}
 
