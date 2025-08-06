@@ -11,8 +11,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "nuxt": "^3.13.0",
-    "stripe": "^16.12.0",
+    "nuxt": "^4.0.3",
+    "stripe": "^18.4.0",
     "stripe-vue": "workspace:*",
     "vue": "latest",
     "vue-router": "latest"

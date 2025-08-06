@@ -146,8 +146,8 @@ export const CheckoutProvider = defineComponent({
 })
 
 export function useElementsOrCheckoutSdkContextWithUseCase(useCaseString: string) {
-  const checkoutSdkContext = inject(CheckoutSdkKey)
-  const elementsContext = inject(ElementsKey)
+  const checkoutSdkContext = inject(CheckoutSdkKey, undefined)
+  const elementsContext = inject(ElementsKey, undefined)
 
   if (checkoutSdkContext && elementsContext) {
     throw new Error(
@@ -163,14 +163,14 @@ export function useElementsOrCheckoutSdkContextWithUseCase(useCaseString: string
 }
 
 export function useCheckoutSdkContextWithUseCase(useCaseString: string): CheckoutSdkContextValue {
-  const ctx = inject(CheckoutSdkKey)
+  const ctx = inject(CheckoutSdkKey, undefined)
   return parseCheckoutSdkContext(ctx, useCaseString)
 }
 
 export function useCheckout(): ComputedRef<CheckoutContextValue | null> {
   // ensure it's in CheckoutProvider
   useCheckoutSdkContextWithUseCase('calls useCheckout()')
-  const ctx = inject(CheckoutKey)
+  const ctx = inject(CheckoutKey, undefined)
   if (!ctx) {
     throw new Error(
       'Could not find Checkout Context; You need to wrap the part of your app that calls useCheckout() in an <CheckoutProvider> provider.',

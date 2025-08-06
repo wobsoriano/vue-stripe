@@ -1,4 +1,4 @@
-import { stripe } from '~/lib/stripe'
+import { stripe } from '../../lib/stripe'
 
 async function createTestPriceId() {
   const price = await stripe.prices.create({

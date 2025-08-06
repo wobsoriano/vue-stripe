@@ -1,4 +1,4 @@
-import { stripe } from '~/lib/stripe'
+import { stripe } from '../../lib/stripe'
 
 export default eventHandler(async (event) => {
   const body = await readBody(event)
