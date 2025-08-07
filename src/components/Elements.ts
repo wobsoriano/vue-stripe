@@ -80,7 +80,7 @@ export const Elements = defineComponent({
           'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.',
         )
       }
-    }, { immediate: true })
+    })
 
     watch(() => {
       const { clientSecret, fonts, ...rest } = props.options ?? {}
