@@ -43,8 +43,8 @@ export const Elements = defineComponent({
       stripe: shallowRef(parsed.value.tag === 'sync' ? parsed.value.stripe : null),
       elements: shallowRef<stripeJs.StripeElements | null>(parsed.value.tag === 'sync'
         ? parsed.value.stripe.elements(
-          props.options as UnknownOptions,
-        )
+            props.options as UnknownOptions,
+          )
         : null),
     }
 

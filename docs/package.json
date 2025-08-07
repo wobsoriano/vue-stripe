@@ -1,0 +1,17 @@
+{
+  "name": "docs",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt dev --extends docus",
+    "build": "nuxt build --extends docus"
+  },
+  "dependencies": {
+    "@nuxt/ui-pro": "^3.3.0",
+    "better-sqlite3": "^12.2.0",
+    "docus": "latest",
+    "nuxt": "^4.0.0",
+    "stripe": "^18.4.0",
+    "stripe-vue": "workspace:*",
+    "tailwindcss": "^4.1.11"
+  }
+}

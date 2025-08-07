@@ -1,13 +1,14 @@
 import type * as stripeJs from '@stripe/stripe-js'
+import type { DeepReadonly, PropType, ShallowRef } from 'vue'
 import type { UnknownOptions } from '../types'
-import { computed, type DeepReadonly, defineComponent, inject, type PropType, provide, readonly, type ShallowRef, shallowRef, watchEffect } from 'vue'
+import { computed, defineComponent, inject, provide, readonly, shallowRef, watchEffect } from 'vue'
 import { EmbeddedCheckoutKey } from '../keys'
 import { parseStripeProp } from '../utils/parseStripeProp'
 
 interface EmbeddedCheckoutPublicInterface {
-  mount(location: string | HTMLElement): void
-  unmount(): void
-  destroy(): void
+  mount: (location: string | HTMLElement) => void
+  unmount: () => void
+  destroy: () => void
 }
 
 export interface EmbeddedCheckoutContextValue {
