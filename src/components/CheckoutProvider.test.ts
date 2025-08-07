@@ -190,7 +190,7 @@ describe('checkoutProvider', () => {
       fetchClientSecret,
       elementsOptions: {
         appearance: { theme: 'stripe' },
-      }
+      },
     })
     const Comp = defineComponent(() => {
       return () => h(CheckoutProvider, {
@@ -213,7 +213,7 @@ describe('checkoutProvider', () => {
       fetchClientSecret: async () => 'cs_123',
       elementsOptions: {
         appearance: { theme: 'night' },
-      }
+      },
     }
 
     await waitFor(() => {
