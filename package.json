@@ -50,6 +50,7 @@
     "@stripe/stripe-js": "^7.8.0",
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/vue": "^8.1.0",
+    "@types/node": "^24.2.0",
     "@vitejs/plugin-vue": "^5.1.4",
     "eslint": "^9.11.0",
     "jsdom": "^25.0.1",
