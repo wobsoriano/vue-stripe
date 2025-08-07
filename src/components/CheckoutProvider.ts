@@ -48,6 +48,7 @@ const INVALID_STRIPE_ERROR
 
 export const CheckoutProvider = defineComponent({
   inheritAttrs: false,
+  name: 'CheckoutProvider',
   props: {
     stripe: {
       type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,

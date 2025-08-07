@@ -28,6 +28,7 @@ const INVALID_STRIPE_ERROR
   = 'Invalid prop `stripe` supplied to `EmbeddedCheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.'
 
 export const EmbeddedCheckoutProvider = defineComponent({
+  name: 'EmbeddedCheckoutProvider',
   props: {
     stripe: {
       type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,

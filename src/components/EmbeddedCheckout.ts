@@ -2,6 +2,8 @@ import { defineComponent, h, shallowRef, watchEffect } from 'vue'
 import { useEmbeddedCheckoutContext } from './EmbeddedCheckoutProvider'
 
 export const EmbeddedCheckout = defineComponent({
+  inheritAttrs: false,
+  name: 'EmbeddedCheckout',
   props: {
     id: {
       type: String,

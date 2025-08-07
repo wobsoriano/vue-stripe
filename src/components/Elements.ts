@@ -24,6 +24,7 @@ export function parseElementsContext(
 }
 
 export const Elements = defineComponent({
+  name: 'Elements',
   props: {
     stripe: {
       type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
