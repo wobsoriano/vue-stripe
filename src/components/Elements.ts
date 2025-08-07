@@ -47,22 +47,39 @@ export const Elements = defineComponent({
         : null),
     }
 
+    const safeSetContext = (stripe: stripeJs.Stripe) => {
+      // no-op if we already have a stripe instance
+      if (ctx.stripe.value) {
+        return
+      }
+
+      ctx.stripe.value = stripe
+      ctx.elements.value = stripe.elements(props.options as UnknownOptions)
+    }
+
     watchEffect(() => {
       // For an async stripePromise, store it in context once resolved
       if (parsed.value.tag === 'async' && !ctx.stripe.value) {
         parsed.value.stripePromise.then((loadedStripe) => {
           if (loadedStripe) {
-            ctx.stripe.value = loadedStripe
-            ctx.elements.value = loadedStripe.elements(props.options as UnknownOptions)
+            safeSetContext(loadedStripe)
           }
         })
       }
       else if (parsed.value.tag === 'sync' && !ctx.stripe.value) {
         // Or, handle a sync stripe instance going from null -> populated
-        ctx.stripe.value = parsed.value.stripe
-        ctx.elements.value = parsed.value.stripe.elements(props.options as UnknownOptions)
+        safeSetContext(parsed.value.stripe)
       }
     })
+
+    // Warn on changes to stripe prop
+    watch(() => props.stripe, (rawStripeProp, prevStripe) => {
+      if (prevStripe !== null && prevStripe !== rawStripeProp) {
+        console.warn(
+          'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.',
+        )
+      }
+    }, { immediate: true })
 
     watch(() => {
       const { clientSecret, fonts, ...rest } = props.options ?? {}

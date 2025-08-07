@@ -1,4 +1,4 @@
-import { render } from '@testing-library/vue'
+import { render, waitFor } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { renderComposable } from 'vue-composable-testing'
@@ -191,6 +191,28 @@ describe('elements', () => {
     expect(() => {
       render(parent)
     }).toThrow('Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.')
+  })
+
+  it('does not allow changes to a set Stripe object', async () => {
+    const stripe = ref(mockStripe)
+    // Silence console output so test output is less noisy
+    consoleWarn.mockImplementation(() => {})
+
+    const Comp = defineComponent(() => {
+      return () => h(Elements, { stripe: stripe.value })
+    })
+    render(Comp)
+
+    const mockStripe2 = mocks.mockStripe()
+    stripe.value = mockStripe2
+
+    await waitFor(() => {
+      expect(mockStripe.elements.mock.calls).toHaveLength(1)
+      expect(mockStripe2.elements.mock.calls).toHaveLength(0)
+      expect(consoleWarn).toHaveBeenCalledWith(
+        'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.',
+      )
+    })
   })
 
   it('allows changes to options via elements.update after setting the Stripe object', async () => {

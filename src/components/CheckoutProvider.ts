@@ -72,6 +72,7 @@ export const CheckoutProvider = defineComponent({
       stripe: stripeJs.Stripe,
       checkoutSdk: stripeJs.StripeCheckout,
     ) => {
+      // no-op if we already have a stripe instance and checkoutSdk
       if (ctx.stripe.value && ctx.checkoutSdk.value) {
         return
       }
@@ -80,10 +81,14 @@ export const CheckoutProvider = defineComponent({
       ctx.checkoutSdk.value = checkoutSdk
     }
 
+    // Used to avoid calling initCheckout multiple times when options changes
+    let initCheckoutCalled = false
+
     watchEffect(() => {
       if (parsed.value.tag === 'async' && !ctx.stripe) {
         parsed.value.stripePromise.then((stripe) => {
-          if (stripe) {
+          if (stripe && !initCheckoutCalled) {
+            initCheckoutCalled = true
             stripe.initCheckout(props.options).then((checkoutSdk) => {
               if (checkoutSdk) {
                 safeSetContext(stripe, checkoutSdk)
@@ -98,7 +103,9 @@ export const CheckoutProvider = defineComponent({
       else if (
         parsed.value.tag === 'sync'
         && parsed.value.stripe
+        && !initCheckoutCalled
       ) {
+        initCheckoutCalled = true
         parsed.value.stripe.initCheckout(props.options).then((checkoutSdk) => {
           if (checkoutSdk) {
             // @ts-expect-error - stripe type is missing
@@ -111,6 +118,16 @@ export const CheckoutProvider = defineComponent({
       }
     })
 
+    // Warn on changes to stripe prop
+    watch(() => props.stripe, (rawStripeProp, prevStripe) => {
+      if (prevStripe !== null && prevStripe !== rawStripeProp) {
+        console.warn(
+          'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.',
+        )
+      }
+    }, { immediate: true })
+
+    // Handle appearance changes
     watch(() => props.options.elementsOptions?.appearance, (appearance) => {
       const checkoutSdk = ctx.checkoutSdk.value
       if (!checkoutSdk) {
@@ -122,6 +139,7 @@ export const CheckoutProvider = defineComponent({
       }
     })
 
+    // Handle fonts changes
     watch(() => props.options.elementsOptions?.fonts, (fonts) => {
       const checkoutSdk = ctx.checkoutSdk.value
       if (!checkoutSdk) {
@@ -141,7 +159,7 @@ export const CheckoutProvider = defineComponent({
       stripe: readonly(ctx.stripe),
     })
 
-    return () => ctx.checkoutSdk.value ? slots.default?.() : null
+    return () => slots.default?.()
   },
 })
 
