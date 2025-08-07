@@ -1,11 +1,13 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { Ref, ShallowRef } from 'vue'
-import { defineComponent, inject, provide, shallowRef, toRef, watch, watchEffect } from 'vue'
+import type { DeepReadonly, PropType, ShallowRef } from 'vue'
+import type { UnknownOptions } from '../types'
+import { computed, defineComponent, inject, provide, readonly, shallowRef, watch, watchEffect } from 'vue'
 import { ElementsKey } from '../keys'
+import { parseStripeProp } from '../utils/parseStripeProp'
 
 export interface ElementsContextValue {
-  stripe: Ref<stripeJs.Stripe | null>
-  elements: ShallowRef<stripeJs.StripeElements | null>
+  stripe: DeepReadonly<ShallowRef<stripeJs.Stripe | null>>
+  elements: DeepReadonly<ShallowRef<stripeJs.StripeElements | null>>
 }
 
 export function parseElementsContext(
@@ -21,40 +23,82 @@ export function parseElementsContext(
   return ctx
 }
 
-export const Elements = defineComponent((props: {
-  stripe: stripeJs.Stripe | null
-  options?: stripeJs.StripeElementsOptions
-}, { slots }) => {
-  const elements = shallowRef<stripeJs.StripeElements | null>(null)
+export const Elements = defineComponent({
+  props: {
+    stripe: {
+      type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
+      required: true,
+    },
+    options: {
+      type: Object as PropType<stripeJs.StripeElementsOptions>,
+      required: false,
+      default: () => ({}),
+    },
+  },
+  setup(props, { slots }) {
+    const parsed = computed(() => parseStripeProp(props.stripe))
 
-  watchEffect(() => {
-    if (props.stripe && !elements.value) {
-      const instance = props.stripe.elements(props.options as any)
-      elements.value = instance
+    const ctx = {
+      stripe: shallowRef(parsed.value.tag === 'sync' ? parsed.value.stripe : null),
+      elements: shallowRef<stripeJs.StripeElements | null>(parsed.value.tag === 'sync'
+        ? parsed.value.stripe.elements(
+          props.options as UnknownOptions,
+        )
+        : null),
     }
-  })
 
-  watch(() => {
-    const { clientSecret, fonts, ...rest } = props.options ?? {}
-    return rest
-  }, (updatedOptions) => {
-    if (!elements.value) {
-      return
+    const safeSetContext = (stripe: stripeJs.Stripe) => {
+      // no-op if we already have a stripe instance
+      if (ctx.stripe.value) {
+        return
+      }
+
+      ctx.stripe.value = stripe
+      ctx.elements.value = stripe.elements(props.options as UnknownOptions)
     }
 
-    elements.value?.update(updatedOptions)
-  }, { flush: 'sync' })
+    watchEffect(() => {
+      // For an async stripePromise, store it in context once resolved
+      if (parsed.value.tag === 'async' && !ctx.stripe.value) {
+        parsed.value.stripePromise.then((loadedStripe) => {
+          if (loadedStripe) {
+            safeSetContext(loadedStripe)
+          }
+        })
+      }
+      else if (parsed.value.tag === 'sync' && !ctx.stripe.value) {
+        // Or, handle a sync stripe instance going from null -> populated
+        safeSetContext(parsed.value.stripe)
+      }
+    })
 
-  const wrappedStripe = toRef(props, 'stripe')
+    // Warn on changes to stripe prop
+    watch(() => props.stripe, (rawStripeProp, prevStripe) => {
+      if (prevStripe !== null && prevStripe !== rawStripeProp) {
+        console.warn(
+          'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.',
+        )
+      }
+    }, { immediate: true })
 
-  provide(ElementsKey, {
-    stripe: wrappedStripe,
-    elements,
-  })
+    watch(() => {
+      const { clientSecret, fonts, ...rest } = props.options ?? {}
+      return rest
+    }, (stripeElementUpdateOptions) => {
+      if (!ctx.elements.value) {
+        return
+      }
 
-  return () => slots.default?.()
-}, {
-  props: ['stripe', 'options'],
+      ctx.elements.value.update(stripeElementUpdateOptions)
+    }, { deep: true })
+
+    provide(ElementsKey, {
+      stripe: readonly(ctx.stripe),
+      elements: readonly(ctx.elements),
+    })
+
+    return () => slots.default?.()
+  },
 })
 
 export function useElementsContextWithUseCase(useCaseMessage: string): ElementsContextValue {

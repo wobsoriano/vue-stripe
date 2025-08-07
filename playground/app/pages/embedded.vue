@@ -12,6 +12,7 @@ onMounted(async () => {
   clientSecret.value = await $fetch('/api/create-checkout-session', {
     method: 'POST',
   })
+  return () => {}
 })
 </script>
 

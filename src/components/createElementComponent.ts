@@ -1,69 +1,129 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import { defineComponent, h, ref, watchEffect } from 'vue'
-import { useAttachEvent } from '../composables'
-import { useElementsOrCustomCheckoutSdkContextWithUseCase } from './CustomCheckout'
+import type { ShallowRef } from 'vue'
+import { defineComponent, h, onUnmounted, ref, shallowRef, toRaw, watch, watchEffect } from 'vue'
+import { useElementsOrCheckoutSdkContextWithUseCase } from './CheckoutProvider'
 
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
+
+export interface PrivateElementProps<T> {
+  id?: string
+  class?: string
+  options?: T
+}
 
 export function createElementComponent<Props extends Record<string, any>, Emits extends { (e: any, value: any): void }>(
   type: stripeJs.StripeElementType,
 ) {
   const displayName = `${capitalized(type)}Element`
-  const wrapper = defineComponent((props: {
-    id?: string
-    class?: string
-    options?: Props
-  }, { emit }) => {
-    const ctx = useElementsOrCustomCheckoutSdkContextWithUseCase(`mounts <${displayName}>`)
-    const elements = 'elements' in ctx ? ctx.elements : null
-    const customCheckoutSdk = 'customCheckoutSdk' in ctx ? ctx.customCheckoutSdk : null
-    const element = ref<stripeJs.StripeElement | null>(null)
-    const domRef = ref<HTMLDivElement | null>(null)
 
-    watchEffect((onInvalidate) => {
-      if (element.value === null && domRef.value !== null && (customCheckoutSdk?.value || elements?.value)) {
+  const Element = defineComponent((props: PrivateElementProps<Props>, { emit, attrs }) => {
+    const ctx = useElementsOrCheckoutSdkContextWithUseCase(`mounts <${displayName}>`)
+    const elements = 'elements' in ctx ? ctx.elements : null
+    const checkoutSdk = 'checkoutSdk' in ctx ? ctx.checkoutSdk : null
+    const elementRef = shallowRef<stripeJs.StripeElement | null>(null)
+    const domNode = ref<HTMLDivElement | null>(null)
+
+    watchEffect(() => {
+      if (elementRef.value === null && domNode.value !== null && (elements?.value || checkoutSdk?.value)) {
         let newElement: stripeJs.StripeElement | null = null
-        if (customCheckoutSdk?.value) {
-          newElement = customCheckoutSdk.value.createElement(type as any, props.options)
+        const options = props.options || {}
+
+        if (checkoutSdk?.value) {
+          switch (type) {
+            case 'payment':
+              newElement = checkoutSdk.value.createPaymentElement(options)
+              break
+            case 'address':
+              if ('mode' in options) {
+                const { mode, ...restOptions } = options
+                if (mode === 'shipping') {
+                  newElement = checkoutSdk.value.createShippingAddressElement(restOptions)
+                }
+                else if (mode === 'billing') {
+                  newElement = checkoutSdk.value.createBillingAddressElement(restOptions)
+                }
+                else {
+                  throw new Error('Invalid options.mode. mode must be \'billing\' or \'shipping\'.')
+                }
+              }
+              else {
+                throw new Error(
+                  'You must supply options.mode. mode must be \'billing\' or \'shipping\'.',
+                )
+              }
+              break
+            case 'expressCheckout':
+              newElement = checkoutSdk.value.createExpressCheckoutElement(
+                props.options as unknown as stripeJs.StripeCheckoutExpressCheckoutElementOptions,
+              ) as stripeJs.StripeExpressCheckoutElement
+              break
+            case 'currencySelector':
+              newElement = checkoutSdk.value.createCurrencySelectorElement()
+              break
+            case 'taxId':
+              newElement = checkoutSdk.value.createTaxIdElement(options)
+              break
+            default:
+              throw new Error(
+                `Invalid Element type ${displayName}. You must use either the <PaymentElement />, <AddressElement options={{mode: 'shipping'}} />, <AddressElement options={{mode: 'billing'}} />, or <ExpressCheckoutElement />.`,
+              )
+          }
         }
         else if (elements?.value) {
-          newElement = elements.value.create(type as any, props.options)
+          newElement = elements.value.create(type as any, options)
         }
 
-        element.value = newElement
+        // Store element in state to facilitate event listener attachment
+        elementRef.value = newElement
 
         if (newElement) {
-          newElement.mount(domRef.value)
+          newElement.mount(domNode.value)
         }
       }
-
-      onInvalidate(() => {
-        if (element.value && typeof element.value.destroy === 'function') {
-          element.value.destroy()
-        }
-      })
     })
 
-    useAttachEvent(element, 'blur', emit)
-    useAttachEvent(element, 'focus', emit)
-    useAttachEvent(element, 'escape', emit)
-    useAttachEvent(element, 'click', emit)
-    useAttachEvent(element, 'loaderror', emit)
-    useAttachEvent(element, 'loaderstart', emit)
-    useAttachEvent(element, 'networkschange', emit)
-    useAttachEvent(element, 'confirm', emit)
-    useAttachEvent(element, 'cancel', emit)
-    useAttachEvent(element, 'shippingaddresschange', emit)
-    useAttachEvent(element, 'shippingratechange', emit)
-    useAttachEvent(element, 'change', emit)
+    watch(() => props.options || {}, (options) => {
+      if (!elementRef.value) {
+        return
+      }
 
-    const emitElement = type !== 'expressCheckout'
-    useAttachEvent(element, 'ready', emit, emitElement)
+      // @ts-expect-error: TODO, why is update method not typed
+      elementRef.value.update(options)
+    }, { deep: true })
+
+    // For every event where the merchant provides a callback, call element.on
+    // with that callback. If the merchant ever changes the callback, removes
+    // the old callback with element.off and then call element.on with the new one.
+    useAttachEvent(elementRef, 'blur', emit, Boolean(attrs.onBlur))
+    useAttachEvent(elementRef, 'focus', emit, Boolean(attrs.onFocus))
+    useAttachEvent(elementRef, 'escape', emit, Boolean(attrs.onEscape))
+    useAttachEvent(elementRef, 'click', emit, Boolean(attrs.onClick))
+    useAttachEvent(elementRef, 'loaderror', emit, Boolean(attrs.onLoaderror))
+    useAttachEvent(elementRef, 'loaderstart', emit, Boolean(attrs.onLoaderstart))
+    useAttachEvent(elementRef, 'networkschange', emit, Boolean(attrs.onNetworkschange))
+    useAttachEvent(elementRef, 'confirm', emit, Boolean(attrs.onConfirm))
+    useAttachEvent(elementRef, 'cancel', emit, Boolean(attrs.onCancel))
+    useAttachEvent(elementRef, 'shippingaddresschange', emit, Boolean(attrs.onShippingaddresschange))
+    useAttachEvent(elementRef, 'shippingratechange', emit, Boolean(attrs.onShippingratechange))
+    useAttachEvent(elementRef, 'change', emit, Boolean(attrs.onChange))
+
+    const shouldEmitElement = type !== 'expressCheckout'
+    useAttachEvent(elementRef, 'ready', emit, Boolean(attrs.onReady), shouldEmitElement)
+
+    onUnmounted(() => {
+      const currentElement = elementRef.value
+      if (currentElement && typeof currentElement.destroy === 'function') {
+        try {
+          currentElement.destroy()
+        }
+        catch {}
+      }
+    })
 
     return () => h('div', {
       id: props.id,
       class: props.class,
-      ref: domRef,
+      ref: domNode,
     })
   }, {
     inheritAttrs: false,
@@ -71,11 +131,42 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
     props: ['id', 'class', 'options'],
   })
 
-  ;(wrapper as any).__elementType = type
+  ;(Element as any).__elementType = type
 
-  return wrapper as typeof wrapper & {
+  return Element as typeof Element & {
     new (...args: any): {
       $emit: Emits
     }
   }
+}
+
+export function useAttachEvent(
+  element: ShallowRef<stripeJs.StripeElement | null>,
+  event: string,
+  emit: (event: any, ...args: unknown[]) => void,
+  // Whether to listen for the event
+  isListeningForEvent: boolean,
+  // Emit with the element as payload
+  shouldEmitElement = false,
+) {
+  watchEffect((onInvalidate) => {
+    if (!element.value || !isListeningForEvent) {
+      return
+    }
+
+    function cbWithEmit(...args: unknown[]) {
+      if (shouldEmitElement) {
+        emit(event, toRaw(element.value))
+      }
+      else {
+        emit(event, ...args)
+      }
+    }
+
+    ;(element.value as any).on(event, cbWithEmit)
+
+    onInvalidate(() => {
+      ;(element.value as any).off(event, cbWithEmit)
+    })
+  })
 }

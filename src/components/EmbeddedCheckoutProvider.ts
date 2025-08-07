@@ -1,6 +1,8 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import { defineComponent, inject, provide, ref, type Ref, watchEffect } from 'vue'
+import type { UnknownOptions } from '../types'
+import { computed, type DeepReadonly, defineComponent, inject, type PropType, provide, readonly, type ShallowRef, shallowRef, watchEffect } from 'vue'
 import { EmbeddedCheckoutKey } from '../keys'
+import { parseStripeProp } from '../utils/parseStripeProp'
 
 interface EmbeddedCheckoutPublicInterface {
   mount(location: string | HTMLElement): void
@@ -9,10 +11,10 @@ interface EmbeddedCheckoutPublicInterface {
 }
 
 export interface EmbeddedCheckoutContextValue {
-  embeddedCheckout: EmbeddedCheckoutPublicInterface | null
+  embeddedCheckout: DeepReadonly<ShallowRef<EmbeddedCheckoutPublicInterface | null>>
 }
 
-export function useEmbeddedCheckoutContext(): Ref<EmbeddedCheckoutContextValue> {
+export function useEmbeddedCheckoutContext(): EmbeddedCheckoutContextValue {
   const ctx = inject(EmbeddedCheckoutKey, undefined)
   if (!ctx) {
     throw new Error(
@@ -22,55 +24,101 @@ export function useEmbeddedCheckoutContext(): Ref<EmbeddedCheckoutContextValue> 
   return ctx
 };
 
-interface EmbeddedCheckoutProviderProps {
-  /**
-   * A [Stripe object](https://stripe.com/docs/js/initializing).
-   * The easiest way to initialize a `Stripe` object is with the the
-   * [Stripe.js wrapper module](https://github.com/stripe/stripe-js/blob/master/README.md#readme).
-   * Once this prop has been set, it can not be changed.
-   *
-   * You can also pass in `null` if you are
-   * performing an initial server-side render or when generating a static site.
-   */
-  stripe: stripeJs.Stripe | null
-  /**
-   * Embedded Checkout configuration options.
-   * You can initially pass in `null` to `options.clientSecret` or
-   * `options.fetchClientSecret` if you are performing an initial server-side
-   * render or when generating a static site.
-   */
-  options: {
-    clientSecret?: string | null
-    fetchClientSecret?: (() => Promise<string>) | null
-    onComplete?: () => void
-    onShippingDetailsChange?: (
-      event: stripeJs.StripeEmbeddedCheckoutShippingDetailsChangeEvent
-    ) => Promise<stripeJs.ResultAction>
-  }
-}
+const INVALID_STRIPE_ERROR
+  = 'Invalid prop `stripe` supplied to `EmbeddedCheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.'
 
-export const EmbeddedCheckoutProvider = defineComponent((props: EmbeddedCheckoutProviderProps, { slots }) => {
-  const ctx = ref<EmbeddedCheckoutContextValue>({
-    embeddedCheckout: null,
-  })
+export const EmbeddedCheckoutProvider = defineComponent({
+  props: {
+    stripe: {
+      type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
+      required: true,
+    },
+    options: {
+      type: Object as PropType<{
+        clientSecret?: string | null
+        fetchClientSecret?: (() => Promise<string>) | null
+        onComplete?: () => void
+        onShippingDetailsChange?: (
+          event: stripeJs.StripeEmbeddedCheckoutShippingDetailsChangeEvent
+        ) => Promise<stripeJs.ResultAction>
+      }>,
+      required: true,
+    },
+  },
+  setup(props, { slots }) {
+    const parsed = computed(() => parseStripeProp(props.stripe, INVALID_STRIPE_ERROR))
 
-  watchEffect((onInvalidate) => {
-    if (
-      props.stripe
-      && !ctx.value.embeddedCheckout
-      && (props.options.clientSecret || props.options.fetchClientSecret)
-    ) {
-      props.stripe.initEmbeddedCheckout(props.options as any).then((embeddedCheckout) => {
-        ctx.value.embeddedCheckout = embeddedCheckout
-      })
+    const embeddedCheckoutPromise = shallowRef<Promise<void> | null>(
+      null,
+    )
+    const loadedStripe = shallowRef<stripeJs.Stripe | null>(null)
+
+    const ctx = {
+      embeddedCheckout: shallowRef<EmbeddedCheckoutPublicInterface | null>(null),
     }
 
-    onInvalidate(() => {
-      ctx.value.embeddedCheckout?.destroy()
+    watchEffect((onInvalidate) => {
+      // Don't support any ctx updates once embeddedCheckout or stripe is set.
+      if (loadedStripe.value || embeddedCheckoutPromise.value) {
+        return
+      }
+
+      const setStripeAndInitEmbeddedCheckout = (stripe: stripeJs.Stripe) => {
+        if (loadedStripe.value || embeddedCheckoutPromise.value)
+          return
+
+        loadedStripe.value = stripe
+        embeddedCheckoutPromise.value = loadedStripe.value
+          .initEmbeddedCheckout(props.options as UnknownOptions)
+          .then((embeddedCheckout) => {
+            ctx.embeddedCheckout.value = embeddedCheckout
+          })
+      }
+
+      // For an async stripePromise, store it once resolved
+      if (
+        parsed.value.tag === 'async'
+        && !loadedStripe.value
+        && (props.options.clientSecret || props.options.fetchClientSecret)
+      ) {
+        parsed.value.stripePromise.then((stripe) => {
+          if (stripe) {
+            setStripeAndInitEmbeddedCheckout(stripe)
+          }
+        })
+      }
+      else if (
+        parsed.value.tag === 'sync'
+        && !loadedStripe.value
+        && (props.options.clientSecret || props.options.fetchClientSecret)
+      ) {
+        // Or, handle a sync stripe instance going from null -> populated
+        setStripeAndInitEmbeddedCheckout(parsed.value.stripe)
+      }
+
+      onInvalidate(() => {
+        if (ctx.embeddedCheckout.value) {
+          embeddedCheckoutPromise.value = null
+          ctx.embeddedCheckout.value.destroy()
+        }
+        else if (embeddedCheckoutPromise.value) {
+          // If embedded checkout is still initializing, destroy it once
+          // it's done. This could be caused by unmounting very quickly
+          // after mounting.
+          embeddedCheckoutPromise.value.then(() => {
+            embeddedCheckoutPromise.value = null
+            if (ctx.embeddedCheckout.value) {
+              ctx.embeddedCheckout.value.destroy()
+            }
+          })
+        }
+      })
     })
-  })
 
-  provide(EmbeddedCheckoutKey, ctx)
+    provide(EmbeddedCheckoutKey, {
+      embeddedCheckout: readonly(ctx.embeddedCheckout),
+    })
 
-  return () => slots.default?.()
+    return () => slots.default?.()
+  },
 })
