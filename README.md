@@ -131,8 +131,10 @@ Don't do this
 
 ## Acknowledgements
 
-- [vue-stripe-js](https://www.npmjs.com/package/vue-stripe-js) - Vue 3 components for Stripe
+This project builds upon the foundation laid by several Vue Stripe integration libraries:
+
 - [vuestripe.com](https://vuestripe.com) - Vue 2 Stripe solution
+- [vue-stripe-js](https://www.npmjs.com/package/vue-stripe-js) - Vue 3 components for Stripe
 
 While these libraries provide valuable solutions, this project aims to deliver a comprehensive 1:1 equivalent to the [React Stripe SDK](https://github.com/stripe/react-stripe-js).
 
