@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.4.0
+
+### Minor Changes
+
+- 35a34d5: Stripe 7 support
+
 ## 0.3.5
 
 ### Patch Changes
