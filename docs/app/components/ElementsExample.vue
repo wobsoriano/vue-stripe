@@ -12,7 +12,7 @@ const options: StripeElementsOptions = {
   amount: 1099,
   currency: 'usd',
   appearance: {
-    theme: 'night'
+    theme: 'night',
   },
 }
 </script>
