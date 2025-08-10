@@ -18,7 +18,7 @@ Vue components for Stripe.js and Elements.
   ---
   color: neutral
   size: xl
-  to: /getting-started/installation
+  to: /getting-started/introduction
   trailing-icon: i-lucide-arrow-right
   ---
   Get started

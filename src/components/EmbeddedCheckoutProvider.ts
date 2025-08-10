@@ -1,7 +1,7 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { DeepReadonly, PropType, ShallowRef } from 'vue'
+import type { PropType, ShallowRef } from 'vue'
 import type { UnknownOptions } from '../types'
-import { computed, defineComponent, inject, provide, readonly, shallowRef, watchEffect } from 'vue'
+import { computed, defineComponent, inject, onUnmounted, provide, shallowRef, watchEffect } from 'vue'
 import { EmbeddedCheckoutKey } from '../keys'
 import { parseStripeProp } from '../utils/parseStripeProp'
 
@@ -12,7 +12,7 @@ interface EmbeddedCheckoutPublicInterface {
 }
 
 export interface EmbeddedCheckoutContextValue {
-  embeddedCheckout: DeepReadonly<ShallowRef<EmbeddedCheckoutPublicInterface | null>>
+  embeddedCheckout: ShallowRef<EmbeddedCheckoutPublicInterface | null>
 }
 
 export function useEmbeddedCheckoutContext(): EmbeddedCheckoutContextValue {
@@ -59,7 +59,7 @@ export const EmbeddedCheckoutProvider = defineComponent({
       embeddedCheckout: shallowRef<EmbeddedCheckoutPublicInterface | null>(null),
     }
 
-    watchEffect((onInvalidate) => {
+    watchEffect(() => {
       // Don't support any ctx updates once embeddedCheckout or stripe is set.
       if (loadedStripe.value || embeddedCheckoutPromise.value) {
         return
@@ -97,29 +97,27 @@ export const EmbeddedCheckoutProvider = defineComponent({
         // Or, handle a sync stripe instance going from null -> populated
         setStripeAndInitEmbeddedCheckout(parsed.value.stripe)
       }
+    })
 
-      onInvalidate(() => {
-        if (ctx.embeddedCheckout.value) {
+    onUnmounted(() => {
+      if (ctx.embeddedCheckout.value) {
+        embeddedCheckoutPromise.value = null
+        ctx.embeddedCheckout.value.destroy()
+      }
+      else if (embeddedCheckoutPromise.value) {
+        // If embedded checkout is still initializing, destroy it once
+        // it's done. This could be caused by unmounting very quickly
+        // after mounting.
+        embeddedCheckoutPromise.value.then(() => {
           embeddedCheckoutPromise.value = null
-          ctx.embeddedCheckout.value.destroy()
-        }
-        else if (embeddedCheckoutPromise.value) {
-          // If embedded checkout is still initializing, destroy it once
-          // it's done. This could be caused by unmounting very quickly
-          // after mounting.
-          embeddedCheckoutPromise.value.then(() => {
-            embeddedCheckoutPromise.value = null
-            if (ctx.embeddedCheckout.value) {
-              ctx.embeddedCheckout.value.destroy()
-            }
-          })
-        }
-      })
+          if (ctx.embeddedCheckout.value) {
+            ctx.embeddedCheckout.value.destroy()
+          }
+        })
+      }
     })
 
-    provide(EmbeddedCheckoutKey, {
-      embeddedCheckout: readonly(ctx.embeddedCheckout),
-    })
+    provide(EmbeddedCheckoutKey, ctx)
 
     return () => slots.default?.()
   },

@@ -9,7 +9,7 @@ export function useServerStripe(event: H3Event): Stripe {
     return event.context._stripe
   }
 
-  const stripe = new Stripe(config.stripe.secretKey)
+  const stripe = new Stripe(config.stripeSecretKey)
   event.context._stripe = stripe
 
   return stripe

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { Elements } from 'stripe-vue'
+import { Elements, ExpressCheckoutElement } from 'stripe-vue'
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -19,6 +19,6 @@ const options: StripeElementsOptions = {
 
 <template>
   <Elements :stripe="stripePromise" :options>
-    <CheckoutForm />
+    <PaymentElementCheckoutForm />
   </Elements>
 </template>
