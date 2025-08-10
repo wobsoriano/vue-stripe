@@ -1,24 +1,16 @@
 <script setup lang="ts">
-import type { StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { Elements, ExpressCheckoutElement } from 'stripe-vue'
+import { Elements } from 'stripe-vue'
 
 const runtimeConfig = useRuntimeConfig()
 
 const stripePromise = loadStripe(runtimeConfig.public.stripePublicKey)
 
-const options: StripeElementsOptions = {
-  mode: 'payment',
-  amount: 1099,
-  currency: 'usd',
-  appearance: {
-    theme: 'night',
-  },
-}
+const { data } = await useFetch('/api/express-checkout/payment-intent')
 </script>
 
 <template>
-  <Elements :stripe="stripePromise" :options>
-    <PaymentElementCheckoutForm />
+  <Elements :stripe="stripePromise" :options="{ clientSecret: data?.clientSecret! }">
+    <ExpressCheckoutForm />
   </Elements>
 </template>

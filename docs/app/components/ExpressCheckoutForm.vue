@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PaymentElement, useElements, useStripe } from 'stripe-vue'
+import { ExpressCheckoutElement, useElements, useStripe } from 'stripe-vue'
 
 const stripe = useStripe()
 const elements = useElements()
@@ -7,7 +7,7 @@ const elements = useElements()
 const errorMessage = ref<string | null>(null)
 const router = useRouter()
 
-async function handleSubmit() {
+async function confirm() {
   if (!stripe.value || !elements.value) {
     return
   }
@@ -21,9 +21,10 @@ async function handleSubmit() {
   }
 
   const { error } = await stripe.value.confirmPayment({
-    // `Elements` instance that was used to create the Payment Element
     elements: elements.value,
-    redirect: 'if_required'
+    confirmParams: {
+      return_url: 'http://localhost:3000/success'
+    }
   })
 
   if (error) {
@@ -45,10 +46,5 @@ async function handleSubmit() {
   <div v-if="errorMessage">
     {{ errorMessage }}
   </div>
-  <form @submit.prevent="handleSubmit">
-    <PaymentElement />
-    <button type="submit" :disabled="!stripe || !elements">
-      Pay
-    </button>
-  </form>
+  <ExpressCheckoutElement @confirm="confirm" />
 </template>
