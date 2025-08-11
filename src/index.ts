@@ -1,3 +1,4 @@
+/* eslint-disable ts/method-signature-style */
 import type * as stripeJs from '@stripe/stripe-js'
 import type {
   AddressElementEmits,

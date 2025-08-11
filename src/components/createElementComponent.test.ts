@@ -739,7 +739,6 @@ describe('createElementComponent', () => {
       setup() {
         return () => h(Elements, {
           stripe: mockStripe,
-          // @ts-expect-error: options is required
         }, () => h(CardElement, { options: options.value }))
       },
     })

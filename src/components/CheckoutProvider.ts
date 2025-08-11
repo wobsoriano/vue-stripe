@@ -126,7 +126,7 @@ export const CheckoutProvider = defineComponent({
           'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.',
         )
       }
-    }, { immediate: true })
+    })
 
     // Handle appearance changes
     watch(() => props.options.elementsOptions?.appearance, (appearance) => {

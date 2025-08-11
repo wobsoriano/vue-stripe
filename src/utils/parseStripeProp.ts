@@ -15,10 +15,10 @@ function validateStripe(maybeStripe: unknown, errorMsg = INVALID_STRIPE_ERROR): 
   throw new Error(errorMsg)
 }
 
-type ParsedStripeProp =
-  | { tag: 'empty' }
-  | { tag: 'sync', stripe: stripeJs.Stripe }
-  | { tag: 'async', stripePromise: Promise<stripeJs.Stripe | null> }
+type ParsedStripeProp
+  = | { tag: 'empty' }
+    | { tag: 'sync', stripe: stripeJs.Stripe }
+    | { tag: 'async', stripePromise: Promise<stripeJs.Stripe | null> }
 
 export function parseStripeProp(raw: unknown, errorMsg = INVALID_STRIPE_ERROR): ParsedStripeProp {
   if (isPromise(raw)) {
