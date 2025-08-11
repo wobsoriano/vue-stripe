@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 0.4.1
+
+### Patch Changes
+
+- a62290a: Fix element option types
+
 ## 0.4.0
 
 ### Minor Changes
