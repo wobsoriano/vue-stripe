@@ -23,8 +23,8 @@ async function confirm() {
   const { error } = await stripe.value.confirmPayment({
     elements: elements.value,
     confirmParams: {
-      return_url: 'http://localhost:3000/success'
-    }
+      return_url: 'http://localhost:3000/success',
+    },
   })
 
   if (error) {

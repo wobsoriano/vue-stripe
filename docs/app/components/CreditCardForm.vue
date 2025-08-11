@@ -1,29 +1,34 @@
 <script setup lang="ts">
-import { PaymentElement, useElements, useStripe } from 'stripe-vue'
+import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from 'stripe-vue'
 
 const stripe = useStripe()
 const elements = useElements()
 
 const errorMessage = ref<string | null>(null)
 const router = useRouter()
+const name = ref('')
+
+const { data, execute: createPaymentIntent } = await useFetch('/api/credit-card/payment-intent', {
+  immediate: false,
+})
 
 async function handleSubmit() {
   if (!stripe.value || !elements.value) {
     return
   }
 
-  // Trigger form validation and wallet collection
-  const { error: submitError } = await elements.value.submit()
-  if (submitError) {
-    // Show error to your customer
-    errorMessage.value = submitError.message!
-    return
-  }
+  await createPaymentIntent()
 
-  const { error } = await stripe.value.confirmPayment({
-    // `Elements` instance that was used to create the Payment Element
-    elements: elements.value,
-    redirect: 'if_required',
+  const clientSecret = data.value!.clientSecret!
+  const cardElement = elements.value.getElement(CardNumberElement)!
+
+  const { error } = await stripe.value.confirmCardPayment(clientSecret, {
+    payment_method: {
+      card: cardElement,
+      billing_details: {
+        name: name.value,
+      },
+    },
   })
 
   if (error) {
@@ -46,8 +51,11 @@ async function handleSubmit() {
     {{ errorMessage }}
   </div>
   <form @submit.prevent="handleSubmit">
-    <PaymentElement />
-    <button type="submit" :disabled="!stripe || !elements">
+    <input v-model="name" name="name" placeholder="Your name">
+    <CardNumberElement />
+    <CardExpiryElement />
+    <CardCvcElement />
+    <button type="submit">
       Pay
     </button>
   </form>

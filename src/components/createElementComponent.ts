@@ -131,9 +131,23 @@ export function createElementComponent<Props extends Record<string, any>, Emits 
     props: ['id', 'class', 'options'],
   })
 
-  ;(Element as any).__elementType = type
+  /**
+   * Stripe's elements.getElement() method requires the component to be a function
+   * with an __elementType property. It performs this check:
+   * `"function" == typeof component && component.__elementType`
+   *
+   * Since Vue's defineComponent() returns a constructor/class (not a plain function),
+   * we wrap it in this function to satisfy Stripe's requirements while preserving
+   * all Vue component functionality including reactivity and event emission.
+   */
+  function ElementWrapper(props: PrivateElementProps<Props>) {
+    return h(Element, props)
+  }
 
-  return Element as typeof Element & {
+  ElementWrapper.props = ['id', 'class', 'options']
+  ElementWrapper.__elementType = type
+
+  return ElementWrapper as typeof ElementWrapper & {
     new (...args: any): {
       $emit: Emits
     }
