@@ -119,6 +119,10 @@ export function createElementComponent<Props extends { id?: string, class?: stri
       class: props.class,
       ref: domNode,
     })
+  }, {
+    props: ['id', 'class', 'options'],
+    inheritAttrs: false,
+    name: displayName,
   })
 
   /**
@@ -134,8 +138,6 @@ export function createElementComponent<Props extends { id?: string, class?: stri
     return h(Element, props)
   }) as unknown as typeof Element
 
-  // @ts-expect-error: Runtime props
-  ElementWrapper.props = ['id', 'class', 'options']
   // @ts-expect-error: Internal Stripe requirement
   ElementWrapper.__elementType = type
 

@@ -4,6 +4,7 @@ import { defineComponent, h, nextTick, ref } from 'vue'
 import { renderComposable } from 'vue-composable-testing'
 import * as mocks from '../../test/mocks'
 import { CheckoutProvider, useCheckout } from './CheckoutProvider'
+import { Elements } from './Elements'
 import { useStripe } from './useStripe'
 
 describe('checkoutProvider', () => {
@@ -182,9 +183,6 @@ describe('checkoutProvider', () => {
   })
 
   it('initCheckout only called once and allows changes to elementsOptions appearance after setting the Stripe object', async () => {
-    // Silence console output so test output is less noisy
-    consoleWarn.mockImplementation(() => {})
-
     const fetchClientSecret = async () => 'cs_123'
     const options = ref({
       fetchClientSecret,
@@ -223,5 +221,183 @@ describe('checkoutProvider', () => {
         theme: 'night',
       })
     })
+  })
+
+  it('does not call loadFonts a 2nd time if they do not change', async () => {
+    const fetchClientSecret = async () => 'cs_123'
+    const options = ref({
+      fetchClientSecret,
+      elementsOptions: {
+        fonts: [
+          {
+            cssSrc: 'https://example.com/font.css',
+          },
+        ],
+      },
+    })
+    const Comp = defineComponent(() => {
+      return () => h(CheckoutProvider, {
+        stripe: mockStripe,
+        options: options.value as any,
+      })
+    })
+    render(Comp)
+
+    await waitFor(() =>
+      expect(mockStripe.initCheckout).toHaveBeenCalledWith({
+        fetchClientSecret,
+        elementsOptions: {
+          fonts: [
+            {
+              cssSrc: 'https://example.com/font.css',
+            },
+          ],
+        },
+      }),
+    )
+
+    options.value = {
+      fetchClientSecret: async () => 'cs_123',
+      elementsOptions: {
+        fonts: [
+          {
+            cssSrc: 'https://example.com/font.css',
+          },
+        ],
+      },
+    }
+
+    options.value = {
+      fetchClientSecret: async () => 'cs_123',
+      elementsOptions: {
+        fonts: [
+          {
+            cssSrc: 'https://example.com/font.css',
+          },
+        ],
+      },
+    }
+
+    await waitFor(() => {
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1)
+      // This is called once, due to the sdk having loaded.
+      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it('allows changes to elementsOptions fonts', async () => {
+    const fetchClientSecret = async () => 'cs_123'
+    const options = ref({
+      fetchClientSecret,
+      elementsOptions: {},
+    })
+    const Comp = defineComponent(() => {
+      return () => h(CheckoutProvider, {
+        stripe: mockStripe,
+        options: options.value as any,
+      })
+    })
+    render(Comp)
+
+    await waitFor(() =>
+      expect(mockStripe.initCheckout).toHaveBeenCalledWith({
+        fetchClientSecret,
+        elementsOptions: {},
+      }),
+    )
+
+    options.value = {
+      fetchClientSecret: async () => 'cs_123',
+      elementsOptions: {
+        fonts: [
+          {
+            cssSrc: 'https://example.com/font.css',
+          },
+        ],
+      },
+    }
+
+    await waitFor(() => {
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1)
+      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(1)
+      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledWith([
+        {
+          cssSrc: 'https://example.com/font.css',
+        },
+      ])
+    })
+  })
+
+  it('allows options changes before setting the Stripe object', async () => {
+    const fetchClientSecret = async () => 'cs_123'
+    const stripe = ref(null)
+
+    const Comp = defineComponent(() => {
+      return () => h(CheckoutProvider, {
+        stripe: stripe.value,
+        options: {
+          fetchClientSecret,
+          elementsOptions: {
+            appearance: { theme: 'stripe' },
+          },
+        },
+      })
+    })
+    render(Comp)
+
+    await waitFor(() =>
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(0),
+    )
+
+    stripe.value = mockStripe
+
+    await waitFor(() => {
+      expect(console.warn).not.toHaveBeenCalled()
+      expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1)
+      expect(mockStripe.initCheckout).toHaveBeenCalledWith({
+        fetchClientSecret,
+        elementsOptions: {
+          appearance: { theme: 'stripe' },
+        },
+      })
+    })
+  })
+
+  it('throws when trying to call useCheckout outside of CheckoutProvider context', () => {
+    expect(() => {
+      renderComposable(() => useCheckout())
+    }).toThrow('Could not find CheckoutProvider context; You need to wrap the part of your app that calls useCheckout() in an <CheckoutProvider> provider.')
+  })
+
+  it('throws when trying to call useStripe outside of CheckoutProvider context', () => {
+    expect(() => {
+      renderComposable(() => useStripe())
+    }).toThrow('Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.')
+  })
+
+  it('throws when trying to call useStripe in Elements -> CheckoutProvider nested context', () => {
+    const wrapper = defineComponent({
+      setup(_, { slots }) {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(CheckoutProvider, { stripe: mockStripe, options: { fetchClientSecret: async () => 'cs_123' } }, () => slots.default?.()))
+      },
+    })
+
+    expect(() => {
+      renderComposable(() => useStripe(), { wrapper })
+    }).toThrow('You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.')
+  })
+
+  it('throws when trying to call useStripe in CheckoutProvider -> Elements nested context', () => {
+    const wrapper = defineComponent({
+      setup(_, { slots }) {
+        return () => h(CheckoutProvider, { stripe: mockStripe, options: { fetchClientSecret: async () => 'cs_123' } }, () => h(Elements, { stripe: mockStripe }, () => slots.default?.()))
+      },
+    })
+
+    expect(() => {
+      renderComposable(() => useStripe(), { wrapper })
+    }).toThrow('You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.')
   })
 })
