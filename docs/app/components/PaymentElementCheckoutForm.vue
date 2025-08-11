@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PaymentElement, useElements, useStripe } from 'stripe-vue'
+import { AddressElement, LinkAuthenticationElement, PaymentElement, useElements, useStripe } from 'stripe-vue'
 
 const stripe = useStripe()
 const elements = useElements()
@@ -46,7 +46,9 @@ async function handleSubmit() {
     {{ errorMessage }}
   </div>
   <form @submit.prevent="handleSubmit">
+    <LinkAuthenticationElement />
     <PaymentElement />
+    <AddressElement :options="{ mode: 'billing' }" />
     <button type="submit" :disabled="!stripe || !elements">
       Pay
     </button>
