@@ -1,6 +1,6 @@
 import { render } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import * as mocks from '../../test/mocks'
 import { EmbeddedCheckout } from './EmbeddedCheckout'
 import * as EmbeddedCheckoutProviderModule from './EmbeddedCheckoutProvider'
@@ -12,7 +12,6 @@ describe('embeddedCheckout on the client', () => {
   let mockStripePromise: any
   let mockEmbeddedCheckout: any
   let mockEmbeddedCheckoutPromise: any
-  let consoleWarn: any
   const fakeClientSecret = 'cs_123_secret_abc'
   const fetchClientSecret = () => Promise.resolve(fakeClientSecret)
   const fakeOptions = { fetchClientSecret }
@@ -25,55 +24,123 @@ describe('embeddedCheckout on the client', () => {
     mockStripe.initEmbeddedCheckout.mockReturnValue(
       mockEmbeddedCheckoutPromise,
     )
-    vi.spyOn(console, 'warn')
-    consoleWarn = console.warn
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  it.todo('passes id to the wrapping DOM element', async () => {
-    // Silence console output so test output is less noisy
-    consoleWarn.mockImplementation(() => {})
+  it('passes id to the wrapping DOM element', async () => {
     const Comp = defineComponent(() => {
       return () => h(EmbeddedCheckoutProvider, {
         stripe: mockStripePromise,
         options: fakeOptions,
       }, () => h(EmbeddedCheckout, { id: 'foo' }))
     })
-    render(Comp)
+    const { container } = render(Comp)
 
-    await mockStripePromise
-    await nextTick()
+    const elementContainer = container.firstElementChild as Element
 
-    render(parent)
-    await nextTick()
-
-    // const elementContainer = container.firstChild as Element
-
-    // expect(elementContainer.id).toBe('foo')
+    expect(elementContainer.id).toBe('foo')
   })
 
-  it.todo('passes class to the wrapping DOM element', async () => {
-    // Silence console output so test output is less noisy
-    consoleWarn.mockImplementation(() => {})
+  it('passes class to the wrapping DOM element', async () => {
     const Comp = defineComponent(() => {
       return () => h(EmbeddedCheckoutProvider, {
         stripe: mockStripePromise,
         options: fakeOptions,
       }, () => h(EmbeddedCheckout, { class: 'bar' }))
     })
-    render(Comp)
+    const { container } = render(Comp)
 
-    await mockStripePromise
-    await nextTick()
-
-    const { container } = render(parent)
-    await nextTick()
-
-    const elementContainer = container.firstChild as Element
+    const elementContainer = container.firstElementChild as Element
 
     expect(elementContainer).toHaveClass('bar')
+  })
+
+  it('mounts Embedded Checkout', async () => {
+    const Comp = defineComponent(() => {
+      return () => h(EmbeddedCheckoutProvider, {
+        stripe: mockStripe,
+        options: fakeOptions,
+      }, () => h(EmbeddedCheckout))
+    })
+    const { container } = render(Comp)
+
+    await mockEmbeddedCheckoutPromise
+
+    expect(mockEmbeddedCheckout.mount).toBeCalledWith(container.firstElementChild)
+  })
+
+  it('does not mount until Embedded Checkout has been initialized', async () => {
+    const stripe = ref(null)
+    const options = ref({
+      fetchClientSecret: null,
+    })
+    // Render with no stripe instance and client secret
+    const Comp = defineComponent(() => {
+      return () => h(EmbeddedCheckoutProvider, {
+        stripe: stripe.value,
+        options: options.value,
+      }, () => h(EmbeddedCheckout))
+    })
+    const { container } = render(Comp)
+    expect(mockEmbeddedCheckout.mount).not.toBeCalled()
+
+    // Set stripe prop
+    stripe.value = mockStripe
+    expect(mockEmbeddedCheckout.mount).not.toBeCalled()
+
+    // Set fetchClientSecret
+    options.value.fetchClientSecret = fetchClientSecret
+    expect(mockEmbeddedCheckout.mount).not.toBeCalled()
+
+    await nextTick()
+    await mockEmbeddedCheckoutPromise
+
+    expect(mockEmbeddedCheckout.mount).toBeCalledWith(container.firstElementChild)
+  })
+
+  it('unmounts Embedded Checkout when the component unmounts', async () => {
+    const rerenderKey = ref(0)
+    const Comp = defineComponent(() => {
+      return () => h(EmbeddedCheckoutProvider, {
+        stripe: mockStripe,
+        options: fakeOptions,
+      }, () => h(EmbeddedCheckout, { key: rerenderKey.value }))
+    })
+    const { container } = render(Comp)
+
+    await mockEmbeddedCheckoutPromise
+
+    expect(mockEmbeddedCheckout.mount).toBeCalledWith(container.firstElementChild)
+
+    rerenderKey.value++
+
+    await nextTick()
+    expect(mockEmbeddedCheckout.unmount).toBeCalled()
+  })
+
+  it('does not throw when the Embedded Checkout instance is already destroyed when unmounting', async () => {
+    const rerenderKey = ref(0)
+    const Comp = defineComponent(() => {
+      return () => h(EmbeddedCheckoutProvider, {
+        stripe: mockStripe,
+        options: fakeOptions,
+      }, () => h(EmbeddedCheckout, { key: rerenderKey.value }))
+    })
+    const { container } = render(Comp)
+
+    await mockEmbeddedCheckoutPromise
+
+    expect(mockEmbeddedCheckout.mount).toBeCalledWith(container.firstElementChild)
+
+    mockEmbeddedCheckout.unmount.mockImplementation(() => {
+      throw new Error('instance has been destroyed')
+    })
+
+    expect(() => {
+      rerenderKey.value++
+    }).not.toThrow()
   })
 })
