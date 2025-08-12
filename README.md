@@ -128,7 +128,7 @@ Don't do this
 This project builds upon the foundation laid by several Vue Stripe integration libraries:
 
 - [vue-stripe](https://github.com/matfish2/vue-stripe) - Vue.js 2 Stripe checkout component. Special thanks to @matfish2 for graciously transferring the `vue-stripe` package name to enable this project.
-- [vuestripe.com](https://vuestripe.com) - Vue 2 Stripe solution
+- [vuestripe.com](https://vuestripe.com) - Stripe Checkout & Elements for Vue.js (verified partner of Stripe)
 - [vue-stripe-js](https://www.npmjs.com/package/vue-stripe-js) - Vue 3 components for Stripe
 
 While these libraries provide valuable solutions, this project aims to deliver a comprehensive 1:1 equivalent to the [React Stripe SDK](https://github.com/stripe/react-stripe-js) with complete tests.
