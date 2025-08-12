@@ -8,7 +8,7 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 ## Installation
 
 ```bash
-npm install stripe-vue @stripe/stripe-js
+npm install vue-stripe @stripe/stripe-js
 ```
 
 ## Minimal example
