@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 1.0.1
+
+### Patch Changes
+
+- d8b4512: Fix package info
+
 ## 1.0.0
 
 ### Major Changes
