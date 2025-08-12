@@ -1,5 +1,7 @@
 import starlight from '@astrojs/starlight'
+import vercel from '@astrojs/vercel'
 import vue from '@astrojs/vue'
+
 // @ts-check
 import { defineConfig } from 'astro/config'
 
@@ -35,4 +37,6 @@ export default defineConfig({
       },
     ],
   }), vue()],
+
+  adapter: vercel(),
 })

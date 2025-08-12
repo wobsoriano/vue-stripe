@@ -1,8 +1,8 @@
 {
   "name": "docs",
-  "private": true,
   "type": "module",
   "version": "0.0.1",
+  "private": true,
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@astrojs/starlight": "^0.35.2",
+    "@astrojs/vercel": "^8.2.5",
     "@astrojs/vue": "^5.1.0",
     "astro": "^5.6.1",
     "sharp": "^0.34.2",
