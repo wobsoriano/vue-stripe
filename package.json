@@ -6,12 +6,12 @@
   "description": "Vue components for Stripe.js and Stripe Elements",
   "author": "Robert Soriano <sorianorobertc@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/wobsoriano/stripe-vue#readme",
+  "homepage": "https://github.com/wobsoriano/vue-stripe#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wobsoriano/stripe-vue.git"
+    "url": "git+https://github.com/wobsoriano/vue-stripe.git"
   },
-  "bugs": "https://github.com/wobsoriano/stripe-vue/issues",
+  "bugs": "https://github.com/wobsoriano/vue-stripe/issues",
   "keywords": [
     "vue",
     "stripe",
