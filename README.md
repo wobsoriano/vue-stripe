@@ -1,4 +1,4 @@
-# stripe-vue
+# vue-stripe
 
 Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) with full TypeScript support.
 
@@ -133,6 +133,7 @@ Don't do this
 
 This project builds upon the foundation laid by several Vue Stripe integration libraries:
 
+- [vue-stripe](https://github.com/matfish2/vue-stripe) - Vue.js 2 Stripe checkout component. Special thanks to @matfish2 for graciously transferring the `vue-stripe` package name to enable this project.
 - [vuestripe.com](https://vuestripe.com) - Vue 2 Stripe solution
 - [vue-stripe-js](https://www.npmjs.com/package/vue-stripe-js) - Vue 3 components for Stripe
 
