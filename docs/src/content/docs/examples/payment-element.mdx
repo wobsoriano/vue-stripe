@@ -6,5 +6,22 @@ description: Learn about Vue components for Stripe.js and Stripe Elements.
 A component with 40+ payment methods including credit cards, SEPA, ApplePay and GooglePay.
 
 import PaymentElementExample from '../../../components/PaymentElementExample.vue';
+import { Code } from '@astrojs/starlight/components';
+import PaymentElementExampleRaw from '../../../components/PaymentElementExample.vue?raw';
+import PaymentElementCheckoutFormRaw from '../../../components/PaymentElementCheckoutForm.vue?raw';
+import PaymentElementServerRaw from '../../../pages/api/payment-element/payment-intent?raw';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 <PaymentElementExample client:load />
+
+<Tabs>
+  <TabItem label="App.vue">
+      <Code code={PaymentElementExampleRaw} lang="vue" />
+  </TabItem>
+  <TabItem label="PaymentElementCheckoutForm.vue">
+      <Code code={PaymentElementCheckoutFormRaw} lang="vue" />
+  </TabItem>
+  <TabItem label="server.ts">
+      <Code code={PaymentElementServerRaw} lang="ts" />
+  </TabItem>
+</Tabs>
