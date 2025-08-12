@@ -74,7 +74,7 @@ describe('embeddedCheckout on the client', () => {
 
   it('does not mount until Embedded Checkout has been initialized', async () => {
     const stripe = ref(null)
-    const options = ref({
+    const options = ref<any>({
       fetchClientSecret: null,
     })
     // Render with no stripe instance and client secret
