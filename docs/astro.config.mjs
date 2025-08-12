@@ -12,7 +12,7 @@ export default defineConfig({
   integrations: [starlight({
     plugins: [starlightThemeRapide()],
     title: 'vue-stripe',
-    social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+    social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/wobsoriano/vue-stripe' }],
     sidebar: [
       {
         label: 'Getting Started',
