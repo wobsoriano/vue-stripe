@@ -21,7 +21,7 @@ import {
   PaymentElement,
   useElements,
   useStripe,
-} from 'stripe-vue'
+} from 'vue-stripe'
 
 const stripe = useStripe()
 const elements = useElements()
@@ -86,7 +86,7 @@ async function handleSubmit() {
 ```vue
 <script setup>
 import { loadStripe } from '@stripe/stripe-js'
-import { Elements } from 'stripe-vue'
+import { Elements } from 'vue-stripe'
 import CheckoutForm from './CheckoutForm.vue'
 
 const stripe = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
