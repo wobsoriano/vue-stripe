@@ -1,5 +1,5 @@
 {
-  "name": "stripe-vue",
+  "name": "vue-stripe",
   "type": "module",
   "version": "0.4.1",
   "packageManager": "pnpm@9.11.0",

@@ -1,15 +1,9 @@
-# stripe-vue
+# vue-stripe
 
 Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) with full TypeScript support.
 
 > [!NOTE]
 > The aim of this module is to have [`@stripe/react-stripe-js`](https://github.com/stripe/react-stripe-js) for Vue with feature parity. You should be able to follow the [React docs](https://stripe.com/docs/stripe-js/react) and examples using this module.
-
-## Features
-
-- All [Stripe Web Elements](https://docs.stripe.com/payments/elements) components
-- [Custom Checkout](https://docs.stripe.com/checkout/custom-checkout/overview) with the [`<CustomCheckoutProvider>`](https://docs.stripe.com/js/custom_checkout/react/custom_checkout_provider) component and [`useCustomCheckout()`](https://docs.stripe.com/js/custom_checkout/react/use_custom_checkout) composable.
-- [Embedded Checkout](https://docs.stripe.com/checkout/embedded/quickstart) with the [`<EmbeddedCheckoutProvider>`](https://docs.stripe.com/checkout/embedded/quickstart?client=react) and `<EmbeddedCheckout>` components.
 
 ## Installation
 
@@ -133,7 +127,8 @@ Don't do this
 
 This project builds upon the foundation laid by several Vue Stripe integration libraries:
 
-- [vuestripe.com](https://vuestripe.com) - Vue 2 Stripe solution
+- [vue-stripe](https://github.com/matfish2/vue-stripe) - Vue.js 2 Stripe checkout component. Special thanks to @matfish2 for graciously transferring the `vue-stripe` package name to enable this project.
+- [vuestripe.com](https://vuestripe.com) - Stripe Checkout & Elements for Vue.js (verified partner of Stripe)
 - [vue-stripe-js](https://www.npmjs.com/package/vue-stripe-js) - Vue 3 components for Stripe
 
 While these libraries provide valuable solutions, this project aims to deliver a comprehensive 1:1 equivalent to the [React Stripe SDK](https://github.com/stripe/react-stripe-js) with complete tests.
