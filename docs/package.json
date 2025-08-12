@@ -1,17 +1,25 @@
 {
   "name": "docs",
+  "type": "module",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "nuxt dev --extends docus",
-    "build": "nuxt build --extends docus"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "dependencies": {
-    "@nuxt/ui-pro": "^3.3.0",
-    "better-sqlite3": "^12.2.0",
-    "docus": "latest",
-    "nuxt": "^4.0.0",
+    "@astrojs/starlight": "^0.35.2",
+    "@astrojs/vercel": "^8.2.5",
+    "@astrojs/vue": "^5.1.0",
+    "astro": "^5.6.1",
+    "sharp": "^0.34.2",
+    "starlight-theme-flexoki": "^0.2.0",
+    "starlight-theme-rapide": "^0.5.1",
     "stripe": "^18.4.0",
-    "stripe-vue": "workspace:*",
-    "tailwindcss": "^4.1.11"
+    "vue": "^3.5.18",
+    "vue-stripe": "workspace:*"
   }
 }
