@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 
 const stripe = new Stripe(import.meta.env.STRIPE_SECRET_KEY)
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async () => {
   const returnUrl = new URL('/success', `http://localhost:4321`)
 
   const session = await stripe.checkout.sessions.create({
