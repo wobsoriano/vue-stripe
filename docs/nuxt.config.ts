@@ -1,5 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  site: {
+    name: 'vue-stripe',
+  },
   devtools: { enabled: false },
   imports: {
     autoImport: true,
