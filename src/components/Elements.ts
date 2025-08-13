@@ -1,5 +1,5 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { DeepReadonly, PropType, ShallowRef } from 'vue'
+import type { DeepReadonly, PropType, ShallowRef, SlotsType } from 'vue'
 import type { UnknownOptions } from '../types'
 import { computed, defineComponent, inject, provide, readonly, shallowRef, watch, watchEffect } from 'vue'
 import { ElementsKey } from '../keys'
@@ -36,6 +36,12 @@ export const Elements = defineComponent({
       default: () => ({}),
     },
   },
+  slots: {} as SlotsType<{
+    default: {
+      stripe: stripeJs.Stripe | null
+      elements: stripeJs.StripeElements | null
+    }
+  }>,
   setup(props, { slots }) {
     const parsed = computed(() => parseStripeProp(props.stripe))
 
@@ -98,7 +104,7 @@ export const Elements = defineComponent({
       elements: readonly(ctx.elements),
     })
 
-    return () => slots.default?.()
+    return () => slots.default?.({ stripe: ctx.stripe.value, elements: ctx.elements.value })
   },
 })
 
