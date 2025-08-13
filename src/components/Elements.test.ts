@@ -70,6 +70,36 @@ describe('elements', () => {
     expect(result.value).toStrictEqual(mockStripe)
   })
 
+  it('injects stripe and elements via slots for Options API users', () => {
+    const Child = defineComponent({
+      props: ['stripe', 'elements'],
+      setup(props) {
+        expect(props.stripe).toBe(mockStripe)
+        expect(props.elements).toBe(mockElements)
+        return () => null
+      }
+    })
+
+    const Parent = defineComponent({
+      components: {
+        Elements,
+        Child,
+      },
+      setup() {
+        return {
+          stripe: mockStripe
+        }
+      },
+      template: `
+        <Elements :stripe="stripe" v-slot="slotProps">
+          <Child :stripe="slotProps.stripe" :elements="slotProps.elements" />
+        </Elements>
+      `
+    })
+
+    render(Parent)
+  })
+
   it('provides given stripe instance on mount', () => {
     const child = defineComponent({
       template: '<div />',
