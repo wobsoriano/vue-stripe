@@ -77,7 +77,7 @@ describe('elements', () => {
         expect(props.stripe).toBe(mockStripe)
         expect(props.elements).toBe(mockElements)
         return () => null
-      }
+      },
     })
 
     const Parent = defineComponent({
@@ -87,14 +87,14 @@ describe('elements', () => {
       },
       setup() {
         return {
-          stripe: mockStripe
+          stripe: mockStripe,
         }
       },
       template: `
         <Elements :stripe="stripe" v-slot="slotProps">
           <Child :stripe="slotProps.stripe" :elements="slotProps.elements" />
         </Elements>
-      `
+      `,
     })
 
     render(Parent)
