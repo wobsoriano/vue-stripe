@@ -10,12 +10,6 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 - [Add Vue Stripe.js to your Vue app](https://www.vue-stripe.com/getting-started/embedded-components/#installation)
 - [Try it out using CodeSandbox](https://codesandbox.io/p/devbox/vue-stripe-demo-nds3jv)
 
-## Installation
-
-```bash
-npm install vue-stripe @stripe/stripe-js
-```
-
 ## Minimal example
 
 An example `CheckoutForm` component:
