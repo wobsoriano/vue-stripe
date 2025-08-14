@@ -5,6 +5,11 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 > [!NOTE]
 > The aim of this module is to have [`@stripe/react-stripe-js`](https://github.com/stripe/react-stripe-js) for Vue with feature parity. You should be able to follow the [React docs](https://stripe.com/docs/stripe-js/react) and examples using this module.
 
+## Getting started
+
+- [Add Vue Stripe.js to your Vue app](https://www.vue-stripe.com/getting-started/embedded-components/#installation)
+- [Try it out using CodeSandbox](https://codesandbox.io/p/devbox/vue-stripe-demo-nds3jv)
+
 ## Installation
 
 ```bash
