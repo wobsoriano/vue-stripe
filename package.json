@@ -1,7 +1,7 @@
 {
   "name": "vue-stripe",
   "type": "module",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "packageManager": "pnpm@10.14.0",
   "description": "Vue components for Stripe.js and Stripe Elements",
   "author": "Robert Soriano <sorianorobertc@gmail.com>",
