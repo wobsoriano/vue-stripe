@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 1.0.3
+
+### Patch Changes
+
+- bedd4ed: JSDoc improvements
+
 ## 1.0.2
 
 ### Patch Changes
