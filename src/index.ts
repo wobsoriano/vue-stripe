@@ -152,7 +152,7 @@ declare module '@stripe/stripe-js' {
      * Requires beta access:
      * Contact [Stripe support](https://support.stripe.com/) for more information.
      *
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=auBankAccount) for the `AuBankAccountElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=auBankAccount) for the `AuBankAccountElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `AuBankAccountElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -160,7 +160,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeAuBankAccountElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `CardElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -168,7 +168,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardNumberElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardNumberElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `CardNumberElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -176,7 +176,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardNumberElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardCvcElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardCvcElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `CardCvcElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -184,7 +184,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardCvcElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardExpiryElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `CardExpiryElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `CardExpiryElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -192,7 +192,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardExpiryElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=fpxBank) for the `FpxBankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=fpxBank) for the `FpxBankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `FpxBankElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -200,7 +200,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeFpxBankElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `IbanElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `IbanElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `IbanElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -208,7 +208,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeIbanElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=idealBank) for the `IdealBankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=idealBank) for the `IdealBankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `IdealBankElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -216,7 +216,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeIdealBankElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=p24Bank) for the `P24BankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=p24Bank) for the `P24BankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `P24BankElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -224,7 +224,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeP24BankElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=epsBank) for the `EpsBankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=epsBank) for the `EpsBankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `EpsBankElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -232,7 +232,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeEpsBankElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_link_authentication_element) for the `LinkAuthenticationElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_link_authentication_element) for the `LinkAuthenticationElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `LinkAuthenticationElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -240,7 +240,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeLinkAuthenticationElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_payment_element) for the `PaymentElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_payment_element) for the `PaymentElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `PaymentElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -248,7 +248,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_express_checkout_element) for the `ExpressCheckoutElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_express_checkout_element) for the `ExpressCheckoutElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `ExpressCheckoutElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -256,7 +256,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `PaymentRequestButtonElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `PaymentRequestButtonElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -264,7 +264,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripePaymentRequestButtonElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_address_element) for the `AddressElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_address_element) for the `AddressElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `AddressElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -272,7 +272,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeAddressElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=paymentMethodMessaging) for the `PaymentMethodMessagingElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=paymentMethodMessaging) for the `PaymentMethodMessagingElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `PaymentMethodMessagingElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -280,7 +280,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripePaymentMethodMessagingElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `AffirmMessageElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `AffirmMessageElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `AffirmMessageElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
@@ -288,7 +288,7 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeAffirmMessageElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `AfterpayClearpayMessageElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/embedded-components/#elements-provider) provider tree.
+     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `AfterpayClearpayMessageElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `AfterpayClearpayMessageElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
