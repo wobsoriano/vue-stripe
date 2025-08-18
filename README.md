@@ -94,7 +94,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from 'vue-stripe'
 import CheckoutForm from './CheckoutForm.vue'
 
-const stripe = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
+const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
 
 const options = {
   mode: 'payment',
@@ -108,7 +108,7 @@ const options = {
 </script>
 
 <template>
-  <Elements :stripe="stripe" :options="options">
+  <Elements :stripe="stripePromise" :options="options">
     <CheckoutForm />
   </Elements>
 </template>
