@@ -13,7 +13,7 @@ npm install vue-stripe @stripe/stripe-js
 
 ## Checkout provider
 
-The `Elements` provider allows you to use [Element components](https://docs.stripe.com/sdks/stripejs-react?ui=elements#element-components) and access the [Stripe object](https://docs.stripe.com/js/initializing) in any nested component.
+The `Elements` provider allows you to use [Element components](https://docs.stripe.com/sdks/stripejs-react?ui=elements#element-components) and access the [Stripe object](https://docs.stripe.com/js/initializing) in any nested component. Render a `CheckoutProvider` at the root of your Vue app so that it’s available everywhere you need it.
 
 ```vue
 <script setup>

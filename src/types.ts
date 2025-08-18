@@ -156,6 +156,24 @@ export interface ExpressCheckoutElementEmits extends BaseElementEmits {
   (e: 'shippingratechange', event: stripeJs.StripeExpressCheckoutElementShippingRateChangeEvent): void
 }
 
+export interface CurrencySelectorElementProps extends ElementProps {}
+
+export interface CurrencySelectorElementEmits extends BaseElementEmits {
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
+   */
+  (e: 'ready', event: stripeJs.StripeCurrencySelectorElement): void
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  (e: 'escape'): void
+  /**
+   * Triggered when the Element fails to load.
+   */
+  (e: 'loaderror', event: { elementType: 'currencySelector', error: stripeJs.StripeError }): void
+}
+
 export interface PaymentRequestButtonElementProps extends ElementProps {
   options?: stripeJs.StripePaymentRequestButtonElementOptions
 }
@@ -199,6 +217,36 @@ export interface AfterpayClearpayMessageElementProps extends ElementProps {
 
 export interface AfterpayClearpayMessageElementEmits extends BaseElementEmits {
   (e: 'ready', element: stripeJs.StripeAfterpayClearpayMessageElement): void
+}
+
+export interface TaxIdElementProps extends ElementProps {
+  /**
+   * An object containing Element configuration options.
+   */
+  options?: stripeJs.StripeTaxIdElementOptions
+}
+
+export interface TaxIdElementEmits extends BaseElementEmits {
+  /**
+   * Triggered when data exposed by this Element is changed (e.g., when there is an error).
+   */
+  (e: 'change', event: stripeJs.StripeTaxIdElementChangeEvent): void
+  /**
+   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
+   */
+  (e: 'ready', element: stripeJs.StripeTaxIdElement): void
+  /**
+   * Triggered when the escape key is pressed within the Element.
+   */
+  (e: 'escape'): void
+  /**
+   * Triggered when the Element fails to load.
+   */
+  (e: 'loaderror', event: { elementType: 'taxId', error: stripeJs.StripeError }): void
+  /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  (e: 'loaderstart', event: { elementType: 'taxId' }): void
 }
 
 export interface UnknownOptions { [k: string]: unknown }
