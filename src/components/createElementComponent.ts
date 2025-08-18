@@ -77,11 +77,11 @@ export function createElementComponent<Props extends { id?: string, class?: stri
     })
 
     watch(() => props.options || {}, (options) => {
-      if (!elementRef.value) {
+      if (elementRef.value && 'update' in elementRef.value) {
         return
       }
 
-      // @ts-expect-error: TODO, why is update method not typed
+      // @ts-expect-error: Update method is not defined for all elements
       elementRef.value.update(options)
     }, { deep: true })
 
