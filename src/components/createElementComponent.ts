@@ -1,16 +1,22 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { ShallowRef } from 'vue'
+import type { EmitsOptions, FunctionalComponent, ShallowRef } from 'vue'
 import { defineComponent, h, onUnmounted, ref, shallowRef, toRaw, watch, watchEffect } from 'vue'
 import { useElementsOrCheckoutSdkContextWithUseCase } from './CheckoutProvider'
 
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
-export function createElementComponent<Props extends { id?: string, class?: string, options?: any }, Emits extends { (e: any, value: any): void }>(
+interface Props {
+  id?: string
+  class?: string
+  options?: any
+}
+
+export function createElementComponent<ElementProps extends Props, ElementEmits extends EmitsOptions>(
   type: stripeJs.StripeElementType,
 ) {
   const displayName = `${capitalized(type)}Element`
 
-  const Element = defineComponent((props: Props, { attrs, emit }) => {
+  const Element = defineComponent<ElementProps, ElementEmits>((props, { attrs, emit }) => {
     const ctx = useElementsOrCheckoutSdkContextWithUseCase(`mounts <${displayName}>`)
     const elements = 'elements' in ctx ? ctx.elements : null
     const checkoutSdk = 'checkoutSdk' in ctx ? ctx.checkoutSdk : null
@@ -118,8 +124,8 @@ export function createElementComponent<Props extends { id?: string, class?: stri
     })
   }, {
     props: ['id', 'class', 'options'],
-    inheritAttrs: false,
     name: displayName,
+    inheritAttrs: false,
   })
 
   /**
@@ -131,18 +137,14 @@ export function createElementComponent<Props extends { id?: string, class?: stri
    * we wrap it in this function to satisfy Stripe's requirements while preserving
    * all Vue component functionality including reactivity and event emission.
    */
-  const ElementWrapper = ((props: any) => {
-    return h(Element, props)
-  }) as unknown as typeof Element
+  const ElementWrapper: FunctionalComponent<ElementProps, ElementEmits> = (props) => {
+    return h(Element, props as any)
+  }
 
   // @ts-expect-error: Internal Stripe requirement
   ElementWrapper.__elementType = type
 
-  return ElementWrapper as typeof ElementWrapper & {
-    new (...args: any): {
-      $emit: Emits
-    }
-  }
+  return ElementWrapper
 }
 
 export function useAttachEvent(
