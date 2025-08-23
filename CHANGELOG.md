@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 1.0.4
+
+### Patch Changes
+
+- d3da2ec: Use Functional component type
+
 ## 1.0.3
 
 ### Patch Changes
