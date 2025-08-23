@@ -1,19 +1,20 @@
-/* eslint-disable ts/consistent-type-definitions */
 import type * as stripeJs from '@stripe/stripe-js'
 
-export type ElementProps = {
+type ElementProps = {
   id?: string
   class?: string
 }
+
+export type WithElementProps<T extends object> = T & ElementProps
 
 export type BaseElementEmits = {
   blur: (event: { elementType: stripeJs.StripeElementType }) => void
   focus: (event: { elementType: stripeJs.StripeElementType }) => void
 }
 
-export type AuBankAccountElementProps = ElementProps & {
+export type AuBankAccountElementProps = WithElementProps<{
   options?: stripeJs.StripeAuBankAccountElementOptions
-}
+}>
 
 export type AuBankAccountElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeAuBankAccountElementChangeEvent) => void
@@ -21,9 +22,9 @@ export type AuBankAccountElementEmits = BaseElementEmits & {
   escape: () => void
 }
 
-export type CardElementProps = ElementProps & {
+export type CardElementProps = WithElementProps<{
   options?: stripeJs.StripeCardElementOptions
-}
+}>
 
 export type CardElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeCardElementChangeEvent) => void
@@ -33,9 +34,9 @@ export type CardElementEmits = BaseElementEmits & {
   loaderror: (event: { elementType: 'card', error: stripeJs.StripeError }) => void
 }
 
-export type CardNumberElementProps = ElementProps & {
+export type CardNumberElementProps = WithElementProps<{
   options?: stripeJs.StripeCardNumberElementOptions
-}
+}>
 
 export type CardNumberElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeCardNumberElementChangeEvent) => void
@@ -45,9 +46,9 @@ export type CardNumberElementEmits = BaseElementEmits & {
   loaderror: (event: { elementType: 'cardNumber', error: stripeJs.StripeError }) => void
 }
 
-export type CardExpiryElementProps = ElementProps & {
+export type CardExpiryElementProps = WithElementProps<{
   options?: stripeJs.StripeCardExpiryElementOptions
-}
+}>
 
 export type CardExpiryElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeCardExpiryElementChangeEvent) => void
@@ -55,9 +56,9 @@ export type CardExpiryElementEmits = BaseElementEmits & {
   escape: () => void
 }
 
-export type CardCvcElementProps = ElementProps & {
+export type CardCvcElementProps = WithElementProps<{
   options?: stripeJs.StripeCardCvcElementOptions
-}
+}>
 
 export type CardCvcElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeCardCvcElementChangeEvent) => void
@@ -65,9 +66,9 @@ export type CardCvcElementEmits = BaseElementEmits & {
   escape: () => void
 }
 
-export type FpxBankElementProps = ElementProps & {
+export type FpxBankElementProps = WithElementProps<{
   options?: stripeJs.StripeFpxBankElementOptions
-}
+}>
 
 export type FpxBankElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeFpxBankElementChangeEvent) => void
@@ -75,9 +76,9 @@ export type FpxBankElementEmits = BaseElementEmits & {
   escape: () => void
 }
 
-export type IbanElementProps = ElementProps & {
+export type IbanElementProps = WithElementProps<{
   options?: stripeJs.StripeIbanElementOptions
-}
+}>
 
 export type IbanElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeIbanElementChangeEvent) => void
@@ -85,9 +86,9 @@ export type IbanElementEmits = BaseElementEmits & {
   escape: () => void
 }
 
-export type IdealBankElementProps = ElementProps & {
+export type IdealBankElementProps = WithElementProps<{
   options?: stripeJs.StripeIdealBankElementOptions
-}
+}>
 
 export type IdealBankElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeIdealBankElementChangeEvent) => void
@@ -95,9 +96,9 @@ export type IdealBankElementEmits = BaseElementEmits & {
   escape: () => void
 }
 
-export type P24BankElementProps = ElementProps & {
+export type P24BankElementProps = WithElementProps<{
   options?: stripeJs.StripeP24BankElementOptions
-}
+}>
 
 export type P24BankElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeP24BankElementChangeEvent) => void
@@ -105,9 +106,9 @@ export type P24BankElementEmits = BaseElementEmits & {
   escape: () => void
 }
 
-export type LinkAuthenticationElementProps = ElementProps & {
+export type LinkAuthenticationElementProps = WithElementProps<{
   options?: stripeJs.StripeLinkAuthenticationElementOptions
-}
+}>
 
 export type LinkAuthenticationElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeLinkAuthenticationElementChangeEvent) => void
@@ -117,9 +118,9 @@ export type LinkAuthenticationElementEmits = BaseElementEmits & {
   loaderstart: (event: { elementType: 'linkAuthentication' }) => void
 }
 
-export type EpsBankElementProps = ElementProps & {
+export type EpsBankElementProps = WithElementProps<{
   options?: stripeJs.StripeEpsBankElementOptions
-}
+}>
 
 export type EpsBankElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeEpsBankElementChangeEvent) => void
@@ -127,9 +128,9 @@ export type EpsBankElementEmits = BaseElementEmits & {
   escape: () => void
 }
 
-export type PaymentElementProps = ElementProps & {
+export type PaymentElementProps = WithElementProps<{
   options?: stripeJs.StripePaymentElementOptions
-}
+}>
 
 export type PaymentElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripePaymentElementChangeEvent) => void
@@ -142,9 +143,9 @@ export type PaymentElementEmits = BaseElementEmits & {
   loaderstart: (event: { elementType: 'payment' }) => void
 }
 
-export type ExpressCheckoutElementProps = ElementProps & {
+export type ExpressCheckoutElementProps = WithElementProps<{
   options?: stripeJs.StripeExpressCheckoutElementOptions
-}
+}>
 
 export type ExpressCheckoutElementEmits = BaseElementEmits & {
   ready: (event: stripeJs.StripeExpressCheckoutElementReadyEvent) => void
@@ -175,18 +176,18 @@ export type CurrencySelectorElementEmits = BaseElementEmits & {
   loaderror: (event: { elementType: 'currencySelector', error: stripeJs.StripeError }) => void
 }
 
-export type PaymentRequestButtonElementProps = ElementProps & {
+export type PaymentRequestButtonElementProps = WithElementProps<{
   options?: stripeJs.StripePaymentRequestButtonElementOptions
-}
+}>
 
 export type PaymentRequestButtonElementEmits = BaseElementEmits & {
   click: (event: stripeJs.StripePaymentRequestButtonElementClickEvent) => void
   ready: (element: stripeJs.StripePaymentRequestButtonElement) => void
 }
 
-export type AddressElementProps = ElementProps & {
+export type AddressElementProps = WithElementProps<{
   options: stripeJs.StripeAddressElementOptions
-}
+}>
 
 export type AddressElementEmits = BaseElementEmits & {
   change: (event: stripeJs.StripeAddressElementChangeEvent) => void
@@ -196,36 +197,36 @@ export type AddressElementEmits = BaseElementEmits & {
   loaderstart: (event: { elementType: 'address' }) => void
 }
 
-export type PaymentMethodMessagingElementProps = ElementProps & {
+export type PaymentMethodMessagingElementProps = WithElementProps<{
   options?: stripeJs.StripePaymentMethodMessagingElementOptions
-}
+}>
 
 export type PaymentMethodMessagingElementEmits = BaseElementEmits & {
   ready: (element: stripeJs.StripePaymentMethodMessagingElement) => void
 }
 
-export type AffirmMessageElementProps = ElementProps & {
+export type AffirmMessageElementProps = WithElementProps<{
   options?: stripeJs.StripeAffirmMessageElementOptions
-}
+}>
 
 export type AffirmMessageElementEmits = BaseElementEmits & {
   ready: (element: stripeJs.StripeAffirmMessageElement) => void
 }
 
-export type AfterpayClearpayMessageElementProps = ElementProps & {
+export type AfterpayClearpayMessageElementProps = WithElementProps<{
   options?: stripeJs.StripeAfterpayClearpayMessageElementOptions
-}
+}>
 
 export type AfterpayClearpayMessageElementEmits = BaseElementEmits & {
   ready: (element: stripeJs.StripeAfterpayClearpayMessageElement) => void
 }
 
-export type TaxIdElementProps = ElementProps & {
+export type TaxIdElementProps = WithElementProps<{
   /**
    * An object containing Element configuration options.
    */
   options?: stripeJs.StripeTaxIdElementOptions
-}
+}>
 
 export type TaxIdElementEmits = BaseElementEmits & {
   /**
