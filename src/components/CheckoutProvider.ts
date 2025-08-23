@@ -131,11 +131,7 @@ export const CheckoutProvider = defineComponent({
     // Handle appearance changes
     watch(() => props.options.elementsOptions?.appearance, (appearance) => {
       const checkoutSdk = ctx.checkoutSdk.value
-      if (!checkoutSdk) {
-        return
-      }
-
-      if (appearance) {
+      if (checkoutSdk && appearance) {
         checkoutSdk.changeAppearance(appearance)
       }
     })
@@ -143,11 +139,7 @@ export const CheckoutProvider = defineComponent({
     // Handle fonts changes
     watch(() => props.options.elementsOptions?.fonts, (fonts) => {
       const checkoutSdk = ctx.checkoutSdk.value
-      if (!checkoutSdk) {
-        return
-      }
-
-      if (fonts) {
+      if (checkoutSdk && fonts) {
         checkoutSdk.loadFonts(fonts)
       }
     })
