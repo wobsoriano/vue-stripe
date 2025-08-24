@@ -120,8 +120,8 @@ export const CheckoutProvider = defineComponent({
     })
 
     // Warn on changes to stripe prop
-    watch(() => props.stripe, (rawStripeProp, prevStripe) => {
-      if (prevStripe !== null && prevStripe !== rawStripeProp) {
+    watch(() => props.stripe, (_, prevStripe) => {
+      if (prevStripe !== null) {
         console.warn(
           'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.',
         )
