@@ -1,7 +1,7 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { ObjectEmitsOptions } from 'vue'
 
-type BaseElementProps = {
+export type BaseElementProps = {
   id?: string
   class?: string
 }

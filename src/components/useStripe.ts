@@ -1,4 +1,4 @@
-import { useElementsOrCheckoutSdkContextWithUseCase } from './CheckoutProvider'
+import { useElementsOrCheckoutSdkContextWithUseCase } from '../checkout/components/CheckoutProvider'
 
 /**
  * The useStripe composable returns a reference to the [Stripe](https://docs.stripe.com/js/initializing)

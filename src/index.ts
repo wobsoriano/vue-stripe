@@ -297,7 +297,6 @@ declare module '@stripe/stripe-js' {
   }
 }
 
-export { CheckoutProvider, useCheckout } from './components/CheckoutProvider'
 export {
   Elements,
   useElements,

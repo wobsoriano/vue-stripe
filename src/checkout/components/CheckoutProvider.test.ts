@@ -2,10 +2,10 @@ import { render, waitFor } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { renderComposable } from 'vue-composable-testing'
-import * as mocks from '../../test/mocks'
+import * as mocks from '../../../test/mocks'
+import { Elements } from '../../components/Elements'
+import { useStripe } from '../../components/useStripe'
 import { CheckoutProvider, useCheckout } from './CheckoutProvider'
-import { Elements } from './Elements'
-import { useStripe } from './useStripe'
 
 describe('checkoutProvider', () => {
   let mockStripe: any

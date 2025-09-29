@@ -1,7 +1,7 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { EmitsOptions, FunctionalComponent, ShallowRef } from 'vue'
 import { defineComponent, h, onUnmounted, ref, shallowRef, toRaw, watch, watchEffect } from 'vue'
-import { useElementsOrCheckoutSdkContextWithUseCase } from './CheckoutProvider'
+import { useElementsOrCheckoutSdkContextWithUseCase } from '../checkout/components/CheckoutProvider'
 
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
