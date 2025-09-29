@@ -2,7 +2,7 @@
   "name": "vue-stripe",
   "type": "module",
   "version": "1.0.4",
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.17.1",
   "description": "Vue components for Stripe.js and Stripe Elements",
   "author": "Robert Soriano <sorianorobertc@gmail.com>",
   "license": "MIT",
@@ -44,19 +44,19 @@
     "vue": "^3.2.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.2.1",
-    "@changesets/cli": "^2.29.6",
-    "@stripe/stripe-js": "^7.8.0",
-    "@testing-library/jest-dom": "^6.7.0",
+    "@antfu/eslint-config": "^5.4.1",
+    "@changesets/cli": "^2.29.7",
+    "@stripe/stripe-js": "^7.9.0",
+    "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/vue": "^8.1.0",
-    "@types/node": "^24.3.0",
+    "@types/node": "^24.6.0",
     "@vitejs/plugin-vue": "^6.0.1",
-    "eslint": "^9.33.0",
-    "jsdom": "^26.1.0",
-    "tsdown": "^0.14.1",
+    "eslint": "^9.36.0",
+    "jsdom": "^27.0.0",
+    "tsdown": "^0.15.5",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4",
-    "vue": "^3.5.18",
+    "vue": "^3.5.22",
     "vue-composable-testing": "^0.2.0"
   }
 }
