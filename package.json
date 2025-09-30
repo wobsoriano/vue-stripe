@@ -19,8 +19,14 @@
   ],
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.js",
-    "./package.json": "./package.json"
+    ".": {
+      "types": "./dist/react-stripe.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./checkout": {
+      "types": "./dist/checkout/index.d.ts",
+      "import": "./dist/checkout/index.js"
+    }
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",

@@ -1,9 +1,9 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { ComputedRef, DeepReadonly, PropType, ShallowRef } from 'vue'
 import { computed, defineComponent, inject, provide, readonly, shallowRef, watch, watchEffect } from 'vue'
-import { CheckoutKey, CheckoutSdkKey, ElementsKey } from '../keys'
-import { parseStripeProp } from '../utils/parseStripeProp'
-import { parseElementsContext } from './Elements'
+import { parseElementsContext } from '../../components/Elements'
+import { CheckoutKey, CheckoutSdkKey, ElementsKey } from '../../keys'
+import { parseStripeProp } from '../../utils/parseStripeProp'
 
 export interface CheckoutSdkContextValue {
   checkoutSdk: DeepReadonly<ShallowRef<stripeJs.StripeCheckout | null>>

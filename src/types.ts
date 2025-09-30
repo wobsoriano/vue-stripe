@@ -1,7 +1,7 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { ObjectEmitsOptions } from 'vue'
 
-type BaseElementProps = {
+export type BaseElementProps = {
   id?: string
   class?: string
 }
@@ -159,24 +159,6 @@ export type ExpressCheckoutElementEmits = WithBaseElementEmits<{
   cancel: (event: { elementType: 'expressCheckout' }) => void
   shippingaddresschange: (event: stripeJs.StripeExpressCheckoutElementShippingAddressChangeEvent) => void
   shippingratechange: (event: stripeJs.StripeExpressCheckoutElementShippingRateChangeEvent) => void
-}>
-
-export type CurrencySelectorElementProps = BaseElementProps
-
-export type CurrencySelectorElementEmits = WithBaseElementEmits<{
-  /**
-   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
-   * Called with a reference to the underlying [Element instance](https://stripe.com/docs/js/element).
-   */
-  ready: (event: stripeJs.StripeCurrencySelectorElement) => void
-  /**
-   * Triggered when the escape key is pressed within the Element.
-   */
-  escape: () => void
-  /**
-   * Triggered when the Element fails to load.
-   */
-  loaderror: (event: { elementType: 'currencySelector', error: stripeJs.StripeError }) => void
 }>
 
 export type PaymentRequestButtonElementProps = WithBaseElementProps<{

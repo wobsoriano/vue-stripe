@@ -17,8 +17,6 @@ import type {
   CardExpiryElementProps,
   CardNumberElementEmits,
   CardNumberElementProps,
-  CurrencySelectorElementEmits,
-  CurrencySelectorElementProps,
   EpsBankElementEmits,
   EpsBankElementProps,
   ExpressCheckoutElementEmits,
@@ -108,12 +106,6 @@ export const PaymentElement = createElementComponent<PaymentElementProps, Paymen
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
  */
 export const ExpressCheckoutElement = createElementComponent<ExpressCheckoutElementProps, ExpressCheckoutElementEmits>('expressCheckout')
-
-/**
- * Requires beta access:
- * Contact [Stripe support](https://support.stripe.com/) for more information.
- */
-export const CurrencySelectorElement = createElementComponent<CurrencySelectorElementProps, CurrencySelectorElementEmits>('currencySelector')
 
 /**
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
@@ -297,7 +289,6 @@ declare module '@stripe/stripe-js' {
   }
 }
 
-export { CheckoutProvider, useCheckout } from './components/CheckoutProvider'
 export {
   Elements,
   useElements,

@@ -18,7 +18,7 @@ The `Elements` provider allows you to use [Element components](https://docs.stri
 ```vue
 <script setup>
 import { loadStripe } from '@stripe/stripe-js'
-import { CheckoutProvider } from 'vue-stripe'
+import { CheckoutProvider } from 'vue-stripe/checkout'
 
 const stripePromise = loadStripe('pk_test_xxx')
 
@@ -49,7 +49,7 @@ You can mount individual Element components inside of your `CheckoutProvider` tr
 
 ```vue [CheckoutForm.vue]
 <script setup>
-import { PaymentElement } from 'vue-stripe'
+import { PaymentElement } from 'vue-stripe/checkout'
 </script>
 
 <template>
@@ -93,7 +93,7 @@ Use the `useCheckout` composable in your components to get the [Checkout object]
 
 ```vue [CheckoutForm.vue]
 <script setup>
-import { PaymentElement, useCheckout } from 'vue-stripe'
+import { PaymentElement, useCheckout } from 'vue-stripe/checkout'
 
 const checkout = useCheckout()
 
