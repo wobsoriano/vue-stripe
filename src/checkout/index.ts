@@ -1,6 +1,7 @@
-import type * as stripeJs from '@stripe/stripe-js'
-import type { ExpressCheckoutElementEmits, PaymentElementEmits, PaymentElementProps as RootPaymentElementProps, TaxIdElementEmits } from '../types'
-import type { ExpressCheckoutElementProps, TaxIdElementProps } from './types'
+import type { FunctionalComponent } from 'vue'
+import type { PaymentElementEmits } from '../types'
+import type { BillingAddressElementEmits, BillingAddressElementProps, CurrencySelectorElementEmits, CurrencySelectorElementProps, ExpressCheckoutElementEmits, ExpressCheckoutElementProps, PaymentElementProps, ShippingAddressElementEmits, ShippingAddressElementProps, TaxIdElementEmits, TaxIdElementProps } from './types'
+import { h } from 'vue'
 import { createElementComponent } from '../components/createElementComponent'
 
 export {
@@ -8,9 +9,13 @@ export {
   useCheckout,
 } from './components/CheckoutProvider'
 
-export const PaymentElement = createElementComponent<Omit<RootPaymentElementProps, 'options'> & {
-  options?: stripeJs.StripeCheckoutPaymentElementOptions
-}, PaymentElementEmits>('payment')
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const CurrencySelectorElement = createElementComponent<CurrencySelectorElementProps, CurrencySelectorElementEmits>('currencySelector')
+
+export const PaymentElement = createElementComponent<PaymentElementProps, PaymentElementEmits>('payment')
 
 /**
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
@@ -18,3 +23,29 @@ export const PaymentElement = createElementComponent<Omit<RootPaymentElementProp
 export const ExpressCheckoutElement = createElementComponent<ExpressCheckoutElementProps, ExpressCheckoutElementEmits>('expressCheckout')
 
 export const TaxIdElement = createElementComponent<TaxIdElementProps, TaxIdElementEmits>('taxId')
+
+const AddressElementBase = createElementComponent<TaxIdElementProps, TaxIdElementEmits>('address')
+
+export const BillingAddressElement: FunctionalComponent<BillingAddressElementProps, BillingAddressElementEmits> = (props) => {
+  const { options, ...rest } = props
+
+  return h(AddressElementBase, {
+    ...rest,
+    options: {
+      ...options,
+      mode: 'billing',
+    } as any,
+  })
+}
+
+export const ShippingAddressElement: FunctionalComponent<ShippingAddressElementProps, ShippingAddressElementEmits> = (props) => {
+  const { options, ...rest } = props
+
+  return h(AddressElementBase, {
+    ...rest,
+    options: {
+      ...options,
+      mode: 'shipping',
+    } as any,
+  })
+}
