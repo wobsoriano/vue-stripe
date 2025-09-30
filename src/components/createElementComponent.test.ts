@@ -640,58 +640,6 @@ describe('createElementComponent', () => {
     expect(mockHandler).not.toHaveBeenCalled()
   })
 
-  it.skip('propagates the Element`s savedpaymentmethodremove event to the current onSavedPaymentMethodRemove prop', async () => {
-    const mockHandler = vi.fn()
-    const mockHandler2 = vi.fn()
-    const onSavedPaymentMethodRemove = ref(mockHandler)
-
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(PaymentElement, {
-          onSavedPaymentMethodRemove: onSavedPaymentMethodRemove.value,
-        }))
-      },
-    })
-    render(parent)
-    await nextTick()
-
-    onSavedPaymentMethodRemove.value = mockHandler2
-    await nextTick()
-
-    const removeEventMock = Symbol('savedpaymentmethodremove')
-    simulateEvent('savedpaymentmethodremove', removeEventMock)
-    expect(mockHandler2).toHaveBeenCalledWith(removeEventMock)
-    expect(mockHandler).not.toHaveBeenCalled()
-  })
-
-  it.skip('propagates the Element`s savedpaymentmethodupdate event to the current onSavedPaymentMethodUpdate prop', async () => {
-    const mockHandler = vi.fn()
-    const mockHandler2 = vi.fn()
-    const onSavedPaymentMethodUpdate = ref(mockHandler)
-
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(PaymentElement, {
-          onSavedPaymentMethodUpdate: onSavedPaymentMethodUpdate.value,
-        }))
-      },
-    })
-    render(parent)
-    await nextTick()
-
-    onSavedPaymentMethodUpdate.value = mockHandler2
-    await nextTick()
-
-    const removeEventMock = Symbol('savedpaymentmethodupdate')
-    simulateEvent('savedpaymentmethodupdate', removeEventMock)
-    expect(mockHandler2).toHaveBeenCalledWith(removeEventMock)
-    expect(mockHandler).not.toHaveBeenCalled()
-  })
-
   it('updates the Element when options change', async () => {
     const options = ref({ style: { base: { fontSize: '20px' } } })
     const parent = defineComponent({
