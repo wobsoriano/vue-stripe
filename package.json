@@ -20,12 +20,12 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/react-stripe.d.ts"
+      "types": "./dist/react-stripe.d.ts",
+      "import": "./dist/index.js"
     },
     "./checkout": {
-      "import": "./dist/checkout/index.js",
-      "types": "./dist/checkout/index.d.ts"
+      "types": "./dist/checkout/index.d.ts",
+      "import": "./dist/checkout/index.js"
     }
   },
   "main": "./dist/index.js",
