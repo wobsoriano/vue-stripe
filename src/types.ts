@@ -144,18 +144,6 @@ export type PaymentElementEmits = WithBaseElementEmits<{
    * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
    */
   loaderstart: (event: { elementType: 'payment' }) => void
-  savedpaymentmethodremove: (event: {
-    elementType: 'payment'
-    success: boolean
-    error?: string
-    payment_method: stripeJs.StripePaymentElementChangeEvent['value']['payment_method']
-  }) => void
-  savedpaymentmethodupdate: (event: {
-    elementType: 'payment'
-    success: boolean
-    error?: string
-    payment_method: stripeJs.StripePaymentElementChangeEvent['value']['payment_method']
-  }) => void
 }>
 
 export type ExpressCheckoutElementProps = WithBaseElementProps<{
