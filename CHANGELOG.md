@@ -1,5 +1,22 @@
 # stripe-vue
 
+## 2.0.0
+
+### Major Changes
+
+- 1d09444: Splits EwCS specific imports into its own `/checkout` path.
+
+  For Elements with Checkout Sessions integrations and only Elements with Checkout Sessions integrations, these elements should now be imported via `'vue-stripe/checkout'`:
+
+  - CurrencySelectorElement
+  - PaymentElement
+  - ExpressCheckoutElement
+  - TaxIdElement
+  - BillingAddressElement
+  - ShippingAddressElement
+
+  `useCheckout` and `CheckoutProvider` are also under this new path
+
 ## 1.0.4
 
 ### Patch Changes
