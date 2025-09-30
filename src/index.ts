@@ -3,10 +3,6 @@ import type * as stripeJs from '@stripe/stripe-js'
 import type {
   AddressElementEmits,
   AddressElementProps,
-  AffirmMessageElementEmits,
-  AffirmMessageElementProps,
-  AfterpayClearpayMessageElementEmits,
-  AfterpayClearpayMessageElementProps,
   AuBankAccountElementEmits,
   AuBankAccountElementProps,
   CardCvcElementEmits,
@@ -17,20 +13,12 @@ import type {
   CardExpiryElementProps,
   CardNumberElementEmits,
   CardNumberElementProps,
-  EpsBankElementEmits,
-  EpsBankElementProps,
   ExpressCheckoutElementEmits,
   ExpressCheckoutElementProps,
-  FpxBankElementEmits,
-  FpxBankElementProps,
   IbanElementEmits,
   IbanElementProps,
-  IdealBankElementEmits,
-  IdealBankElementProps,
   LinkAuthenticationElementEmits,
   LinkAuthenticationElementProps,
-  P24BankElementEmits,
-  P24BankElementProps,
   PaymentElementEmits,
   PaymentElementProps,
   PaymentMethodMessagingElementEmits,
@@ -73,27 +61,7 @@ export const CardCvcElement = createElementComponent<CardCvcElementProps, CardCv
 /**
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
  */
-export const FpxBankElement = createElementComponent<FpxBankElementProps, FpxBankElementEmits>('fpxBank')
-
-/**
- * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
- */
 export const IbanElement = createElementComponent<IbanElementProps, IbanElementEmits>('iban')
-
-/**
- * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
- */
-export const IdealBankElement = createElementComponent<IdealBankElementProps, IdealBankElementEmits>('idealBank')
-
-/**
- * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
- */
-export const P24BankElement = createElementComponent<P24BankElementProps, P24BankElementEmits>('p24Bank')
-
-/**
- * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
- */
-export const EpsBankElement = createElementComponent<EpsBankElementProps, EpsBankElementEmits>('epsBank')
 
 /**
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
@@ -121,16 +89,6 @@ export const AddressElement = createElementComponent<AddressElementProps, Addres
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
  */
 export const PaymentMethodMessagingElement = createElementComponent<PaymentMethodMessagingElementProps, PaymentMethodMessagingElementEmits>('paymentMethodMessaging')
-
-/**
- * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
- */
-export const AffirmMessageElement = createElementComponent<AffirmMessageElementProps, AffirmMessageElementEmits>('affirmMessage')
-
-/**
- * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
- */
-export const AfterpayClearpayMessageElement = createElementComponent<AfterpayClearpayMessageElementProps, AfterpayClearpayMessageElementEmits>('afterpayClearpayMessage')
 
 /**
  * Requires beta access:
@@ -184,44 +142,12 @@ declare module '@stripe/stripe-js' {
     ): stripeJs.StripeCardExpiryElement | null
 
     /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=fpxBank) for the `FpxBankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
-     * Returns `null` if no `FpxBankElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: typeof FpxBankElement
-    ): stripeJs.StripeFpxBankElement | null
-
-    /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `IbanElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
      * Returns `null` if no `IbanElement` is rendered in the current `Elements` provider tree.
      */
     getElement(
       component: typeof IbanElement
     ): stripeJs.StripeIbanElement | null
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=idealBank) for the `IdealBankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
-     * Returns `null` if no `IdealBankElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: typeof IdealBankElement
-    ): stripeJs.StripeIdealBankElement | null
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=p24Bank) for the `P24BankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
-     * Returns `null` if no `P24BankElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: typeof P24BankElement
-    ): stripeJs.StripeP24BankElement | null
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=epsBank) for the `EpsBankElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
-     * Returns `null` if no `EpsBankElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: typeof EpsBankElement
-    ): stripeJs.StripeEpsBankElement | null
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_link_authentication_element) for the `LinkAuthenticationElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
@@ -270,22 +196,6 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: typeof PaymentMethodMessagingElement
     ): stripeJs.StripePaymentMethodMessagingElement | null
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `AffirmMessageElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
-     * Returns `null` if no `AffirmMessageElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: typeof AffirmMessageElement
-    ): stripeJs.StripeAffirmMessageElement | null
-
-    /**
-     * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_element?type=card) for the `AfterpayClearpayMessageElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.
-     * Returns `null` if no `AfterpayClearpayMessageElement` is rendered in the current `Elements` provider tree.
-     */
-    getElement(
-      component: typeof AfterpayClearpayMessageElement
-    ): stripeJs.StripeAfterpayClearpayMessageElement | null
   }
 }
 
