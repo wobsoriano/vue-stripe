@@ -1,5 +1,5 @@
 import type { ComputedRef, InjectionKey } from 'vue'
-import type { CheckoutContextValue, CheckoutSdkContextValue } from './components/CheckoutProvider'
+import type { CheckoutContextValue, CheckoutSdkContextValue } from './checkout/components/CheckoutProvider'
 import type { ElementsContextValue } from './components/Elements'
 import type { EmbeddedCheckoutContextValue } from './components/EmbeddedCheckoutProvider'
 
