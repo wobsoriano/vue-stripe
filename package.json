@@ -21,12 +21,10 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "default": "./dist/index.js",
       "types": "./dist/react-stripe.d.ts"
     },
     "./checkout": {
       "import": "./dist/checkout/index.js",
-      "default": "./dist/checkout/index.js",
       "types": "./dist/checkout/index.d.ts"
     }
   },
