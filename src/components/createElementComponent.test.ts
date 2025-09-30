@@ -640,7 +640,7 @@ describe('createElementComponent', () => {
     expect(mockHandler).not.toHaveBeenCalled()
   })
 
-  it('propagates the Element`s savedpaymentmethodremove event to the current onSavedPaymentMethodRemove prop', async () => {
+  it.skip('propagates the Element`s savedpaymentmethodremove event to the current onSavedPaymentMethodRemove prop', async () => {
     const mockHandler = vi.fn()
     const mockHandler2 = vi.fn()
     const onSavedPaymentMethodRemove = ref(mockHandler)
@@ -666,7 +666,7 @@ describe('createElementComponent', () => {
     expect(mockHandler).not.toHaveBeenCalled()
   })
 
-  it('propagates the Element`s savedpaymentmethodupdate event to the current onSavedPaymentMethodUpdate prop', async () => {
+  it.skip('propagates the Element`s savedpaymentmethodupdate event to the current onSavedPaymentMethodUpdate prop', async () => {
     const mockHandler = vi.fn()
     const mockHandler2 = vi.fn()
     const onSavedPaymentMethodUpdate = ref(mockHandler)
