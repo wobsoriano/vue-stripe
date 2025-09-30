@@ -24,7 +24,7 @@ export const ExpressCheckoutElement = createElementComponent<ExpressCheckoutElem
 
 export const TaxIdElement = createElementComponent<TaxIdElementProps, TaxIdElementEmits>('taxId')
 
-const AddressElementBase = createElementComponent<TaxIdElementProps, TaxIdElementEmits>('address')
+const AddressElementBase = createElementComponent('address')
 
 export const BillingAddressElement: FunctionalComponent<BillingAddressElementProps, BillingAddressElementEmits> = (props) => {
   const { options, ...rest } = props
