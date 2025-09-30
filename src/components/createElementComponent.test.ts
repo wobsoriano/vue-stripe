@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
 import { AddressElement, PaymentElement } from '..'
 import * as mocks from '../../test/mocks'
-import * as CheckoutModule from './CheckoutProvider'
+import * as CheckoutModule from '../checkout/components/CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
 import * as ElementsModule from './Elements'
 
