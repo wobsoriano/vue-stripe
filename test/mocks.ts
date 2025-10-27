@@ -41,6 +41,21 @@ export function mockCheckoutSession() {
   }
 }
 
+export function mockCheckoutActions() {
+  return {
+    getSession: vi.fn(() => mockCheckoutSession()),
+    applyPromotionCode: vi.fn(),
+    removePromotionCode: vi.fn(),
+    updateShippingAddress: vi.fn(),
+    updateBillingAddress: vi.fn(),
+    updatePhoneNumber: vi.fn(),
+    updateEmail: vi.fn(),
+    updateLineItemQuantity: vi.fn(),
+    updateShippingOption: vi.fn(),
+    confirm: vi.fn(),
+  }
+}
+
 export function mockCheckoutSdk() {
   const elements: Record<string, ReturnType<typeof mockElement>> = {}
 

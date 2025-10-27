@@ -1,6 +1,6 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { ComputedRef, DeepReadonly, PropType, ShallowRef } from 'vue'
-import { computed, defineComponent, inject, provide, readonly, shallowRef, watch, watchEffect } from 'vue'
+import type { ComputedRef, DeepReadonly, InjectionKey, PropType, ShallowRef } from 'vue'
+import { computed, defineComponent, inject, provide, readonly, ref, shallowRef, watch, watchEffect } from 'vue'
 import { parseElementsContext } from '../../components/Elements'
 import { CheckoutKey, CheckoutSdkKey, ElementsKey } from '../../keys'
 import { parseStripeProp } from '../../utils/parseStripeProp'
@@ -25,26 +25,46 @@ export function parseCheckoutSdkContext(
 
 type StripeCheckoutActions = Omit<Omit<stripeJs.StripeCheckout, 'session'>, 'on'>
 
-export interface CheckoutContextValue extends StripeCheckoutActions, stripeJs.StripeCheckoutSession {}
-
-export function extractCheckoutContextValue(
-  checkoutSdk: stripeJs.StripeCheckout | null,
-  sessionState: stripeJs.StripeCheckoutSession | null,
-): CheckoutContextValue | null {
-  if (!checkoutSdk) {
-    return null
+export type State
+  = | {
+    type: 'loading'
+    sdk: stripeJs.StripeCheckout | null
   }
-
-  const { on: _on, session: _session, ...actions } = checkoutSdk
-  if (!sessionState) {
-    return Object.assign(checkoutSdk.session(), actions)
+  | {
+    type: 'success'
+    sdk: stripeJs.StripeCheckout
+    checkoutActions: stripeJs.LoadActionsSuccess
+    session: stripeJs.StripeCheckoutSession
   }
+  | { type: 'error', error: { message: string } }
 
-  return Object.assign(sessionState, actions)
+type CheckoutContextValue = {
+  stripe: DeepReadonly<ShallowRef<stripeJs.Stripe | null>>
+  checkoutState: DeepReadonly<ShallowRef<State>>
+}
+
+export const CheckoutContextKey = Symbol('Checkout Context') as InjectionKey<CheckoutContextValue>
+
+function validateCheckoutContext(ctx: CheckoutContextValue | null, useCase: string): CheckoutContextValue {
+  if (!ctx) {
+    throw new Error(
+      `Could not find CheckoutProvider context; You need to wrap the part of your app that ${useCase} in a <CheckoutProvider> provider.`,
+    )
+  }
+  return ctx
 }
 
 const INVALID_STRIPE_ERROR
   = 'Invalid prop `stripe` supplied to `CheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.'
+
+function maybeSdk(state: State): stripeJs.StripeCheckout | null {
+  if (state.type === 'success' || state.type === 'loading') {
+    return state.sdk
+  }
+  else {
+    return null
+  }
+}
 
 export const CheckoutProvider = defineComponent({
   inheritAttrs: false,
@@ -62,60 +82,77 @@ export const CheckoutProvider = defineComponent({
   setup(props, { slots }) {
     const parsed = computed(() => parseStripeProp(props.stripe, INVALID_STRIPE_ERROR))
 
-    const session = shallowRef<stripeJs.StripeCheckoutSession | null>(null)
-
-    const ctx = {
-      stripe: shallowRef<stripeJs.Stripe | null>(parsed.value.tag === 'sync' ? parsed.value.stripe : null),
-      checkoutSdk: shallowRef<stripeJs.StripeCheckout | null>(null),
-    }
-
-    const safeSetContext = (
-      stripe: stripeJs.Stripe,
-      checkoutSdk: stripeJs.StripeCheckout,
-    ) => {
-      // no-op if we already have a stripe instance and checkoutSdk
-      if (ctx.stripe.value && ctx.checkoutSdk.value) {
-        return
-      }
-
-      ctx.stripe.value = stripe
-      ctx.checkoutSdk.value = checkoutSdk
-    }
+    const state = shallowRef<State>({ type: 'loading', sdk: null })
+    const stripe = shallowRef<stripeJs.Stripe | null>(null)
 
     // Used to avoid calling initCheckout multiple times when options changes
     let initCheckoutCalled = false
 
     watchEffect(() => {
-      if (parsed.value.tag === 'async' && !ctx.stripe) {
-        parsed.value.stripePromise.then((stripe) => {
-          if (stripe && !initCheckoutCalled) {
-            initCheckoutCalled = true
-            stripe.initCheckout(props.options).then((checkoutSdk) => {
-              if (checkoutSdk) {
-                safeSetContext(stripe, checkoutSdk)
-                checkoutSdk.on('change', (payload) => {
-                  session.value = payload
+      const init = ({ stripe }: { stripe: stripeJs.Stripe }) => {
+        if (stripe && !initCheckoutCalled) {
+          // Only update context if the component is still mounted
+          // and stripe is not null. We allow stripe to be null to make
+          // handling SSR easier.
+          initCheckoutCalled = true
+          const sdk = stripe.initCheckout(props.options)
+          state.value = {
+            type: 'loading',
+            sdk
+          }
+
+          sdk.loadActions()
+            .then((result) => {
+              if (result.type === 'success') {
+                const { actions } = result
+                state.value = {
+                  type: 'success',
+                  sdk,
+                  checkoutActions: actions,
+                  session: actions.getSession(),
+                }
+
+                sdk.on('change', (session) => {
+                  if (state.value.type === 'success') {
+                    state.value = {
+                      ...state.value,
+                      session,
+                    }
+                  }
                 })
               }
+              else {
+                state.value = {
+                  type: 'error',
+                  error: result.error
+                }
+              }
             })
+            .catch((error) => {
+              state.value = {
+                type: 'error',
+                error
+              }
+            })
+        }
+      }
+
+      if (parsed.value.tag === 'async') {
+        parsed.value.stripePromise.then((newStripe) => {
+          stripe.value = newStripe
+          if (newStripe) {
+            init({ stripe: newStripe })
+          }
+          else {
+            // Only update context if the component is still mounted
+            // and stripe is not null. We allow stripe to be null to make
+            // handling SSR easier.
           }
         })
       }
-      else if (
-        parsed.value.tag === 'sync'
-        && parsed.value.stripe
-        && !initCheckoutCalled
-      ) {
-        initCheckoutCalled = true
-        parsed.value.stripe.initCheckout(props.options).then((checkoutSdk) => {
-          if (checkoutSdk) {
-            // @ts-expect-error - stripe type is missing
-            safeSetContext(parsed.value.stripe, checkoutSdk)
-            checkoutSdk.on('change', (payload) => {
-              session.value = payload
-            })
-          }
-        })
+      else if (parsed.value.tag === 'sync') {
+        stripe.value = parsed.value.stripe
+        init({ stripe: parsed.value.stripe })
       }
     })
 
@@ -128,28 +165,25 @@ export const CheckoutProvider = defineComponent({
       }
     })
 
+    const sdk = computed(() => maybeSdk(state.value))
+
     // Handle appearance changes
     watch(() => props.options.elementsOptions?.appearance, (appearance) => {
-      const checkoutSdk = ctx.checkoutSdk.value
-      if (checkoutSdk && appearance) {
-        checkoutSdk.changeAppearance(appearance)
+      if (sdk.value && appearance) {
+        sdk.value.changeAppearance(appearance)
       }
     })
 
     // Handle fonts changes
     watch(() => props.options.elementsOptions?.fonts, (fonts) => {
-      const checkoutSdk = ctx.checkoutSdk.value
-      if (checkoutSdk && fonts) {
-        checkoutSdk.loadFonts(fonts)
+      if (sdk.value && fonts) {
+        sdk.value.loadFonts(fonts)
       }
     })
 
-    const checkoutContextValue = computed(() => extractCheckoutContextValue(ctx.checkoutSdk.value, session.value))
-
-    provide(CheckoutKey, checkoutContextValue)
-    provide(CheckoutSdkKey, {
-      checkoutSdk: readonly(ctx.checkoutSdk),
-      stripe: readonly(ctx.stripe),
+    provide(CheckoutContextKey, {
+      checkoutState: readonly(state),
+      stripe: readonly(stripe),
     })
 
     return () => slots.default?.()
@@ -173,8 +207,8 @@ export function useElementsOrCheckoutSdkContextWithUseCase(useCaseString: string
   return parseElementsContext(elementsContext, useCaseString)
 }
 
-export function useCheckoutSdkContextWithUseCase(useCaseString: string): CheckoutSdkContextValue {
-  const ctx = inject(CheckoutSdkKey, undefined)
+export function useElementsOrCheckoutContextWithUseCase(useCaseString: string): CheckoutSdkContextValue {
+  const checkout = inject(CheckoutContextKey, null)
   return parseCheckoutSdkContext(ctx, useCaseString)
 }
 
