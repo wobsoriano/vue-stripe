@@ -69,16 +69,6 @@ export type CardCvcElementEmits = WithBaseElementEmits<{
   escape: () => void
 }>
 
-export type FpxBankElementProps = WithBaseElementProps<{
-  options?: stripeJs.StripeFpxBankElementOptions
-}>
-
-export type FpxBankElementEmits = WithBaseElementEmits<{
-  change: (event: stripeJs.StripeFpxBankElementChangeEvent) => void
-  ready: (element: stripeJs.StripeFpxBankElement) => void
-  escape: () => void
-}>
-
 export type IbanElementProps = WithBaseElementProps<{
   options?: stripeJs.StripeIbanElementOptions
 }>
@@ -86,26 +76,6 @@ export type IbanElementProps = WithBaseElementProps<{
 export type IbanElementEmits = WithBaseElementEmits<{
   change: (event: stripeJs.StripeIbanElementChangeEvent) => void
   ready: (element: stripeJs.StripeIbanElement) => void
-  escape: () => void
-}>
-
-export type IdealBankElementProps = WithBaseElementProps<{
-  options?: stripeJs.StripeIdealBankElementOptions
-}>
-
-export type IdealBankElementEmits = WithBaseElementEmits<{
-  change: (event: stripeJs.StripeIdealBankElementChangeEvent) => void
-  ready: (element: stripeJs.StripeIdealBankElement) => void
-  escape: () => void
-}>
-
-export type P24BankElementProps = WithBaseElementProps<{
-  options?: stripeJs.StripeP24BankElementOptions
-}>
-
-export type P24BankElementEmits = WithBaseElementEmits<{
-  change: (event: stripeJs.StripeP24BankElementChangeEvent) => void
-  ready: (element: stripeJs.StripeP24BankElement) => void
   escape: () => void
 }>
 
@@ -119,16 +89,6 @@ export type LinkAuthenticationElementEmits = WithBaseElementEmits<{
   escape: () => void
   loaderror: (event: { elementType: 'linkAuthentication', error: stripeJs.StripeError }) => void
   loaderstart: (event: { elementType: 'linkAuthentication' }) => void
-}>
-
-export type EpsBankElementProps = WithBaseElementProps<{
-  options?: stripeJs.StripeEpsBankElementOptions
-}>
-
-export type EpsBankElementEmits = WithBaseElementEmits<{
-  change: (event: stripeJs.StripeEpsBankElementChangeEvent) => void
-  ready: (element: stripeJs.StripeEpsBankElement) => void
-  escape: () => void
 }>
 
 export type PaymentElementProps = WithBaseElementProps<{
@@ -188,22 +148,6 @@ export type PaymentMethodMessagingElementProps = WithBaseElementProps<{
 
 export type PaymentMethodMessagingElementEmits = WithBaseElementEmits<{
   ready: (element: stripeJs.StripePaymentMethodMessagingElement) => void
-}>
-
-export type AffirmMessageElementProps = WithBaseElementProps<{
-  options?: stripeJs.StripeAffirmMessageElementOptions
-}>
-
-export type AffirmMessageElementEmits = WithBaseElementEmits<{
-  ready: (element: stripeJs.StripeAffirmMessageElement) => void
-}>
-
-export type AfterpayClearpayMessageElementProps = WithBaseElementProps<{
-  options?: stripeJs.StripeAfterpayClearpayMessageElementOptions
-}>
-
-export type AfterpayClearpayMessageElementEmits = WithBaseElementEmits<{
-  ready: (element: stripeJs.StripeAfterpayClearpayMessageElement) => void
 }>
 
 export type TaxIdElementProps = WithBaseElementProps<{

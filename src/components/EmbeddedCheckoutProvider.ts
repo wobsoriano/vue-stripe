@@ -17,7 +17,7 @@ export interface EmbeddedCheckoutContextValue {
 export const EmbeddedCheckoutContextKey = Symbol('embedded checkout context') as InjectionKey<EmbeddedCheckoutContextValue>
 
 export function useEmbeddedCheckoutContext(): EmbeddedCheckoutContextValue {
-  const ctx = inject(EmbeddedCheckoutContextKey, undefined)
+  const ctx = inject(EmbeddedCheckoutContextKey, null)
   if (!ctx) {
     throw new Error(
       '<EmbeddedCheckout> must be used within <EmbeddedCheckoutProvider>',
@@ -118,7 +118,7 @@ export const EmbeddedCheckoutProvider = defineComponent({
       }
     })
 
-    provide(useEmbeddedCheckoutContext, ctx)
+    provide(EmbeddedCheckoutContextKey, ctx)
 
     return () => slots.default?.()
   },
