@@ -31,7 +31,7 @@ describe('createElementComponent', () => {
     mockElement = mocks.mockElement()
     mockStripe.elements.mockReturnValue(mockElements)
     mockElements.create.mockReturnValue(mockElement)
-    mockStripe.initCheckout.mockResolvedValue(mockCheckoutSdk)
+    mockStripe.initCheckout.mockReturnValue(mockCheckoutSdk)
     mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement)
     mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement)
     mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement)
@@ -771,7 +771,7 @@ describe('createElementComponent', () => {
       })
     })
 
-    it.only('can remove and add PaymentElement at the same time', async () => {
+    it('can remove and add PaymentElement at the same time', async () => {
       const parent = defineComponent({
         props: {
           rerenderKey: {
@@ -789,10 +789,10 @@ describe('createElementComponent', () => {
         },
       })
 
-      const { rerender } = render(parent, { props: { rerenderKey: '1' } })
+      const { rerender } = render(parent, { props: { rerenderKey: '100' } })
       await nextTick()
 
-      await rerender({ rerenderKey: '2' })
+      await rerender({ rerenderKey: '200' })
 
       await waitFor(() => expect(peMounted).toBeTruthy())
       expect(mockElement.mount).toHaveBeenCalledTimes(2)
