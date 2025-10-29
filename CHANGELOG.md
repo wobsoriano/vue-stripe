@@ -1,5 +1,28 @@
 # stripe-vue
 
+## 2.0.0
+
+### Major Changes
+
+- 1d09444: Splits EwCS specific imports into its own `/checkout` path.
+
+  For Elements with Checkout Sessions integrations and only Elements with Checkout Sessions integrations, these elements should now be imported via `'vue-stripe/checkout'`:
+
+  - CurrencySelectorElement
+  - PaymentElement
+  - ExpressCheckoutElement
+  - TaxIdElement
+  - BillingAddressElement
+  - ShippingAddressElement
+
+  `useCheckout` and `CheckoutProvider` are also under this new path
+
+- 6332b04: Changed the <CheckoutProvider /> to use https://js.stripe.com/clover/stripe.js
+
+  The options changed from `fetchClientSecret: () => Promise<string>;` to `clientSecret: string | Promise<string>`
+
+- b0bdbd6: Removed Clover element types
+
 ## 1.0.4
 
 ### Patch Changes
