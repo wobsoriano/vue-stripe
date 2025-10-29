@@ -5,5 +5,6 @@ export default antfu({
   gitignore: true,
   rules: {
     'ts/consistent-type-definitions': 'off',
+    'node/prefer-global/process': 'warn',
   },
 })

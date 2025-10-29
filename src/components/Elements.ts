@@ -1,8 +1,7 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { DeepReadonly, PropType, ShallowRef, SlotsType } from 'vue'
+import type { DeepReadonly, InjectionKey, PropType, ShallowRef, SlotsType } from 'vue'
 import type { UnknownOptions } from '../types'
 import { computed, defineComponent, inject, provide, readonly, shallowRef, watch, watchEffect } from 'vue'
-import { ElementsKey } from '../keys'
 import { parseStripeProp } from '../utils/parseStripeProp'
 
 export interface ElementsContextValue {
@@ -10,8 +9,10 @@ export interface ElementsContextValue {
   elements: DeepReadonly<ShallowRef<stripeJs.StripeElements | null>>
 }
 
+export const ElementsContextKey = Symbol('elements context') as InjectionKey<ElementsContextValue>
+
 export function parseElementsContext(
-  ctx: ElementsContextValue | undefined,
+  ctx: ElementsContextValue | null,
   useCase: string,
 ): ElementsContextValue {
   if (!ctx) {
@@ -99,7 +100,7 @@ export const Elements = defineComponent({
       ctx.elements.value.update(stripeElementUpdateOptions)
     }, { deep: true })
 
-    provide(ElementsKey, {
+    provide(ElementsContextKey, {
       stripe: readonly(ctx.stripe),
       elements: readonly(ctx.elements),
     })
@@ -109,7 +110,7 @@ export const Elements = defineComponent({
 })
 
 export function useElementsContextWithUseCase(useCaseMessage: string): ElementsContextValue {
-  const ctx = inject(ElementsKey, undefined)
+  const ctx = inject(ElementsContextKey, null)
   return parseElementsContext(ctx, useCaseMessage)
 }
 

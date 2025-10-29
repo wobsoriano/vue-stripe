@@ -13,7 +13,9 @@ npm install vue-stripe @stripe/stripe-js
 
 ## Checkout provider
 
-The `Elements` provider allows you to use [Element components](https://docs.stripe.com/sdks/stripejs-react?ui=elements#element-components) and access the [Stripe object](https://docs.stripe.com/js/initializing) in any nested component. Render a `CheckoutProvider` at the root of your Vue app so that it’s available everywhere you need it.
+The `CheckoutProvider` provider allows you to use [Element components](https://docs.stripe.com/sdks/stripejs-react?ui=elements#element-components) and access the [Stripe object](https://docs.stripe.com/js/initializing) in any nested component. Render a `CheckoutProvider` at the root of your Vue app so that it’s available everywhere you need it.
+
+See [Create a Checkout Session](https://docs.stripe.com/payments/accept-a-payment?platform=web&ui=embedded-components#create-checkout-session) for an example of what your endpoint might look like.
 
 ```vue
 <script setup>
@@ -25,12 +27,12 @@ const stripePromise = loadStripe('pk_test_xxx')
 function fetchClientSecret() {
   return fetch('/create-checkout-session', { method: 'POST' })
     .then(response => response.json())
-    .then(json => json.checkoutSessionClientSecret)
+    .then(data => data.clientSecret)
 }
 </script>
 
 <template>
-  <CheckoutProvider :stripe="stripePromise" :options="{ fetchClientSecret }">
+  <CheckoutProvider :stripe="stripePromise" :options="{ clientSecret: fetchClientSecret }">
     <CheckoutForm />
   </CheckoutProvider>
 </template>
@@ -81,6 +83,7 @@ You can use several different kinds of Elements for collecting information on yo
 
 | Component                      | Usage                                                                                                                                                                      |
 |--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `BillingAddressElement`          | Collects billing address details for more than 236 regional formats. See the [Address Element](https://docs.stripe.com/payments/advanced/collect-addresses?payment-ui=embedded-components) documentation to learn more.                                                 |
 | `AddressElement`                 | Collects address details for 236+ regional formats. See the [Address Element docs](https://docs.stripe.com/elements/address-element/collect-addresses?platform=web&client=react).                                                                                          |
 | `ExpressCheckoutElement`         | Allows you to accept card or wallet payments through one or more payment buttons, including Apple Pay, Google Pay, Link, or PayPal. See the [Express Checkout Element](https://docs.stripe.com/elements/express-checkout-element) docs. |
 | `PaymentElement`                 | Collects payment details for [25+ payment methods](https://docs.stripe.com/payments/payment-methods/integration-options) from around the globe. See the [Payment Element](https://docs.stripe.com/payments/accept-a-payment?platform=web&ui=elements&client=react) docs.                                                                      |
@@ -95,12 +98,21 @@ Use the `useCheckout` composable in your components to get the [Checkout object]
 <script setup>
 import { PaymentElement, useCheckout } from 'vue-stripe/checkout'
 
-const checkout = useCheckout()
+const checkoutState = useCheckout()
 
 async function handleSubmit() {
-  const result = await checkout.value.confirm()
+  if (checkoutState.value.type === 'loading') {
+    // Handle loading state
+  }
+  else if (checkoutState.value.type === 'error') {
+    // Handle error state
+  }
 
-  if (result.error) {
+  // checkoutState.type === 'success'
+  const { checkout } = checkoutState.value
+  const result = await checkout.confirm()
+
+  if (result.type === 'error') {
     // Show error to your customer (for example, payment details incomplete)
     console.log(result.error.message)
   }
@@ -115,9 +127,7 @@ async function handleSubmit() {
 <template>
   <form @submit.prevent="handleSubmit">
     <PaymentElement />
-    <button :disabled="!stripe">
-      Submit
-    </button>
+    <button>Submit</button>
   </form>
 </template>
 ```
