@@ -108,16 +108,10 @@ const options = {
 </script>
 
 <template>
-  <Elements :stripe="stripePromise" :options="options">
+  <Elements :stripe="stripePromise" :options>
     <CheckoutForm />
   </Elements>
 </template>
-```
-
-To listen for events, use the `@eventname` directive:
-
-```vue
-<PaymentElement @loaderstart="onLoaderStart">
 ```
 
 ## Acknowledgements
