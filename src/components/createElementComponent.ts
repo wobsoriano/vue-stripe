@@ -1,7 +1,7 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { EmitsOptions, FunctionalComponent, ShallowRef } from 'vue'
-import { defineComponent, h, onUnmounted, ref, shallowRef, toRaw, watch, watchEffect } from 'vue'
-import { useElementsOrCheckoutSdkContextWithUseCase } from '../checkout/components/CheckoutProvider'
+import { computed, defineComponent, h, onUnmounted, ref, shallowRef, toRaw, watch, watchEffect } from 'vue'
+import { useElementsOrCheckoutContextWithUseCase } from '../checkout/components/CheckoutProvider'
 
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -17,18 +17,21 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
   const displayName = `${capitalized(type)}Element`
 
   const Element = defineComponent<ElementProps, ElementEmits>((props, { attrs, emit }) => {
-    const ctx = useElementsOrCheckoutSdkContextWithUseCase(`mounts <${displayName}>`)
+    const ctx = useElementsOrCheckoutContextWithUseCase(`mounts <${displayName}>`)
     const elements = 'elements' in ctx ? ctx.elements : null
-    const checkoutSdk = 'checkoutSdk' in ctx ? ctx.checkoutSdk : null
+    const checkoutState = 'checkoutState' in ctx ? ctx.checkoutState : null
+    const checkoutSdk = computed(() => checkoutState?.value.type === 'success' || checkoutState?.value.type === 'loading'
+      ? checkoutState.value.sdk
+      : null)
     const elementRef = shallowRef<stripeJs.StripeElement | null>(null)
     const domNode = ref<HTMLDivElement | null>(null)
 
     watchEffect(() => {
-      if (elementRef.value === null && domNode.value !== null && (elements?.value || checkoutSdk?.value)) {
+      if (elementRef.value === null && domNode.value !== null && (elements?.value || checkoutSdk.value)) {
         let newElement: stripeJs.StripeElement | null = null
         const options = props.options || {}
 
-        if (checkoutSdk?.value) {
+        if (checkoutSdk.value) {
           switch (type) {
             case 'payment':
               newElement = checkoutSdk.value.createPaymentElement(options)

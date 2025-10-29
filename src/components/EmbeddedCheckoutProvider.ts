@@ -1,8 +1,7 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { PropType, ShallowRef } from 'vue'
+import type { InjectionKey, PropType, ShallowRef } from 'vue'
 import type { UnknownOptions } from '../types'
 import { computed, defineComponent, inject, onUnmounted, provide, shallowRef, watchEffect } from 'vue'
-import { EmbeddedCheckoutKey } from '../keys'
 import { parseStripeProp } from '../utils/parseStripeProp'
 
 interface EmbeddedCheckoutPublicInterface {
@@ -15,8 +14,10 @@ export interface EmbeddedCheckoutContextValue {
   embeddedCheckout: ShallowRef<EmbeddedCheckoutPublicInterface | null>
 }
 
+export const EmbeddedCheckoutContextKey = Symbol('embedded checkout context') as InjectionKey<EmbeddedCheckoutContextValue>
+
 export function useEmbeddedCheckoutContext(): EmbeddedCheckoutContextValue {
-  const ctx = inject(EmbeddedCheckoutKey, undefined)
+  const ctx = inject(EmbeddedCheckoutContextKey, undefined)
   if (!ctx) {
     throw new Error(
       '<EmbeddedCheckout> must be used within <EmbeddedCheckoutProvider>',
@@ -117,7 +118,7 @@ export const EmbeddedCheckoutProvider = defineComponent({
       }
     })
 
-    provide(EmbeddedCheckoutKey, ctx)
+    provide(useEmbeddedCheckoutContext, ctx)
 
     return () => slots.default?.()
   },

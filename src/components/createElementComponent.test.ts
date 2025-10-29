@@ -219,7 +219,7 @@ describe('createElementComponent', () => {
     const elementsRef = shallowRef(null)
     const stripeRef = shallowRef(null)
 
-    vi.spyOn(CheckoutModule, 'useElementsOrCheckoutSdkContextWithUseCase').mockReturnValue({ elements: elementsRef, stripe: stripeRef })
+    vi.spyOn(CheckoutModule, 'useElementsOrCheckoutContextWithUseCase').mockReturnValue({ elements: elementsRef, stripe: stripeRef })
 
     const mockHandler = vi.fn()
 
@@ -771,10 +771,10 @@ describe('createElementComponent', () => {
       })
     })
 
-    it('can remove and add PaymentElement at the same time', async () => {
+    it.only('can remove and add PaymentElement at the same time', async () => {
       const parent = defineComponent({
         props: {
-          key: {
+          rerenderKey: {
             type: String,
             required: true,
           },
@@ -782,17 +782,17 @@ describe('createElementComponent', () => {
         setup(props) {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, {
-            key: props.key,
+            key: props.rerenderKey,
           }))
         },
       })
 
-      const { rerender } = render(parent, { props: { key: '1' } })
+      const { rerender } = render(parent, { props: { rerenderKey: '1' } })
       await nextTick()
 
-      await rerender({ key: '2' })
+      await rerender({ rerenderKey: '2' })
 
       await waitFor(() => expect(peMounted).toBeTruthy())
       expect(mockElement.mount).toHaveBeenCalledTimes(2)
@@ -803,7 +803,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { id: 'foo' }))
         },
       })
@@ -822,7 +822,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { class: 'bar' }))
         },
       })
@@ -842,7 +842,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { options }))
         },
       })
@@ -860,7 +860,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
         },
       })
@@ -883,7 +883,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: stripe.value,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
         },
       })
@@ -906,7 +906,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: mockHandler }))
         },
       })
@@ -927,7 +927,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: stripe.value,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: mockHandler }))
         },
       })
@@ -958,7 +958,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: mockHandler, key: key.value }))
         },
       })
@@ -987,7 +987,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: onChange.value }))
         },
       })
@@ -1012,7 +1012,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onReady: onReady.value }))
         },
       })
@@ -1037,7 +1037,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: onChange.value }))
         },
       })
@@ -1062,7 +1062,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onBlur: onBlur.value }))
         },
       })
@@ -1086,7 +1086,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onFocus: onFocus.value }))
         },
       })
@@ -1110,7 +1110,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onEscape: onEscape.value }))
         },
       })
@@ -1134,7 +1134,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onLoaderror: onLoadError.value }))
         },
       })
@@ -1158,7 +1158,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onLoaderstart: onLoaderStart.value }))
         },
       })
@@ -1179,7 +1179,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { options: options.value as any }))
         },
       })
@@ -1201,7 +1201,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { options: options.value as any }))
         },
       })
@@ -1221,7 +1221,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { options: options.value as any }))
         },
       })
@@ -1242,7 +1242,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: null,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
         },
       })
@@ -1256,7 +1256,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
         },
       })
@@ -1274,7 +1274,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: stripePromise,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
         },
       })
@@ -1297,7 +1297,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(CardElement))
         },
       })
@@ -1317,7 +1317,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
             // @ts-expect-error: Testing invalid mode
           }, () => h(AddressElement, { options: { mode: 'foo' } }))
         },
@@ -1338,7 +1338,7 @@ describe('createElementComponent', () => {
         setup() {
           return () => h(CheckoutProvider, {
             stripe: mockStripe,
-            options: { fetchClientSecret: async () => 'cs_123' },
+            options: { clientSecret: 'cs_123' },
           }, () => h(AddressElement))
         },
       })

@@ -1,29 +1,8 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { ComputedRef, DeepReadonly, InjectionKey, PropType, ShallowRef } from 'vue'
-import { computed, defineComponent, inject, provide, readonly, ref, shallowRef, watch, watchEffect } from 'vue'
-import { parseElementsContext } from '../../components/Elements'
-import { CheckoutKey, CheckoutSdkKey, ElementsKey } from '../../keys'
+import type { ComputedRef, InjectionKey, PropType, ShallowRef } from 'vue'
+import { computed, defineComponent, inject, provide, shallowRef, watch, watchEffect } from 'vue'
+import { ElementsContextKey, parseElementsContext } from '../../components/Elements'
 import { parseStripeProp } from '../../utils/parseStripeProp'
-
-export interface CheckoutSdkContextValue {
-  checkoutSdk: DeepReadonly<ShallowRef<stripeJs.StripeCheckout | null>>
-  stripe: DeepReadonly<ShallowRef<stripeJs.Stripe | null>>
-}
-
-export function parseCheckoutSdkContext(
-  ctx: CheckoutSdkContextValue | undefined,
-  useCase: string,
-): CheckoutSdkContextValue {
-  if (!ctx) {
-    throw new Error(
-      `Could not find CheckoutProvider context; You need to wrap the part of your app that ${useCase} in an <CheckoutProvider> provider.`,
-    )
-  }
-
-  return ctx
-}
-
-type StripeCheckoutActions = Omit<Omit<stripeJs.StripeCheckout, 'session'>, 'on'>
 
 export type State
   = | {
@@ -38,9 +17,9 @@ export type State
   }
   | { type: 'error', error: { message: string } }
 
-type CheckoutContextValue = {
-  stripe: DeepReadonly<ShallowRef<stripeJs.Stripe | null>>
-  checkoutState: DeepReadonly<ShallowRef<State>>
+export interface CheckoutContextValue {
+  stripe: ShallowRef<stripeJs.Stripe | null>
+  checkoutState: ShallowRef<State>
 }
 
 export const CheckoutContextKey = Symbol('Checkout Context') as InjectionKey<CheckoutContextValue>
@@ -98,7 +77,7 @@ export const CheckoutProvider = defineComponent({
           const sdk = stripe.initCheckout(props.options)
           state.value = {
             type: 'loading',
-            sdk
+            sdk,
           }
 
           sdk.loadActions()
@@ -124,14 +103,14 @@ export const CheckoutProvider = defineComponent({
               else {
                 state.value = {
                   type: 'error',
-                  error: result.error
+                  error: result.error,
                 }
               }
             })
             .catch((error) => {
               state.value = {
                 type: 'error',
-                error
+                error,
               }
             })
         }
@@ -182,44 +161,82 @@ export const CheckoutProvider = defineComponent({
     })
 
     provide(CheckoutContextKey, {
-      checkoutState: readonly(state),
-      stripe: readonly(stripe),
+      checkoutState: state,
+      stripe,
     })
 
     return () => slots.default?.()
   },
 })
 
-export function useElementsOrCheckoutSdkContextWithUseCase(useCaseString: string) {
-  const checkoutSdkContext = inject(CheckoutSdkKey, undefined)
-  const elementsContext = inject(ElementsKey, undefined)
-
-  if (checkoutSdkContext && elementsContext) {
-    throw new Error(
-      `You cannot wrap the part of your app that ${useCaseString} in both <CheckoutProvider> and <Elements> providers.`,
-    )
-  }
-
-  if (checkoutSdkContext) {
-    return parseCheckoutSdkContext(checkoutSdkContext, useCaseString)
-  }
-
-  return parseElementsContext(elementsContext, useCaseString)
-}
-
-export function useElementsOrCheckoutContextWithUseCase(useCaseString: string): CheckoutSdkContextValue {
+export function useElementsOrCheckoutContextWithUseCase(useCaseString: string) {
   const checkout = inject(CheckoutContextKey, null)
-  return parseCheckoutSdkContext(ctx, useCaseString)
+  const elements = inject(ElementsContextKey, null)
+
+  if (checkout) {
+    if (elements) {
+      throw new Error(
+        `You cannot wrap the part of your app that ${useCaseString} in both <CheckoutProvider> and <Elements> providers.`,
+      )
+    }
+    else {
+      return checkout
+    }
+  }
+  else {
+    return parseElementsContext(elements, useCaseString)
+  }
 }
 
-export function useCheckout(): ComputedRef<CheckoutContextValue | null> {
-  // ensure it's in CheckoutProvider
-  useCheckoutSdkContextWithUseCase('calls useCheckout()')
-  const ctx = inject(CheckoutKey, undefined)
-  if (!ctx) {
-    throw new Error(
-      'Could not find Checkout Context; You need to wrap the part of your app that calls useCheckout() in an <CheckoutProvider> provider.',
-    )
+type StripeCheckoutActions = Omit<
+  stripeJs.StripeCheckout,
+  'on' | 'loadActions'
+>
+& Omit<stripeJs.LoadActionsSuccess, 'getSession'>
+
+export type StripeCheckoutValue = StripeCheckoutActions
+  & stripeJs.StripeCheckoutSession
+
+export type StripeUseCheckoutResult
+  = | { type: 'loading' }
+    | {
+      type: 'success'
+      checkout: StripeCheckoutValue
+    }
+    | { type: 'error', error: { message: string } }
+
+function mapStateToUseCheckoutResult(checkoutState: State): StripeUseCheckoutResult {
+  if (checkoutState.type === 'success') {
+    const { sdk, session, checkoutActions } = checkoutState
+    const { on: _on, loadActions: _loadActions, ...elementsMethods } = sdk
+    const { getSession: _getSession, ...otherCheckoutActions } = checkoutActions
+    const actions = {
+      ...elementsMethods,
+      ...otherCheckoutActions,
+    }
+    return {
+      type: 'success',
+      checkout: {
+        ...session,
+        ...actions,
+      },
+    }
   }
-  return ctx
+  else if (checkoutState.type === 'loading') {
+    return {
+      type: 'loading',
+    }
+  }
+  else {
+    return {
+      type: 'error',
+      error: checkoutState.error,
+    }
+  }
+}
+
+export function useCheckout(): ComputedRef<StripeUseCheckoutResult> {
+  const ctx = inject(CheckoutContextKey, null)
+  const { checkoutState } = validateCheckoutContext(ctx, 'calls useCheckout()')
+  return computed(() => mapStateToUseCheckoutResult(checkoutState.value))
 }

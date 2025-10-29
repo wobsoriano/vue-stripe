@@ -90,17 +90,17 @@ export function mockCheckoutSdk() {
     getExpressCheckoutElement: vi.fn(() => {
       return elements.expressCheckout || null
     }),
-    session: vi.fn(() => mockCheckoutSession()),
-    applyPromotionCode: vi.fn(),
-    removePromotionCode: vi.fn(),
-    updateShippingAddress: vi.fn(),
-    updateBillingAddress: vi.fn(),
-    updatePhoneNumber: vi.fn(),
-    updateEmail: vi.fn(),
-    updateLineItemQuantity: vi.fn(),
-    updateShippingOption: vi.fn(),
-    confirm: vi.fn(),
-    on: vi.fn(),
+
+    on: vi.fn((event, callback) => {
+      if (event === 'change') {
+        // Simulate initial session call
+        setTimeout(() => callback(mockCheckoutSession()), 0)
+      }
+    }),
+    loadActions: vi.fn().mockResolvedValue({
+      type: 'success',
+      actions: mockCheckoutActions(),
+    }),
   }
 }
 
@@ -114,6 +114,7 @@ export function mockEmbeddedCheckout() {
 
 export function mockStripe() {
   const checkoutSdk = mockCheckoutSdk()
+
   return {
     elements: vi.fn(() => mockElements()),
     createToken: vi.fn(),
@@ -124,7 +125,7 @@ export function mockStripe() {
     paymentRequest: vi.fn(),
     registerAppInfo: vi.fn(),
     _registerWrapper: vi.fn(),
-    initCheckout: vi.fn().mockResolvedValue(checkoutSdk),
+    initCheckout: vi.fn(() => checkoutSdk),
     initEmbeddedCheckout: vi.fn(() =>
       Promise.resolve(mockEmbeddedCheckout()),
     ),
