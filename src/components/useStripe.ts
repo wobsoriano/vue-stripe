@@ -1,3 +1,4 @@
+import { readonly } from 'vue'
 import { useElementsOrCheckoutContextWithUseCase } from '../checkout/components/CheckoutProvider'
 
 /**
@@ -6,5 +7,5 @@ import { useElementsOrCheckoutContextWithUseCase } from '../checkout/components/
  */
 export function useStripe() {
   const { stripe } = useElementsOrCheckoutContextWithUseCase('calls useStripe()')
-  return stripe
+  return readonly(stripe)
 }
