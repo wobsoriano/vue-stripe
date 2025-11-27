@@ -2,7 +2,7 @@ import type { UnknownOptions } from '../types'
 import { render, waitFor } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
-import { AddressElement, PaymentElement } from '..'
+import { AddressElement, PaymentElement, PaymentFormElement } from '..'
 import * as mocks from '../../test/mocks'
 import * as CheckoutModule from '../checkout/components/CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
@@ -318,6 +318,32 @@ describe('createElementComponent', () => {
         return () => h(Elements, {
           stripe: mockStripe,
         }, () => h(CardElement, {
+          onReady: onReady.value,
+        }))
+      },
+    })
+    render(parent)
+    await nextTick()
+
+    onReady.value = mockHandler2
+    await nextTick()
+
+    const mockEvent = Symbol('ready')
+    simulateEvent('ready', mockEvent)
+    expect(mockHandler2).toHaveBeenCalledWith(mockElement)
+    expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('propagates the Payment Form Element`s ready event to the current onReady prop', async () => {
+    const mockHandler = vi.fn()
+    const mockHandler2 = vi.fn()
+    const onReady = ref(mockHandler)
+
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+        }, () => h(PaymentFormElement, {
           onReady: onReady.value,
         }))
       },

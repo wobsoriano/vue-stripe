@@ -33,6 +33,9 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
 
         if (checkoutSdk.value) {
           switch (type) {
+            case 'paymentForm':
+              newElement = checkoutSdk.value.createPaymentFormElement()
+              break
             case 'payment':
               newElement = checkoutSdk.value.createPaymentElement(options)
               break

@@ -91,6 +91,12 @@ export type LinkAuthenticationElementEmits = WithBaseElementEmits<{
   loaderstart: (event: { elementType: 'linkAuthentication' }) => void
 }>
 
+export type PaymentFormElementProps = WithBaseElementProps<object>
+
+export type PaymentFormElementEmits = WithBaseElementEmits<{
+  ready: (element: stripeJs.StripePaymentFormElement) => void
+}>
+
 export type PaymentElementProps = WithBaseElementProps<{
   options?: stripeJs.StripePaymentElementOptions
 }>
