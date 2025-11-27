@@ -66,6 +66,10 @@ export function mockCheckoutSdk() {
       elements.payment = mockElement()
       return elements.payment
     }),
+    createPaymentFormElement: vi.fn(() => {
+      elements.paymentForm = mockElement()
+      return elements.paymentForm
+    }),
     createBillingAddressElement: vi.fn(() => {
       elements.billingAddress = mockElement()
       return elements.billingAddress

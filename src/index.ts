@@ -21,6 +21,8 @@ import type {
   LinkAuthenticationElementProps,
   PaymentElementEmits,
   PaymentElementProps,
+  PaymentFormElementEmits,
+  PaymentFormElementProps,
   PaymentMethodMessagingElementEmits,
   PaymentMethodMessagingElementProps,
   PaymentRequestButtonElementEmits,
@@ -69,6 +71,8 @@ export const IbanElement = createElementComponent<IbanElementProps, IbanElementE
 export const LinkAuthenticationElement = createElementComponent<LinkAuthenticationElementProps, LinkAuthenticationElementEmits>('linkAuthentication')
 
 export const PaymentElement = createElementComponent<PaymentElementProps, PaymentElementEmits>('payment')
+
+export const PaymentFormElement = createElementComponent<PaymentFormElementProps, PaymentFormElementEmits>('paymentForm')
 
 /**
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
