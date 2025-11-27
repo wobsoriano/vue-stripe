@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 2.2.0
+
+### Minor Changes
+
+- ba8fab6: Add PaymentForm Element
+
 ## 2.1.0
 
 ### Minor Changes
