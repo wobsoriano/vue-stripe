@@ -9,10 +9,6 @@ export {
   useCheckout,
 } from './components/CheckoutProvider'
 
-/**
- * Requires beta access:
- * Contact [Stripe support](https://support.stripe.com/) for more information.
- */
 export const CurrencySelectorElement = createElementComponent<CurrencySelectorElementProps, CurrencySelectorElementEmits>('currencySelector')
 
 export const PaymentElement = createElementComponent<PaymentElementProps, PaymentElementEmits>('payment')
