@@ -1,5 +1,12 @@
 # stripe-vue
 
+## 2.1.0
+
+### Minor Changes
+
+- 92b1000: Add Financial Account for Platforms disclosure Vue component
+- 1f6c1c6: Add Issuing disclosure Vue component
+
 ## 2.0.0
 
 ### Major Changes
