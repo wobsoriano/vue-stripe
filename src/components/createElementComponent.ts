@@ -140,12 +140,14 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
    * we wrap it in this function to satisfy Stripe's requirements while preserving
    * all Vue component functionality including reactivity and event emission.
    */
-  const ElementWrapper: FunctionalComponent<ElementProps, ElementEmits> = (props) => {
-    return h(Element, props as any)
+  const ElementWrapper: FunctionalComponent<ElementProps, ElementEmits> = (props, { attrs }) => {
+    return h(Element, { ...props, ...attrs } as any)
   }
 
-  // @ts-expect-error: Internal Stripe requirement
-  ElementWrapper.__elementType = type
+  // Internal Stripe requirement
+  Object.assign(ElementWrapper, {
+    __elementType: type,
+  })
 
   return ElementWrapper
 }
