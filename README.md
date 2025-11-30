@@ -4,6 +4,8 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 
 > [!NOTE]
 > The aim of this module is to have [`@stripe/react-stripe-js`](https://github.com/stripe/react-stripe-js) for Vue with feature parity. You should be able to follow the [React docs](https://stripe.com/docs/stripe-js/react) and examples using this module.
+>
+> **When to use this library**: Only use this library if you want parity with the React Stripe.js SDK. Otherwise, consider using the [Stripe Partner Vue SDK](https://vuestripe.com).
 
 ## Getting started
 
