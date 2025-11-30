@@ -2,4 +2,4 @@
 "vue-stripe": patch
 ---
 
-Republish with trusted publishing
+Switch to OIDC for npm publishing
