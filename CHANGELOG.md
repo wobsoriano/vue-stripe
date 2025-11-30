@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 2.3.1
+
+### Patch Changes
+
+- 931f6a3: Retry provenance publish
+
 ## 2.3.0
 
 ### Minor Changes
