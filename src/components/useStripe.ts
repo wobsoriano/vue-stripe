@@ -3,7 +3,7 @@ import { useElementsOrCheckoutContextWithUseCase } from '../checkout/components/
 
 /**
  * The useStripe composable returns a reference to the [Stripe](https://docs.stripe.com/js/initializing)
- * instance passed to the Elements provider.
+ * instance passed to the Elements or CheckoutProvider.
  */
 export function useStripe() {
   const { stripe } = useElementsOrCheckoutContextWithUseCase('calls useStripe()')

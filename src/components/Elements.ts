@@ -121,5 +121,5 @@ export function useElementsContextWithUseCase(useCaseMessage: string): ElementsC
  */
 export function useElements() {
   const { elements } = useElementsContextWithUseCase('calls useElements()')
-  return readonly(elements)
+  return elements
 }
