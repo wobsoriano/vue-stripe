@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 2.3.0
+
+### Minor Changes
+
+- c1a61fd: Switch to OIDC for NPM publishing
+
 ## 2.2.0
 
 ### Minor Changes
