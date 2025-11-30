@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- d1599d2: Switch to OIDC for npm publishing
+
+## 2.3.1
+
+### Patch Changes
+
 - 931f6a3: Retry provenance publish
 
 ## 2.3.0
