@@ -34,9 +34,6 @@
   "files": [
     "dist"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "dev": "tsdown --watch --onSuccess \"pnpm build:dts\"",
     "build": "tsdown --env.NODE_ENV production",
