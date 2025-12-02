@@ -46,7 +46,7 @@ Features
   ---
   #title
   Full TypeScript Support
-  
+
   #description
   Complete type definitions for all components and composables. Built with TypeScript from the ground up for the best developer experience.
   :::
@@ -57,7 +57,7 @@ Features
   ---
   #title
   1:1 Parity with React Stripe.js
-  
+
   #description
   Designed as a direct equivalent to `@stripe/react-stripe-js`. Follow the official React Stripe.js documentation and adapt examples to Vue syntax.
   :::
@@ -68,7 +68,7 @@ Features
   ---
   #title
   All Stripe Elements
-  
+
   #description
   Support for Payment Element, Express Checkout, Card Elements, Address Element, Link Authentication, and more. Everything you need for payment collection.
   :::
@@ -79,7 +79,7 @@ Features
   ---
   #title
   Vue 3 Composition API
-  
+
   #description
   Built with Vue 3's Composition API for optimal developer experience. Use composables like `useStripe()` and `useElements()` for easy access to Stripe instances.
   :::
@@ -90,7 +90,7 @@ Features
   ---
   #title
   Checkout Integration
-  
+
   #description
   Support for both Elements and Embedded Checkout. Use `CheckoutProvider` for Elements with Checkout Sessions or `EmbeddedCheckout` for pre-built checkout UI.
   :::
@@ -101,7 +101,7 @@ Features
   ---
   #title
   Fully Customizable
-  
+
   #description
   Use Stripe's Appearance API to match Elements to your brand. Complete control over styling and behavior while maintaining security and compliance.
   :::
