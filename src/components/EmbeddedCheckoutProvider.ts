@@ -42,7 +42,7 @@ export const EmbeddedCheckoutProvider = defineComponent({
         fetchClientSecret?: (() => Promise<string>) | null
         onComplete?: () => void
         onShippingDetailsChange?: (
-          event: stripeJs.StripeEmbeddedCheckoutShippingDetailsChangeEvent
+          event: stripeJs.StripeEmbeddedCheckoutShippingDetailsChangeEvent,
         ) => Promise<stripeJs.ResultAction>
       }>,
       required: true,
