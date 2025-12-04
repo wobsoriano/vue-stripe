@@ -9,7 +9,24 @@ export default defineNuxtConfig({
     url: 'https://vue-stripe.dev',
   },
   sitemap: {
-    // This setting is crucial for Nuxt Content integration
-    strictNuxtContentPaths: true,
+    urls: [
+      '/',
+      '/getting-started/introduction',
+      '/getting-started/installation',
+      '/getting-started/setup-application',
+      '/core-concepts/elements',
+      '/core-concepts/payment-element',
+      '/core-concepts/express-checkout-element',
+      '/core-concepts/link-authentication-element',
+      '/core-concepts/address-element',
+      '/core-concepts/card-elements',
+      '/core-concepts/checkout',
+      '/advance/service',
+      '/advance/styling',
+      '/advance/reference-instance',
+      '/advance/mount-your-element',
+      '/support/faqs',
+      '/support/examples',
+    ],
   },
 })
