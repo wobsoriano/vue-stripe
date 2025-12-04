@@ -1,8 +1,7 @@
 ---
 seo:
   title: Vue Stripe - Vue components for Stripe.js and Elements
-  description: Vue components for Stripe.js and Elements with full TypeScript support.
-    Provides 1:1 parity with React Stripe.js SDK.
+  description: Vue components for Stripe.js and Elements. Integrate secure payment forms and accept payments in your Vue applications.
 ---
 
 ::u-page-hero
@@ -10,7 +9,7 @@ seo:
 Vue Stripe
 
 #description
-Vue components for Stripe.js and Elements with full TypeScript support.
+Vue components for Stripe.js and Elements. Integrate secure payment forms and accept payments in your Vue applications.
 
 #links
   :::u-button
@@ -40,17 +39,6 @@ Vue components for Stripe.js and Elements with full TypeScript support.
 Features
 
 #features
-  :::u-page-feature
-  ---
-  icon: i-lucide-code
-  ---
-  #title
-  Full TypeScript Support
-
-  #description
-  Complete type definitions for all components and composables. Built with TypeScript from the ground up for the best developer experience.
-  :::
-
   :::u-page-feature
   ---
   icon: i-lucide-git-compare
