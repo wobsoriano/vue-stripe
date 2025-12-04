@@ -2,7 +2,7 @@ export default defineAppConfig({
   seo: {
     titleTemplate: '%s - Vue Stripe',
     title: 'Vue Stripe',
-    description: 'Vue components for Stripe.js and Elements. Integrate secure payment forms, collect payment details, and accept payments in your Vue applications.',
+    description: 'Vue components for Stripe.js and Elements.',
   },
   header: {
     title: 'Vue Stripe',

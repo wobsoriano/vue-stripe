@@ -1,7 +1,7 @@
 ---
 seo:
   title: Vue Stripe - Vue components for Stripe.js and Elements
-  description: Vue components for Stripe.js and Elements. Integrate secure payment forms and accept payments in your Vue applications.
+  description: Vue components for Stripe.js and Elements.
 ---
 
 ::u-page-hero
@@ -9,7 +9,7 @@ seo:
 Vue Stripe
 
 #description
-Vue components for Stripe.js and Elements. Integrate secure payment forms and accept payments in your Vue applications.
+Vue components for Stripe.js and Elements.
 
 #links
   :::u-button
