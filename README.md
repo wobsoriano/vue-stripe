@@ -7,7 +7,7 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 
 ## Getting started
 
-- [Add Vue Stripe.js to your Vue app](https://www.vue-stripe.com/getting-started/embedded-components/#installation)
+- [Add Vue Stripe.js to your Vue app](https://vue-stripe.vercel.app/getting-started/installation)
 - [Try it out using CodeSandbox](https://codesandbox.io/p/devbox/vue-stripe-demo-nds3jv)
 
 ## Installation
