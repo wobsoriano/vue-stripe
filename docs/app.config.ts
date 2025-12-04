@@ -1,0 +1,21 @@
+export default defineAppConfig({
+  seo: {
+    titleTemplate: '%s - Vue Stripe',
+    title: 'Vue Stripe',
+    description: 'Vue components for Stripe.js and Elements. Integrate secure payment forms, collect payment details, and accept payments in your Vue applications.',
+  },
+  header: {
+    title: 'Vue Stripe',
+  },
+  socials: {
+    github: 'https://github.com/wobsoriano/vue-stripe',
+  },
+  github: {
+    url: 'https://github.com/wobsoriano/vue-stripe',
+    branch: 'main',
+    rootDir: 'docs',
+  },
+  toc: {
+    title: 'On this page',
+  },
+})
