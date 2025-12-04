@@ -8,4 +8,8 @@ export default defineNuxtConfig({
     name: 'Vue Stripe',
     url: 'https://vue-stripe.dev',
   },
+  sitemap: {
+    // This setting is crucial for Nuxt Content integration
+    strictNuxtContentPaths: true,
+  },
 })
