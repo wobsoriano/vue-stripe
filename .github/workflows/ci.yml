@@ -46,3 +46,15 @@ jobs:
 
       - name: Test
         run: pnpm test
+  provenance:
+    name: Provenance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Check Provenance
+        uses: danielroe/provenance-action@v0.1.1
+        with:
+          fail-on-downgrade: true
