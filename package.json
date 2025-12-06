@@ -20,7 +20,7 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/react-stripe.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./checkout": {
