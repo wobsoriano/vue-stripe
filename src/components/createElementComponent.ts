@@ -109,6 +109,8 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
     useAttachEvent(elementRef, 'shippingaddresschange', emit, Boolean(attrs.onShippingaddresschange))
     useAttachEvent(elementRef, 'shippingratechange', emit, Boolean(attrs.onShippingratechange))
     useAttachEvent(elementRef, 'change', emit, Boolean(attrs.onChange))
+    useAttachEvent(elementRef, 'savedpaymentmethodremove', emit, Boolean(attrs.onSavedpaymentmethodremove))
+    useAttachEvent(elementRef, 'savedpaymentmethodupdate', emit, Boolean(attrs.onSavedpaymentmethodupdate))
 
     const shouldEmitElement = type !== 'expressCheckout'
     useAttachEvent(elementRef, 'ready', emit, Boolean(attrs.onReady), shouldEmitElement)

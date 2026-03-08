@@ -1,8 +1,9 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { DeepReadonly, InjectionKey, PropType, ShallowRef, SlotsType } from 'vue'
-import type { UnknownOptions } from '../types'
 import { computed, defineComponent, inject, provide, readonly, shallowRef, watch, watchEffect } from 'vue'
+import { extractAllowedOptionsUpdates } from '../utils/extractAllowedOptionsUpdates'
 import { parseStripeProp } from '../utils/parseStripeProp'
+import { registerWithStripeJs } from '../utils/registerWithStripeJs'
 
 export interface ElementsContextValue {
   stripe: DeepReadonly<ShallowRef<stripeJs.Stripe | null>>
@@ -50,9 +51,13 @@ export const Elements = defineComponent({
       stripe: shallowRef(parsed.value.tag === 'sync' ? parsed.value.stripe : null),
       elements: shallowRef<stripeJs.StripeElements | null>(parsed.value.tag === 'sync'
         ? parsed.value.stripe.elements(
-            props.options as UnknownOptions,
+            props.options as Record<string, unknown>,
           )
         : null),
+    }
+
+    if (parsed.value.tag === 'sync') {
+      registerWithStripeJs(ctx.stripe)
     }
 
     const safeSetContext = (stripe: stripeJs.Stripe) => {
@@ -62,7 +67,8 @@ export const Elements = defineComponent({
       }
 
       ctx.stripe.value = stripe
-      ctx.elements.value = stripe.elements(props.options as UnknownOptions)
+      ctx.elements.value = stripe.elements(props.options as Record<string, unknown>)
+      registerWithStripeJs(ctx.stripe)
     }
 
     watchEffect(() => {
@@ -89,15 +95,15 @@ export const Elements = defineComponent({
       }
     })
 
-    watch(() => {
-      const { clientSecret, fonts, ...rest } = props.options ?? {}
-      return rest
-    }, (stripeElementUpdateOptions) => {
+    watch(() => props.options, (options, prevOptions) => {
       if (!ctx.elements.value) {
         return
       }
 
-      ctx.elements.value.update(stripeElementUpdateOptions)
+      const updates = extractAllowedOptionsUpdates(options, prevOptions, ['clientSecret', 'fonts'])
+      if (updates) {
+        ctx.elements.value.update(updates)
+      }
     }, { deep: true })
 
     provide(ElementsContextKey, {
