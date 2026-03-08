@@ -52,7 +52,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^5.4.1",
     "@changesets/cli": "^2.29.8",
-    "@stripe/stripe-js": "^8.9.0",
+    "@stripe/stripe-js": "^8.7.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/vue": "^8.1.0",
     "@types/node": "^24.10.1",

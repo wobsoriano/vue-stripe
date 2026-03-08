@@ -15,7 +15,7 @@ importers:
         specifier: ^2.29.8
         version: 2.29.8(@types/node@24.10.1)
       '@stripe/stripe-js':
-        specifier: ^8.9.0
+        specifier: ^8.7.0
         version: 8.9.0
       '@testing-library/jest-dom':
         specifier: ^6.9.1
