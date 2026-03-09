@@ -13,5 +13,6 @@ export default defineConfig({
   plugins: [vue()],
   define: {
     _VERSION: JSON.stringify(pkg.version),
+    _NAME: JSON.stringify(pkg.name),
   },
 })

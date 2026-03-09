@@ -8,5 +8,6 @@ export default defineConfig({
   platform: 'neutral',
   define: {
     _VERSION: JSON.stringify(pkg.version),
+    _NAME: JSON.stringify(pkg.name),
   },
 })
