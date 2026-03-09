@@ -333,5 +333,34 @@ describe('embeddedCheckoutProvider', () => {
 
       expect(mockEmbeddedCheckout.destroy).toHaveBeenCalledTimes(1)
     })
+
+    it('does not retain embedded checkout after unmount during async initialization', async () => {
+      let resolveStripe!: (value: any) => void
+      const slowStripePromise: Promise<any> = new Promise((resolve) => {
+        resolveStripe = resolve
+      })
+      let providedContext: any
+
+      const Consumer = defineComponent(() => {
+        providedContext = useEmbeddedCheckoutContext()
+        return () => null
+      })
+      const Comp = defineComponent(() => {
+        return () => h(EmbeddedCheckoutProvider, {
+          stripe: slowStripePromise,
+          options: fakeOptions,
+        }, () => h(Consumer))
+      })
+
+      const view = render(Comp)
+      view.unmount()
+
+      resolveStripe(mockStripe)
+      await slowStripePromise
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(providedContext.embeddedCheckout.value).toBe(null)
+    })
   })
 })

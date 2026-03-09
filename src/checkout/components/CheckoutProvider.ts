@@ -1,7 +1,9 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { ComputedRef, InjectionKey, PropType, ShallowRef } from 'vue'
-import { computed, defineComponent, inject, provide, shallowRef, watch, watchEffect } from 'vue'
+import { computed, defineComponent, inject, provide, shallowRef, watch } from 'vue'
 import { ElementsContextKey, parseElementsContext } from '../../components/Elements'
+import { createSnapshot } from '../../utils/createSnapshot'
+import { isEqual } from '../../utils/isEqual'
 import { parseStripeProp } from '../../utils/parseStripeProp'
 
 export type State
@@ -67,9 +69,14 @@ export const CheckoutProvider = defineComponent({
     // Used to avoid calling initCheckout multiple times when options changes
     let initCheckoutCalled = false
 
-    watchEffect(() => {
+    watch(parsed, (currentParsed, _, onCleanup) => {
+      let cancelled = false
+      onCleanup(() => {
+        cancelled = true
+      })
+
       const init = ({ stripe }: { stripe: stripeJs.Stripe }) => {
-        if (stripe && !initCheckoutCalled) {
+        if (stripe && !cancelled && !initCheckoutCalled) {
           // Only update context if the component is still mounted
           // and stripe is not null. We allow stripe to be null to make
           // handling SSR easier.
@@ -82,6 +89,10 @@ export const CheckoutProvider = defineComponent({
 
           sdk.loadActions()
             .then((result) => {
+              if (cancelled) {
+                return
+              }
+
               if (result.type === 'success') {
                 const { actions } = result
                 state.value = {
@@ -108,6 +119,10 @@ export const CheckoutProvider = defineComponent({
               }
             })
             .catch((error) => {
+              if (cancelled) {
+                return
+              }
+
               state.value = {
                 type: 'error',
                 error,
@@ -116,8 +131,12 @@ export const CheckoutProvider = defineComponent({
         }
       }
 
-      if (parsed.value.tag === 'async') {
-        parsed.value.stripePromise.then((newStripe) => {
+      if (currentParsed.tag === 'async') {
+        currentParsed.stripePromise.then((newStripe) => {
+          if (cancelled) {
+            return
+          }
+
           stripe.value = newStripe
           if (newStripe) {
             init({ stripe: newStripe })
@@ -129,11 +148,11 @@ export const CheckoutProvider = defineComponent({
           }
         })
       }
-      else if (parsed.value.tag === 'sync') {
-        stripe.value = parsed.value.stripe
-        init({ stripe: parsed.value.stripe })
+      else if (currentParsed.tag === 'sync') {
+        stripe.value = currentParsed.stripe
+        init({ stripe: currentParsed.stripe })
       }
-    })
+    }, { immediate: true })
 
     // Warn on changes to stripe prop
     watch(() => props.stripe, (_, prevStripe) => {
@@ -147,18 +166,30 @@ export const CheckoutProvider = defineComponent({
     const sdk = computed(() => maybeSdk(state.value))
 
     // Handle appearance changes
+    let previousAppearanceSnapshot = createSnapshot(props.options.elementsOptions?.appearance)
+
     watch(() => props.options.elementsOptions?.appearance, (appearance) => {
-      if (sdk.value && appearance) {
+      const nextAppearanceSnapshot = createSnapshot(appearance)
+
+      if (sdk.value && appearance && !isEqual(nextAppearanceSnapshot, previousAppearanceSnapshot)) {
         sdk.value.changeAppearance(appearance)
       }
-    })
+
+      previousAppearanceSnapshot = nextAppearanceSnapshot
+    }, { deep: true })
 
     // Handle fonts changes
+    let previousFontsSnapshot = createSnapshot(props.options.elementsOptions?.fonts)
+
     watch(() => props.options.elementsOptions?.fonts, (fonts) => {
-      if (sdk.value && fonts) {
+      const nextFontsSnapshot = createSnapshot(fonts)
+
+      if (sdk.value && fonts && !isEqual(nextFontsSnapshot, previousFontsSnapshot)) {
         sdk.value.loadFonts(fonts)
       }
-    })
+
+      previousFontsSnapshot = nextFontsSnapshot
+    }, { deep: true })
 
     provide(CheckoutContextKey, {
       checkoutState: state,

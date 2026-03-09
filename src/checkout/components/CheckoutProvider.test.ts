@@ -308,6 +308,33 @@ describe('checkout provider', () => {
       })
     })
 
+    it('reacts to nested appearance mutations', async () => {
+      const options = ref<any>({
+        clientSecret: fakeClientSecret,
+        elementsOptions: {
+          appearance: { theme: 'stripe' },
+        },
+      })
+      const Comp = defineComponent(() => {
+        return () => h(CheckoutProvider, {
+          stripe: mockStripe,
+          options: options.value,
+        })
+      })
+
+      render(Comp)
+
+      await waitFor(() => expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1))
+
+      mockCheckoutSdk.changeAppearance.mockClear()
+      options.value.elementsOptions.appearance.theme = 'night'
+      await nextTick()
+
+      expect(mockCheckoutSdk.changeAppearance).toHaveBeenCalledWith({
+        theme: 'night',
+      })
+    })
+
     it('does not call loadFonts a 2nd time if they do not change', async () => {
       const options = ref({
         clientSecret: fakeClientSecret,
@@ -409,6 +436,39 @@ describe('checkout provider', () => {
           },
         ])
       })
+    })
+
+    it('reacts to nested font mutations', async () => {
+      const options = ref<any>({
+        clientSecret: fakeClientSecret,
+        elementsOptions: {
+          fonts: [
+            {
+              cssSrc: 'https://example.com/font.css',
+            },
+          ],
+        },
+      })
+      const Comp = defineComponent(() => {
+        return () => h(CheckoutProvider, {
+          stripe: mockStripe,
+          options: options.value,
+        })
+      })
+
+      render(Comp)
+
+      await waitFor(() => expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1))
+
+      mockCheckoutSdk.loadFonts.mockClear()
+      options.value.elementsOptions.fonts[0].cssSrc = 'https://example.com/font-2.css'
+      await nextTick()
+
+      expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledWith([
+        {
+          cssSrc: 'https://example.com/font-2.css',
+        },
+      ])
     })
 
     it('allows options changes before setting the Stripe object', async () => {
