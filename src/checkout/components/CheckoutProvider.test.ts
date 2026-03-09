@@ -391,8 +391,8 @@ describe('checkout provider', () => {
 
       await waitFor(() => {
         expect(mockStripe.initCheckout).toHaveBeenCalledTimes(1)
-        // This is called once, due to the sdk having loaded.
-        expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(1)
+        // This is not called because the fonts value did not change.
+        expect(mockCheckoutSdk.loadFonts).toHaveBeenCalledTimes(0)
       })
     })
 
