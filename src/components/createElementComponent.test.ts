@@ -2,7 +2,7 @@ import type { UnknownOptions } from '../types'
 import { render, waitFor } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
-import { AddressElement, PaymentElement, PaymentFormElement } from '..'
+import { AddressElement, PaymentElement, PaymentFormElement, PaymentRequestButtonElement } from '..'
 import * as mocks from '../../test/mocks'
 import * as CheckoutModule from '../checkout/components/CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
@@ -33,6 +33,7 @@ describe('createElementComponent', () => {
     mockElements.create.mockReturnValue(mockElement)
     mockStripe.initCheckout.mockReturnValue(mockCheckoutSdk)
     mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement)
+    mockCheckoutSdk.createPaymentFormElement.mockReturnValue(mockElement)
     mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement)
     mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement)
     mockCheckoutSdk.createExpressCheckoutElement.mockReturnValue(mockElement)
@@ -881,6 +882,24 @@ describe('createElementComponent', () => {
       expect(simulateOff).not.toBeCalled()
     })
 
+    it('passes options to PaymentFormElement on initial mount', async () => {
+      const options: any = { defaultValues: { billingDetails: { name: 'Jenny Rosen' } } }
+      const parent = defineComponent({
+        setup() {
+          return () => h(CheckoutProvider, {
+            stripe: mockStripe,
+            options: { clientSecret: 'cs_123' },
+          }, () => h(PaymentFormElement, { options }))
+        },
+      })
+
+      result = render(parent)
+
+      await waitFor(() => expect(peMounted).toBeTruthy())
+
+      expect(mockCheckoutSdk.createPaymentFormElement).toHaveBeenCalledWith(options)
+    })
+
     it('mounts the element', async () => {
       const parent = defineComponent({
         setup() {
@@ -1239,6 +1258,39 @@ describe('createElementComponent', () => {
       await waitFor(() => expect(peMounted).toBeTruthy())
 
       expect(mockElement.update).not.toHaveBeenCalled()
+    })
+
+    it('warns and ignores paymentRequest updates after mount', async () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const options = ref<any>({
+        paymentRequest: { id: 'pr_1' },
+        style: { paymentRequestButton: { type: 'default' } },
+      })
+      const parent = defineComponent({
+        setup() {
+          return () => h(Elements, {
+            stripe: mockStripe,
+          }, () => h(PaymentRequestButtonElement, { options: options.value }))
+        },
+      })
+
+      render(parent)
+      await nextTick()
+
+      mockElement.update.mockClear()
+
+      options.value = {
+        paymentRequest: { id: 'pr_2' },
+        style: { paymentRequestButton: { type: 'book' } },
+      }
+      await nextTick()
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Unsupported prop change: options.paymentRequest is not a mutable property.',
+      )
+      expect(mockElement.update).toHaveBeenCalledWith({
+        style: { paymentRequestButton: { type: 'book' } },
+      })
     })
 
     it('updates the Element when options change from null to non-null value', async () => {

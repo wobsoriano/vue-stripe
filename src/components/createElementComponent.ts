@@ -1,7 +1,9 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { EmitsOptions, FunctionalComponent, ShallowRef } from 'vue'
-import { computed, defineComponent, h, onUnmounted, ref, shallowRef, toRaw, watch, watchEffect } from 'vue'
+import { computed, defineComponent, h, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue'
 import { useElementsOrCheckoutContextWithUseCase } from '../checkout/components/CheckoutProvider'
+import { createSnapshot } from '../utils/createSnapshot'
+import { extractAllowedOptionsUpdates } from '../utils/extractAllowedOptionsUpdates'
 
 const capitalized = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -34,7 +36,7 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
         if (checkoutSdk.value) {
           switch (type) {
             case 'paymentForm':
-              newElement = checkoutSdk.value.createPaymentFormElement()
+              newElement = checkoutSdk.value.createPaymentFormElement(options)
               break
             case 'payment':
               newElement = checkoutSdk.value.createPaymentElement(options)
@@ -88,10 +90,26 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
       }
     })
 
-    watch(() => props.options || {}, (options) => {
-      if (elementRef.value && 'update' in elementRef.value) {
-        elementRef.value.update(options)
+    let previousOptionsSnapshot = createSnapshot(props.options || {})
+
+    watch(() => props.options, (options) => {
+      if (!elementRef.value || !('update' in elementRef.value)) {
+        previousOptionsSnapshot = createSnapshot(options || {})
+        return
       }
+
+      const nextOptionsSnapshot = createSnapshot(options || {})
+      const updates = extractAllowedOptionsUpdates(
+        nextOptionsSnapshot,
+        previousOptionsSnapshot,
+        ['paymentRequest'],
+      )
+
+      if (updates) {
+        elementRef.value.update(updates)
+      }
+
+      previousOptionsSnapshot = nextOptionsSnapshot
     }, { deep: true })
 
     // For every event where the merchant provides a callback, call element.on
@@ -109,6 +127,8 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
     useAttachEvent(elementRef, 'shippingaddresschange', emit, Boolean(attrs.onShippingaddresschange))
     useAttachEvent(elementRef, 'shippingratechange', emit, Boolean(attrs.onShippingratechange))
     useAttachEvent(elementRef, 'change', emit, Boolean(attrs.onChange))
+    useAttachEvent(elementRef, 'savedpaymentmethodremove', emit, Boolean(attrs.onSavedpaymentmethodremove))
+    useAttachEvent(elementRef, 'savedpaymentmethodupdate', emit, Boolean(attrs.onSavedpaymentmethodupdate))
 
     const shouldEmitElement = type !== 'expressCheckout'
     useAttachEvent(elementRef, 'ready', emit, Boolean(attrs.onReady), shouldEmitElement)
@@ -171,7 +191,7 @@ export function useAttachEvent(
 
     function cbWithEmit(...args: unknown[]) {
       if (shouldEmitElement) {
-        emit(event, toRaw(element.value))
+        emit(event, element.value)
       }
       else {
         emit(event, ...args)

@@ -268,4 +268,26 @@ describe('elements', () => {
     expect(mockElements.update).toHaveBeenCalledWith({ bar: 'bar' })
     expect(mockStripe.elements).toHaveBeenCalledTimes(1)
   })
+
+  it('applies nested reactive option updates', async () => {
+    const options = ref<any>({ appearance: { theme: 'stripe' } })
+    const parent = defineComponent({
+      setup() {
+        return () => h(Elements, {
+          stripe: mockStripe,
+          options: options.value,
+        })
+      },
+    })
+
+    render(parent)
+
+    mockElements.update.mockClear()
+    options.value.appearance.theme = 'night'
+    await nextTick()
+
+    expect(mockElements.update).toHaveBeenCalledWith({
+      appearance: { theme: 'night' },
+    })
+  })
 })

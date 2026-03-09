@@ -1,7 +1,7 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { InjectionKey, PropType, ShallowRef } from 'vue'
 import type { UnknownOptions } from '../types'
-import { computed, defineComponent, inject, onUnmounted, provide, shallowRef, watchEffect } from 'vue'
+import { computed, defineComponent, inject, onUnmounted, provide, shallowRef, watch } from 'vue'
 import { parseStripeProp } from '../utils/parseStripeProp'
 
 interface EmbeddedCheckoutPublicInterface {
@@ -44,6 +44,9 @@ export const EmbeddedCheckoutProvider = defineComponent({
         onShippingDetailsChange?: (
           event: stripeJs.StripeEmbeddedCheckoutShippingDetailsChangeEvent,
         ) => Promise<stripeJs.ResultAction>
+        onLineItemsChange?: (
+          event: stripeJs.StripeEmbeddedCheckoutLineItemsChangeEvent,
+        ) => Promise<stripeJs.ResultAction>
       }>,
       required: true,
     },
@@ -60,45 +63,56 @@ export const EmbeddedCheckoutProvider = defineComponent({
       embeddedCheckout: shallowRef<EmbeddedCheckoutPublicInterface | null>(null),
     }
 
-    watchEffect(() => {
+    watch([parsed, () => props.options], ([currentParsed, currentOptions], _, onCleanup) => {
+      let cancelled = false
+      onCleanup(() => {
+        cancelled = true
+      })
+
       // Don't support any ctx updates once embeddedCheckout or stripe is set.
       if (loadedStripe.value || embeddedCheckoutPromise.value) {
         return
       }
 
       const setStripeAndInitEmbeddedCheckout = (stripe: stripeJs.Stripe) => {
-        if (loadedStripe.value || embeddedCheckoutPromise.value)
+        if (cancelled || loadedStripe.value || embeddedCheckoutPromise.value)
           return
 
         loadedStripe.value = stripe
         embeddedCheckoutPromise.value = loadedStripe.value
-          .initEmbeddedCheckout(props.options as UnknownOptions)
+          .initEmbeddedCheckout(currentOptions as UnknownOptions)
           .then((embeddedCheckout) => {
+            if (cancelled) {
+              embeddedCheckout.destroy()
+              embeddedCheckoutPromise.value = null
+              return
+            }
+
             ctx.embeddedCheckout.value = embeddedCheckout
           })
       }
 
       // For an async stripePromise, store it once resolved
       if (
-        parsed.value.tag === 'async'
+        currentParsed.tag === 'async'
         && !loadedStripe.value
-        && (props.options.clientSecret || props.options.fetchClientSecret)
+        && (currentOptions.clientSecret || currentOptions.fetchClientSecret)
       ) {
-        parsed.value.stripePromise.then((stripe) => {
-          if (stripe) {
+        currentParsed.stripePromise.then((stripe) => {
+          if (!cancelled && stripe) {
             setStripeAndInitEmbeddedCheckout(stripe)
           }
         })
       }
       else if (
-        parsed.value.tag === 'sync'
+        currentParsed.tag === 'sync'
         && !loadedStripe.value
-        && (props.options.clientSecret || props.options.fetchClientSecret)
+        && (currentOptions.clientSecret || currentOptions.fetchClientSecret)
       ) {
         // Or, handle a sync stripe instance going from null -> populated
-        setStripeAndInitEmbeddedCheckout(parsed.value.stripe)
+        setStripeAndInitEmbeddedCheckout(currentParsed.stripe)
       }
-    })
+    }, { immediate: true, deep: true })
 
     onUnmounted(() => {
       if (ctx.embeddedCheckout.value) {
@@ -119,6 +133,64 @@ export const EmbeddedCheckoutProvider = defineComponent({
     })
 
     provide(EmbeddedCheckoutContextKey, ctx)
+
+    // Warn on changes to stripe prop
+    watch(() => props.stripe, (_, prevStripe) => {
+      if (prevStripe !== null) {
+        console.warn(
+          'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the `stripe` prop after setting it.',
+        )
+      }
+    })
+
+    // Warn on changes to immutable options
+    watch(() => props.options, (options, prevOptions) => {
+      if (prevOptions == null)
+        return
+
+      if (options == null) {
+        console.warn(
+          'Unsupported prop change on EmbeddedCheckoutProvider: You cannot unset options after setting them.',
+        )
+        return
+      }
+
+      if (options.clientSecret === undefined && options.fetchClientSecret === undefined) {
+        console.warn(
+          'Invalid props passed to EmbeddedCheckoutProvider: You must provide one of either `options.fetchClientSecret` or `options.clientSecret`.',
+        )
+      }
+
+      if (prevOptions.clientSecret != null && options.clientSecret !== prevOptions.clientSecret) {
+        console.warn(
+          'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the client secret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.',
+        )
+      }
+
+      if (prevOptions.fetchClientSecret != null && options.fetchClientSecret !== prevOptions.fetchClientSecret) {
+        console.warn(
+          'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change fetchClientSecret after setting it. Unmount and create a new instance of EmbeddedCheckoutProvider instead.',
+        )
+      }
+
+      if (prevOptions.onComplete != null && options.onComplete !== prevOptions.onComplete) {
+        console.warn(
+          'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onComplete option after setting it.',
+        )
+      }
+
+      if (prevOptions.onShippingDetailsChange != null && options.onShippingDetailsChange !== prevOptions.onShippingDetailsChange) {
+        console.warn(
+          'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onShippingDetailsChange option after setting it.',
+        )
+      }
+
+      if (prevOptions.onLineItemsChange != null && options.onLineItemsChange !== prevOptions.onLineItemsChange) {
+        console.warn(
+          'Unsupported prop change on EmbeddedCheckoutProvider: You cannot change the onLineItemsChange option after setting it.',
+        )
+      }
+    })
 
     return () => slots.default?.()
   },

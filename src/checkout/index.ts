@@ -1,6 +1,6 @@
 import type { FunctionalComponent } from 'vue'
 import type { PaymentElementEmits } from '../types'
-import type { BillingAddressElementEmits, BillingAddressElementProps, CurrencySelectorElementEmits, CurrencySelectorElementProps, ExpressCheckoutElementEmits, ExpressCheckoutElementProps, PaymentElementProps, ShippingAddressElementEmits, ShippingAddressElementProps, TaxIdElementEmits, TaxIdElementProps } from './types'
+import type { BillingAddressElementEmits, BillingAddressElementProps, CurrencySelectorElementEmits, CurrencySelectorElementProps, ExpressCheckoutElementEmits, ExpressCheckoutElementProps, PaymentElementProps, PaymentFormElementEmits, PaymentFormElementProps, ShippingAddressElementEmits, ShippingAddressElementProps, TaxIdElementEmits, TaxIdElementProps } from './types'
 import { h } from 'vue'
 import { createElementComponent } from '../components/createElementComponent'
 
@@ -12,6 +12,8 @@ export {
 export const CurrencySelectorElement = createElementComponent<CurrencySelectorElementProps, CurrencySelectorElementEmits>('currencySelector')
 
 export const PaymentElement = createElementComponent<PaymentElementProps, PaymentElementEmits>('payment')
+
+export const PaymentFormElement = createElementComponent<PaymentFormElementProps, PaymentFormElementEmits>('paymentForm')
 
 /**
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components

@@ -1,8 +1,10 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { DeepReadonly, InjectionKey, PropType, ShallowRef, SlotsType } from 'vue'
-import type { UnknownOptions } from '../types'
-import { computed, defineComponent, inject, provide, readonly, shallowRef, watch, watchEffect } from 'vue'
+import { computed, defineComponent, inject, provide, readonly, shallowRef, watch } from 'vue'
+import { createSnapshot } from '../utils/createSnapshot'
+import { extractAllowedOptionsUpdates } from '../utils/extractAllowedOptionsUpdates'
 import { parseStripeProp } from '../utils/parseStripeProp'
+import { registerWithStripeJs } from '../utils/registerWithStripeJs'
 
 export interface ElementsContextValue {
   stripe: DeepReadonly<ShallowRef<stripeJs.Stripe | null>>
@@ -50,9 +52,13 @@ export const Elements = defineComponent({
       stripe: shallowRef(parsed.value.tag === 'sync' ? parsed.value.stripe : null),
       elements: shallowRef<stripeJs.StripeElements | null>(parsed.value.tag === 'sync'
         ? parsed.value.stripe.elements(
-            props.options as UnknownOptions,
+            props.options as Record<string, unknown>,
           )
         : null),
+    }
+
+    if (parsed.value.tag === 'sync') {
+      registerWithStripeJs(ctx.stripe)
     }
 
     const safeSetContext = (stripe: stripeJs.Stripe) => {
@@ -62,23 +68,29 @@ export const Elements = defineComponent({
       }
 
       ctx.stripe.value = stripe
-      ctx.elements.value = stripe.elements(props.options as UnknownOptions)
+      ctx.elements.value = stripe.elements(props.options as Record<string, unknown>)
+      registerWithStripeJs(ctx.stripe)
     }
 
-    watchEffect(() => {
+    watch(parsed, (currentParsed, _, onCleanup) => {
+      let cancelled = false
+      onCleanup(() => {
+        cancelled = true
+      })
+
       // For an async stripePromise, store it in context once resolved
-      if (parsed.value.tag === 'async' && !ctx.stripe.value) {
-        parsed.value.stripePromise.then((loadedStripe) => {
-          if (loadedStripe) {
+      if (currentParsed.tag === 'async' && !ctx.stripe.value) {
+        currentParsed.stripePromise.then((loadedStripe) => {
+          if (!cancelled && loadedStripe) {
             safeSetContext(loadedStripe)
           }
         })
       }
-      else if (parsed.value.tag === 'sync' && !ctx.stripe.value) {
+      else if (currentParsed.tag === 'sync' && !ctx.stripe.value) {
         // Or, handle a sync stripe instance going from null -> populated
-        safeSetContext(parsed.value.stripe)
+        safeSetContext(currentParsed.stripe)
       }
-    })
+    }, { immediate: true })
 
     // Warn on changes to stripe prop
     watch(() => props.stripe, (_, prevStripe) => {
@@ -89,15 +101,21 @@ export const Elements = defineComponent({
       }
     })
 
-    watch(() => {
-      const { clientSecret, fonts, ...rest } = props.options ?? {}
-      return rest
-    }, (stripeElementUpdateOptions) => {
+    let previousOptionsSnapshot = createSnapshot(props.options)
+
+    watch(() => props.options, (options) => {
       if (!ctx.elements.value) {
+        previousOptionsSnapshot = createSnapshot(options)
         return
       }
 
-      ctx.elements.value.update(stripeElementUpdateOptions)
+      const nextOptionsSnapshot = createSnapshot(options)
+      const updates = extractAllowedOptionsUpdates(nextOptionsSnapshot, previousOptionsSnapshot, ['clientSecret', 'fonts'])
+      if (updates) {
+        ctx.elements.value.update(updates)
+      }
+
+      previousOptionsSnapshot = nextOptionsSnapshot
     }, { deep: true })
 
     provide(ElementsContextKey, {
