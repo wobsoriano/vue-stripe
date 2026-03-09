@@ -1,5 +1,11 @@
 # stripe-vue
 
+## 2.4.0
+
+### Minor Changes
+
+- b49d335: Fix Stripe element and provider updates to better match React Stripe behavior while handling Vue reactive option changes correctly.
+
 ## 2.3.2
 
 ### Patch Changes
