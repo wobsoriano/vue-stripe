@@ -1292,7 +1292,7 @@ describe('createElementComponent', () => {
         style: { paymentRequestButton: { type: 'book' } },
       })
     })
-  
+
     it('updates the Element when options change from null to non-null value', async () => {
       const options = ref<UnknownOptions | null>(null)
       const parent = defineComponent({
