@@ -50,6 +50,7 @@
 - 1d09444: Splits EwCS specific imports into its own `/checkout` path.
 
   For Elements with Checkout Sessions integrations and only Elements with Checkout Sessions integrations, these elements should now be imported via `'vue-stripe/checkout'`:
+
   - CurrencySelectorElement
   - PaymentElement
   - ExpressCheckoutElement
@@ -85,13 +86,13 @@
 
   ```vue
   <script setup>
-  import { loadStripe } from '@stripe/stripe-js'
-  import { Elements } from 'vue-stripe'
-  import CheckoutForm from './CheckoutForm.vue'
+  import { loadStripe } from "@stripe/stripe-js";
+  import { Elements } from "vue-stripe";
+  import CheckoutForm from "./CheckoutForm.vue";
 
-  const stripe = loadStripe('pk_xxx')
+  const stripe = loadStripe("pk_xxx");
 
-  const options = {}
+  const options = {};
   </script>
 
   <template>

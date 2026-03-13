@@ -1,86 +1,6 @@
-import { vi, type Mock } from 'vite-plus/test'
+import { vi } from 'vitest'
 
-type MockedFn<T extends (...args: any[]) => any> = Mock<T>
-
-export interface MockElement {
-  mount: MockedFn<() => void>
-  destroy: MockedFn<() => void>
-  on: MockedFn<(...args: any[]) => void>
-  update: MockedFn<(...args: any[]) => void>
-}
-
-export interface MockElements {
-  create: MockedFn<(type: string) => MockElement>
-  getElement: MockedFn<(type: string) => MockElement | null>
-  update: MockedFn<(...args: any[]) => void>
-}
-
-export interface MockCheckoutSession {
-  lineItems: never[]
-  currency: string
-  shippingOptions: never[]
-  total: {
-    subtotal: number
-    taxExclusive: number
-    taxInclusive: number
-    shippingRate: number
-    discount: number
-    total: number
-  }
-  confirmationRequirements: never[]
-  canConfirm: boolean
-}
-
-export interface MockCheckoutActions {
-  getSession: MockedFn<() => MockCheckoutSession>
-  applyPromotionCode: MockedFn<(...args: any[]) => void>
-  removePromotionCode: MockedFn<(...args: any[]) => void>
-  updateShippingAddress: MockedFn<(...args: any[]) => void>
-  updateBillingAddress: MockedFn<(...args: any[]) => void>
-  updatePhoneNumber: MockedFn<(...args: any[]) => void>
-  updateEmail: MockedFn<(...args: any[]) => void>
-  updateLineItemQuantity: MockedFn<(...args: any[]) => void>
-  updateShippingOption: MockedFn<(...args: any[]) => void>
-  confirm: MockedFn<(...args: any[]) => void>
-}
-
-export interface MockCheckoutSdk {
-  changeAppearance: MockedFn<(...args: any[]) => void>
-  loadFonts: MockedFn<(...args: any[]) => void>
-  createPaymentElement: MockedFn<() => MockElement>
-  createPaymentFormElement: MockedFn<() => MockElement>
-  createBillingAddressElement: MockedFn<() => MockElement>
-  createShippingAddressElement: MockedFn<() => MockElement>
-  createExpressCheckoutElement: MockedFn<() => MockElement>
-  getPaymentElement: MockedFn<() => MockElement | null>
-  getBillingAddressElement: MockedFn<() => MockElement | null>
-  getShippingAddressElement: MockedFn<() => MockElement | null>
-  getExpressCheckoutElement: MockedFn<() => MockElement | null>
-  on: MockedFn<(event: string, callback: (session: MockCheckoutSession) => void) => void>
-  loadActions: MockedFn<() => Promise<{ type: 'success'; actions: MockCheckoutActions }>>
-}
-
-export interface MockEmbeddedCheckout {
-  mount: MockedFn<(...args: any[]) => void>
-  unmount: MockedFn<(...args: any[]) => void>
-  destroy: MockedFn<(...args: any[]) => void>
-}
-
-export interface MockStripe {
-  elements: MockedFn<() => MockElements>
-  createToken: MockedFn<(...args: any[]) => void>
-  createSource: MockedFn<(...args: any[]) => void>
-  createPaymentMethod: MockedFn<(...args: any[]) => void>
-  confirmCardPayment: MockedFn<(...args: any[]) => void>
-  confirmCardSetup: MockedFn<(...args: any[]) => void>
-  paymentRequest: MockedFn<(...args: any[]) => void>
-  registerAppInfo: MockedFn<(...args: any[]) => void>
-  _registerWrapper: MockedFn<(...args: any[]) => void>
-  initCheckout: MockedFn<() => MockCheckoutSdk>
-  initEmbeddedCheckout: MockedFn<() => Promise<MockEmbeddedCheckout>>
-}
-
-export function mockElement(): MockElement {
+export function mockElement() {
   return {
     mount: vi.fn(),
     destroy: vi.fn(),
@@ -89,8 +9,8 @@ export function mockElement(): MockElement {
   }
 }
 
-export function mockElements(): MockElements {
-  const elements: Record<string, MockElement> = {}
+export function mockElements() {
+  const elements: Record<string, ReturnType<typeof mockElement>> = {}
   return {
     create: vi.fn((type) => {
       elements[type] = mockElement()
@@ -103,7 +23,7 @@ export function mockElements(): MockElements {
   }
 }
 
-export function mockCheckoutSession(): MockCheckoutSession {
+export function mockCheckoutSession() {
   return {
     lineItems: [],
     currency: 'usd',
@@ -121,7 +41,7 @@ export function mockCheckoutSession(): MockCheckoutSession {
   }
 }
 
-export function mockCheckoutActions(): MockCheckoutActions {
+export function mockCheckoutActions() {
   return {
     getSession: vi.fn(() => mockCheckoutSession()),
     applyPromotionCode: vi.fn(),
@@ -136,8 +56,8 @@ export function mockCheckoutActions(): MockCheckoutActions {
   }
 }
 
-export function mockCheckoutSdk(): MockCheckoutSdk {
-  const elements: Record<string, MockElement> = {}
+export function mockCheckoutSdk() {
+  const elements: Record<string, ReturnType<typeof mockElement>> = {}
 
   return {
     changeAppearance: vi.fn(),
@@ -188,7 +108,7 @@ export function mockCheckoutSdk(): MockCheckoutSdk {
   }
 }
 
-export function mockEmbeddedCheckout(): MockEmbeddedCheckout {
+export function mockEmbeddedCheckout() {
   return {
     mount: vi.fn(),
     unmount: vi.fn(),
@@ -196,7 +116,7 @@ export function mockEmbeddedCheckout(): MockEmbeddedCheckout {
   }
 }
 
-export function mockStripe(): MockStripe {
+export function mockStripe() {
   const checkoutSdk = mockCheckoutSdk()
 
   return {
@@ -210,6 +130,8 @@ export function mockStripe(): MockStripe {
     registerAppInfo: vi.fn(),
     _registerWrapper: vi.fn(),
     initCheckout: vi.fn(() => checkoutSdk),
-    initEmbeddedCheckout: vi.fn(() => Promise.resolve(mockEmbeddedCheckout())),
+    initEmbeddedCheckout: vi.fn(() =>
+      Promise.resolve(mockEmbeddedCheckout()),
+    ),
   }
 }

@@ -1,6 +1,6 @@
 import type { StripeErrorType } from '@stripe/stripe-js'
 import { render, waitFor } from '@testing-library/vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import * as mocks from '../../test/mocks'
 import { FinancialAccountDisclosure } from './FinancialAccountDisclosure'
@@ -47,10 +47,9 @@ describe('<FinancialAccountDisclosure>', () => {
 
   it('should render', () => {
     const Comp = defineComponent(() => {
-      return () =>
-        h(FinancialAccountDisclosure, {
-          stripe: mockStripePromise,
-        })
+      return () => h(FinancialAccountDisclosure, {
+        stripe: mockStripePromise,
+      })
     })
     render(Comp)
   })
@@ -61,11 +60,10 @@ describe('<FinancialAccountDisclosure>', () => {
       learnMoreLink: 'https://test.com',
     }
     const Comp = defineComponent(() => {
-      return () =>
-        h(FinancialAccountDisclosure, {
-          stripe: mockStripePromise,
-          options,
-        })
+      return () => h(FinancialAccountDisclosure, {
+        stripe: mockStripePromise,
+        options,
+      })
     })
     render(Comp)
   })
@@ -73,10 +71,9 @@ describe('<FinancialAccountDisclosure>', () => {
   it('should render when there is an error', () => {
     mockStripe = mockStripeJsWithError()
     const Comp = defineComponent(() => {
-      return () =>
-        h(FinancialAccountDisclosure, {
-          stripe: mockStripe,
-        })
+      return () => h(FinancialAccountDisclosure, {
+        stripe: mockStripe,
+      })
     })
     render(Comp)
   })
@@ -131,10 +128,9 @@ describe('<FinancialAccountDisclosure>', () => {
   it('does not mount until Stripe instance is available', async () => {
     const stripe = ref(null)
     const Comp = defineComponent(() => {
-      return () =>
-        h(FinancialAccountDisclosure, {
-          stripe: stripe.value,
-        })
+      return () => h(FinancialAccountDisclosure, {
+        stripe: stripe.value,
+      })
     })
     render(Comp)
     expect(mockStripe.createFinancialAccountDisclosure).not.toHaveBeenCalled()
@@ -151,11 +147,10 @@ describe('<FinancialAccountDisclosure>', () => {
       businessName: 'Initial Business',
     })
     const Comp = defineComponent(() => {
-      return () =>
-        h(FinancialAccountDisclosure, {
-          stripe: mockStripePromise,
-          options: options.value,
-        })
+      return () => h(FinancialAccountDisclosure, {
+        stripe: mockStripePromise,
+        options: options.value,
+      })
     })
     render(Comp)
 
@@ -169,8 +164,6 @@ describe('<FinancialAccountDisclosure>', () => {
     }
     await nextTick()
 
-    expect(mockStripe.createFinancialAccountDisclosure.mock.calls.length).toBeGreaterThan(
-      initialCallCount,
-    )
+    expect(mockStripe.createFinancialAccountDisclosure.mock.calls.length).toBeGreaterThan(initialCallCount)
   })
 })

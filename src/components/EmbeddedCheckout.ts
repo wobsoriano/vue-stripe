@@ -32,7 +32,8 @@ export const EmbeddedCheckout = defineComponent({
           try {
             embeddedCheckout.unmount()
             isMounted.value = false
-          } catch {
+          }
+          catch {
             // Do nothing.
             // Parent effects are destroyed before child effects, so
             // in cases where both the EmbeddedCheckoutProvider and
@@ -44,11 +45,10 @@ export const EmbeddedCheckout = defineComponent({
       })
     })
 
-    return () =>
-      h('div', {
-        id: props.id,
-        class: props.class,
-        ref: domNode,
-      })
+    return () => h('div', {
+      id: props.id,
+      class: props.class,
+      ref: domNode,
+    })
   },
 })

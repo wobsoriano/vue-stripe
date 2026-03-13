@@ -1,6 +1,6 @@
 import type { StripeErrorType } from '@stripe/stripe-js'
 import { render, waitFor } from '@testing-library/vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import * as mocks from '../../test/mocks'
 import { IssuingDisclosure } from './IssuingDisclosure'
@@ -47,10 +47,9 @@ describe('<IssuingDisclosure>', () => {
 
   it('should render', () => {
     const Comp = defineComponent(() => {
-      return () =>
-        h(IssuingDisclosure, {
-          stripe: mockStripePromise,
-        })
+      return () => h(IssuingDisclosure, {
+        stripe: mockStripePromise,
+      })
     })
     render(Comp)
   })
@@ -62,11 +61,10 @@ describe('<IssuingDisclosure>', () => {
       learnMoreLink: 'https://test.com',
     }
     const Comp = defineComponent(() => {
-      return () =>
-        h(IssuingDisclosure, {
-          stripe: mockStripePromise,
-          options,
-        })
+      return () => h(IssuingDisclosure, {
+        stripe: mockStripePromise,
+        options,
+      })
     })
     render(Comp)
   })
@@ -74,10 +72,9 @@ describe('<IssuingDisclosure>', () => {
   it('should render when there is an error', () => {
     mockStripe = mockStripeJsWithError()
     const Comp = defineComponent(() => {
-      return () =>
-        h(IssuingDisclosure, {
-          stripe: mockStripe,
-        })
+      return () => h(IssuingDisclosure, {
+        stripe: mockStripe,
+      })
     })
     render(Comp)
   })
@@ -132,10 +129,9 @@ describe('<IssuingDisclosure>', () => {
   it('does not mount until Stripe instance is available', async () => {
     const stripe = ref(null)
     const Comp = defineComponent(() => {
-      return () =>
-        h(IssuingDisclosure, {
-          stripe: stripe.value,
-        })
+      return () => h(IssuingDisclosure, {
+        stripe: stripe.value,
+      })
     })
     render(Comp)
     expect(mockStripe.createIssuingDisclosure).not.toHaveBeenCalled()
@@ -152,11 +148,10 @@ describe('<IssuingDisclosure>', () => {
       issuingProgramID: 'iprg_123',
     })
     const Comp = defineComponent(() => {
-      return () =>
-        h(IssuingDisclosure, {
-          stripe: mockStripePromise,
-          options: options.value,
-        })
+      return () => h(IssuingDisclosure, {
+        stripe: mockStripePromise,
+        options: options.value,
+      })
     })
     render(Comp)
 

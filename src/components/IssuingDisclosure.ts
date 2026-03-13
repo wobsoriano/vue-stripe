@@ -8,9 +8,7 @@ export const IssuingDisclosure = defineComponent({
   name: 'IssuingDisclosure',
   props: {
     stripe: {
-      type: [Object, null] as PropType<
-        PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null
-      >,
+      type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
       required: true,
     },
     options: {
@@ -42,22 +40,20 @@ export const IssuingDisclosure = defineComponent({
             stripeState.value = stripePromise
           }
         })
-      } else if (parsed.value.tag === 'sync') {
+      }
+      else if (parsed.value.tag === 'sync') {
         stripeState.value = parsed.value.stripe
       }
     })
 
     // Warn on changes to stripe prop
-    watch(
-      () => props.stripe,
-      (_, prevStripe) => {
-        if (prevStripe !== null && prevStripe !== props.stripe) {
-          console.warn(
-            'Unsupported prop change on IssuingDisclosure: You cannot change the `stripe` prop after setting it.',
-          )
-        }
-      },
-    )
+    watch(() => props.stripe, (_, prevStripe) => {
+      if (prevStripe !== null && prevStripe !== props.stripe) {
+        console.warn(
+          'Unsupported prop change on IssuingDisclosure: You cannot change the `stripe` prop after setting it.',
+        )
+      }
+    })
 
     // Create disclosure
     watchEffect((onInvalidate) => {
@@ -66,9 +62,10 @@ export const IssuingDisclosure = defineComponent({
           return
         }
 
-        const { htmlElement: disclosureContent, error } = await (
-          stripeState.value as any
-        ).createIssuingDisclosure({
+        const {
+          htmlElement: disclosureContent,
+          error,
+        } = await (stripeState.value as any).createIssuingDisclosure({
           issuingProgramID: issuingProgramID.value,
           publicCardProgramName: publicCardProgramName.value,
           learnMoreLink: learnMoreLink.value,
@@ -76,7 +73,8 @@ export const IssuingDisclosure = defineComponent({
 
         if (error) {
           emit('error', error)
-        } else if (disclosureContent && containerRef.value) {
+        }
+        else if (disclosureContent && containerRef.value) {
           const container = containerRef.value
           container.innerHTML = ''
           container.appendChild(disclosureContent)
@@ -90,16 +88,16 @@ export const IssuingDisclosure = defineComponent({
         if (containerRef.value) {
           try {
             containerRef.value.innerHTML = ''
-          } catch {
+          }
+          catch {
             // Do nothing - element may already be removed
           }
         }
       })
     })
 
-    return () =>
-      h('div', {
-        ref: containerRef,
-      })
+    return () => h('div', {
+      ref: containerRef,
+    })
   },
 })

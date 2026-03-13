@@ -30,9 +30,7 @@ export const Elements = defineComponent({
   name: 'Elements',
   props: {
     stripe: {
-      type: [Object, null] as PropType<
-        PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null
-      >,
+      type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
       required: true,
     },
     options: {
@@ -52,11 +50,11 @@ export const Elements = defineComponent({
 
     const ctx = {
       stripe: shallowRef(parsed.value.tag === 'sync' ? parsed.value.stripe : null),
-      elements: shallowRef<stripeJs.StripeElements | null>(
-        parsed.value.tag === 'sync'
-          ? parsed.value.stripe.elements(props.options as Record<string, unknown>)
-          : null,
-      ),
+      elements: shallowRef<stripeJs.StripeElements | null>(parsed.value.tag === 'sync'
+        ? parsed.value.stripe.elements(
+            props.options as Record<string, unknown>,
+          )
+        : null),
     }
 
     if (parsed.value.tag === 'sync') {
@@ -74,64 +72,51 @@ export const Elements = defineComponent({
       registerWithStripeJs(ctx.stripe)
     }
 
-    watch(
-      parsed,
-      (currentParsed, _, onCleanup) => {
-        let cancelled = false
-        onCleanup(() => {
-          cancelled = true
-        })
+    watch(parsed, (currentParsed, _, onCleanup) => {
+      let cancelled = false
+      onCleanup(() => {
+        cancelled = true
+      })
 
-        // For an async stripePromise, store it in context once resolved
-        if (currentParsed.tag === 'async' && !ctx.stripe.value) {
-          currentParsed.stripePromise.then((loadedStripe) => {
-            if (!cancelled && loadedStripe) {
-              safeSetContext(loadedStripe)
-            }
-          })
-        } else if (currentParsed.tag === 'sync' && !ctx.stripe.value) {
-          // Or, handle a sync stripe instance going from null -> populated
-          safeSetContext(currentParsed.stripe)
-        }
-      },
-      { immediate: true },
-    )
+      // For an async stripePromise, store it in context once resolved
+      if (currentParsed.tag === 'async' && !ctx.stripe.value) {
+        currentParsed.stripePromise.then((loadedStripe) => {
+          if (!cancelled && loadedStripe) {
+            safeSetContext(loadedStripe)
+          }
+        })
+      }
+      else if (currentParsed.tag === 'sync' && !ctx.stripe.value) {
+        // Or, handle a sync stripe instance going from null -> populated
+        safeSetContext(currentParsed.stripe)
+      }
+    }, { immediate: true })
 
     // Warn on changes to stripe prop
-    watch(
-      () => props.stripe,
-      (_, prevStripe) => {
-        if (prevStripe !== null) {
-          console.warn(
-            'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.',
-          )
-        }
-      },
-    )
+    watch(() => props.stripe, (_, prevStripe) => {
+      if (prevStripe !== null) {
+        console.warn(
+          'Unsupported prop change on Elements: You cannot change the `stripe` prop after setting it.',
+        )
+      }
+    })
 
     let previousOptionsSnapshot = createSnapshot(props.options)
 
-    watch(
-      () => props.options,
-      (options) => {
-        if (!ctx.elements.value) {
-          previousOptionsSnapshot = createSnapshot(options)
-          return
-        }
+    watch(() => props.options, (options) => {
+      if (!ctx.elements.value) {
+        previousOptionsSnapshot = createSnapshot(options)
+        return
+      }
 
-        const nextOptionsSnapshot = createSnapshot(options)
-        const updates = extractAllowedOptionsUpdates(nextOptionsSnapshot, previousOptionsSnapshot, [
-          'clientSecret',
-          'fonts',
-        ])
-        if (updates) {
-          ctx.elements.value.update(updates)
-        }
+      const nextOptionsSnapshot = createSnapshot(options)
+      const updates = extractAllowedOptionsUpdates(nextOptionsSnapshot, previousOptionsSnapshot, ['clientSecret', 'fonts'])
+      if (updates) {
+        ctx.elements.value.update(updates)
+      }
 
-        previousOptionsSnapshot = nextOptionsSnapshot
-      },
-      { deep: true },
-    )
+      previousOptionsSnapshot = nextOptionsSnapshot
+    }, { deep: true })
 
     provide(ElementsContextKey, {
       stripe: readonly(ctx.stripe),

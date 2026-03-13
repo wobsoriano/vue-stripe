@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 import { extractAllowedOptionsUpdates } from './extractAllowedOptionsUpdates'
 
 describe('extractAllowedOptionsUpdates', () => {
@@ -22,10 +22,11 @@ describe('extractAllowedOptionsUpdates', () => {
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
     expect(
-      extractAllowedOptionsUpdates({ foo: 'foo2', bar: 'bar' }, { foo: 'foo1', bar: 'bar' }, [
-        'bar',
-        'foo',
-      ]),
+      extractAllowedOptionsUpdates(
+        { foo: 'foo2', bar: 'bar' },
+        { foo: 'foo1', bar: 'bar' },
+        ['bar', 'foo'],
+      ),
     ).toEqual(null)
     expect(consoleSpy).toHaveBeenCalledWith(
       'Unsupported prop change: options.foo is not a mutable property.',
