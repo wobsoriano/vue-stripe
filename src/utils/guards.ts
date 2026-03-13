@@ -13,10 +13,10 @@ export function isPromise(raw: unknown): raw is PromiseLike<unknown> {
 // to do some sanity validation to prevent type errors.
 export function isStripe(raw: unknown): raw is Stripe {
   return (
-    isUnknownObject(raw)
-    && typeof raw.elements === 'function'
-    && typeof raw.createToken === 'function'
-    && typeof raw.createPaymentMethod === 'function'
-    && typeof raw.confirmCardPayment === 'function'
+    isUnknownObject(raw) &&
+    typeof raw.elements === 'function' &&
+    typeof raw.createToken === 'function' &&
+    typeof raw.createPaymentMethod === 'function' &&
+    typeof raw.confirmCardPayment === 'function'
   )
 }

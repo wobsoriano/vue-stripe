@@ -22,11 +22,7 @@ An example `CheckoutForm` component:
 
 ```vue
 <script setup>
-import {
-  PaymentElement,
-  useElements,
-  useStripe,
-} from 'vue-stripe'
+import { PaymentElement, useElements, useStripe } from 'vue-stripe'
 
 const stripe = useStripe()
 const elements = useElements()
@@ -66,8 +62,7 @@ async function handleSubmit() {
     // confirming the payment. Show error to your customer (for example, payment
     // details incomplete)
     errorMessage.value = error.message
-  }
-  else {
+  } else {
     // Your customer will be redirected to your `return_url`. For some payment
     // methods like iDEAL, your customer will be redirected to an intermediate
     // site first to authorize the payment, then redirected to the `return_url`.
@@ -78,9 +73,7 @@ async function handleSubmit() {
 <template>
   <form @submit.prevent="handleSubmit">
     <PaymentElement />
-    <button type="submit" :disabled="!stripe || !elements">
-      Pay
-    </button>
+    <button type="submit" :disabled="!stripe || !elements">Pay</button>
     <div v-if="errorMessage">
       {{ errorMessage }}
     </div>

@@ -10,27 +10,21 @@ export function isEqual(left: unknown, right: unknown): boolean {
   const leftArray = Array.isArray(left)
   const rightArray = Array.isArray(right)
 
-  if (leftArray !== rightArray)
-    return false
+  if (leftArray !== rightArray) return false
 
-  const leftPlainObject
-    = Object.prototype.toString.call(left) === PLAIN_OBJECT_STR
-  const rightPlainObject
-    = Object.prototype.toString.call(right) === PLAIN_OBJECT_STR
+  const leftPlainObject = Object.prototype.toString.call(left) === PLAIN_OBJECT_STR
+  const rightPlainObject = Object.prototype.toString.call(right) === PLAIN_OBJECT_STR
 
-  if (leftPlainObject !== rightPlainObject)
-    return false
+  if (leftPlainObject !== rightPlainObject) return false
 
   // not sure what sort of special object this is (regexp is one option), so
   // fallback to reference check.
-  if (!leftPlainObject && !leftArray)
-    return left === right
+  if (!leftPlainObject && !leftArray) return left === right
 
   const leftKeys = Object.keys(left)
   const rightKeys = Object.keys(right)
 
-  if (leftKeys.length !== rightKeys.length)
-    return false
+  if (leftKeys.length !== rightKeys.length) return false
 
   const keySet: { [key: string]: boolean } = {}
   for (let i = 0; i < leftKeys.length; i += 1) {

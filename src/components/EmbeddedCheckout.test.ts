@@ -1,5 +1,5 @@
 import { render } from '@testing-library/vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import * as mocks from '../../test/mocks'
 import { EmbeddedCheckout } from './EmbeddedCheckout'
@@ -21,9 +21,7 @@ describe('embeddedCheckout on the client', () => {
     mockStripePromise = Promise.resolve(mockStripe)
     mockEmbeddedCheckout = mocks.mockEmbeddedCheckout()
     mockEmbeddedCheckoutPromise = Promise.resolve(mockEmbeddedCheckout)
-    mockStripe.initEmbeddedCheckout.mockReturnValue(
-      mockEmbeddedCheckoutPromise,
-    )
+    mockStripe.initEmbeddedCheckout.mockReturnValue(mockEmbeddedCheckoutPromise)
   })
 
   afterEach(() => {
@@ -32,10 +30,15 @@ describe('embeddedCheckout on the client', () => {
 
   it('passes id to the wrapping DOM element', async () => {
     const Comp = defineComponent(() => {
-      return () => h(EmbeddedCheckoutProvider, {
-        stripe: mockStripePromise,
-        options: fakeOptions,
-      }, () => h(EmbeddedCheckout, { id: 'foo' }))
+      return () =>
+        h(
+          EmbeddedCheckoutProvider,
+          {
+            stripe: mockStripePromise,
+            options: fakeOptions,
+          },
+          () => h(EmbeddedCheckout, { id: 'foo' }),
+        )
     })
     const { container } = render(Comp)
 
@@ -46,10 +49,15 @@ describe('embeddedCheckout on the client', () => {
 
   it('passes class to the wrapping DOM element', async () => {
     const Comp = defineComponent(() => {
-      return () => h(EmbeddedCheckoutProvider, {
-        stripe: mockStripePromise,
-        options: fakeOptions,
-      }, () => h(EmbeddedCheckout, { class: 'bar' }))
+      return () =>
+        h(
+          EmbeddedCheckoutProvider,
+          {
+            stripe: mockStripePromise,
+            options: fakeOptions,
+          },
+          () => h(EmbeddedCheckout, { class: 'bar' }),
+        )
     })
     const { container } = render(Comp)
 
@@ -60,10 +68,15 @@ describe('embeddedCheckout on the client', () => {
 
   it('mounts Embedded Checkout', async () => {
     const Comp = defineComponent(() => {
-      return () => h(EmbeddedCheckoutProvider, {
-        stripe: mockStripe,
-        options: fakeOptions,
-      }, () => h(EmbeddedCheckout))
+      return () =>
+        h(
+          EmbeddedCheckoutProvider,
+          {
+            stripe: mockStripe,
+            options: fakeOptions,
+          },
+          () => h(EmbeddedCheckout),
+        )
     })
     const { container } = render(Comp)
 
@@ -79,10 +92,15 @@ describe('embeddedCheckout on the client', () => {
     })
     // Render with no stripe instance and client secret
     const Comp = defineComponent(() => {
-      return () => h(EmbeddedCheckoutProvider, {
-        stripe: stripe.value,
-        options: options.value,
-      }, () => h(EmbeddedCheckout))
+      return () =>
+        h(
+          EmbeddedCheckoutProvider,
+          {
+            stripe: stripe.value,
+            options: options.value,
+          },
+          () => h(EmbeddedCheckout),
+        )
     })
     const { container } = render(Comp)
     expect(mockEmbeddedCheckout.mount).not.toBeCalled()
@@ -104,10 +122,15 @@ describe('embeddedCheckout on the client', () => {
   it('unmounts Embedded Checkout when the component unmounts', async () => {
     const rerenderKey = ref(0)
     const Comp = defineComponent(() => {
-      return () => h(EmbeddedCheckoutProvider, {
-        stripe: mockStripe,
-        options: fakeOptions,
-      }, () => h(EmbeddedCheckout, { key: rerenderKey.value }))
+      return () =>
+        h(
+          EmbeddedCheckoutProvider,
+          {
+            stripe: mockStripe,
+            options: fakeOptions,
+          },
+          () => h(EmbeddedCheckout, { key: rerenderKey.value }),
+        )
     })
     const { container } = render(Comp)
 
@@ -124,10 +147,15 @@ describe('embeddedCheckout on the client', () => {
   it('does not throw when the Embedded Checkout instance is already destroyed when unmounting', async () => {
     const rerenderKey = ref(0)
     const Comp = defineComponent(() => {
-      return () => h(EmbeddedCheckoutProvider, {
-        stripe: mockStripe,
-        options: fakeOptions,
-      }, () => h(EmbeddedCheckout, { key: rerenderKey.value }))
+      return () =>
+        h(
+          EmbeddedCheckoutProvider,
+          {
+            stripe: mockStripe,
+            options: fakeOptions,
+          },
+          () => h(EmbeddedCheckout, { key: rerenderKey.value }),
+        )
     })
     const { container } = render(Comp)
 

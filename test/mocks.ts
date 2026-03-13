@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { vi } from 'vite-plus/test'
 
 export function mockElement() {
   return {
@@ -130,8 +130,6 @@ export function mockStripe() {
     registerAppInfo: vi.fn(),
     _registerWrapper: vi.fn(),
     initCheckout: vi.fn(() => checkoutSdk),
-    initEmbeddedCheckout: vi.fn(() =>
-      Promise.resolve(mockEmbeddedCheckout()),
-    ),
+    initEmbeddedCheckout: vi.fn(() => Promise.resolve(mockEmbeddedCheckout())),
   }
 }

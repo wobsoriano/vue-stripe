@@ -1,5 +1,5 @@
 import { render, waitFor } from '@testing-library/vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { renderComposable } from 'vue-composable-testing'
 import * as mocks from '../../test/mocks'
@@ -33,9 +33,14 @@ describe('elements', () => {
     const { result } = renderComposable(() => useElements(), {
       wrapper: defineComponent({
         setup(_, { slots }) {
-          return () => h(Elements, {
-            stripe: mockStripe,
-          }, () => slots.default?.())
+          return () =>
+            h(
+              Elements,
+              {
+                stripe: mockStripe,
+              },
+              () => slots.default?.(),
+            )
         },
       }),
     })
@@ -47,9 +52,14 @@ describe('elements', () => {
     renderComposable(() => useElements(), {
       wrapper: defineComponent({
         setup(_, { slots }) {
-          return () => h(Elements, {
-            stripe: mockStripe,
-          }, () => slots.default?.())
+          return () =>
+            h(
+              Elements,
+              {
+                stripe: mockStripe,
+              },
+              () => slots.default?.(),
+            )
         },
       }),
     })
@@ -61,9 +71,14 @@ describe('elements', () => {
     const { result } = renderComposable(() => useStripe(), {
       wrapper: defineComponent({
         setup(_, { slots }) {
-          return () => h(Elements, {
-            stripe: mockStripe,
-          }, () => slots.default?.())
+          return () =>
+            h(
+              Elements,
+              {
+                stripe: mockStripe,
+              },
+              () => slots.default?.(),
+            )
         },
       }),
     })
@@ -118,9 +133,14 @@ describe('elements', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(child))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () => h(child),
+          )
       },
     })
 
@@ -135,9 +155,14 @@ describe('elements', () => {
     const { result } = renderComposable(() => useElements(), {
       wrapper: defineComponent({
         setup(_, { slots }) {
-          return () => h(Elements, {
-            stripe: stripeProp.value,
-          }, () => slots.default?.())
+          return () =>
+            h(
+              Elements,
+              {
+                stripe: stripeProp.value,
+              },
+              () => slots.default?.(),
+            )
         },
       }),
     })
@@ -153,9 +178,14 @@ describe('elements', () => {
     const { result } = renderComposable(() => useElements(), {
       wrapper: defineComponent({
         setup(_, { slots }) {
-          return () => h(Elements, {
-            stripe: mockStripePromise,
-          }, () => slots.default?.())
+          return () =>
+            h(
+              Elements,
+              {
+                stripe: mockStripePromise,
+              },
+              () => slots.default?.(),
+            )
         },
       }),
     })
@@ -172,9 +202,14 @@ describe('elements', () => {
     const { result } = renderComposable(() => useElements(), {
       wrapper: defineComponent({
         setup(_, { slots }) {
-          return () => h(Elements, {
-            stripe: stripeProp.value,
-          }, () => slots.default?.())
+          return () =>
+            h(
+              Elements,
+              {
+                stripe: stripeProp.value,
+              },
+              () => slots.default?.(),
+            )
         },
       }),
     })
@@ -203,7 +238,9 @@ describe('elements', () => {
 
     expect(() => {
       render(parent)
-    }).toThrow('Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.')
+    }).toThrow(
+      'Could not find Elements context; You need to wrap the part of your app that calls useElements() in an <Elements> provider.',
+    )
   })
 
   it('throws when trying to call useStripe outside of Elements context', () => {
@@ -220,7 +257,9 @@ describe('elements', () => {
 
     expect(() => {
       render(parent)
-    }).toThrow('Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.')
+    }).toThrow(
+      'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.',
+    )
   })
 
   it('does not allow changes to a set Stripe object', async () => {
@@ -249,10 +288,11 @@ describe('elements', () => {
     const options = ref<Record<string, string>>({ foo: 'foo' })
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-          options: options.value,
-        })
+        return () =>
+          h(Elements, {
+            stripe: mockStripe,
+            options: options.value,
+          })
       },
     })
 
@@ -273,10 +313,11 @@ describe('elements', () => {
     const options = ref<any>({ appearance: { theme: 'stripe' } })
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-          options: options.value,
-        })
+        return () =>
+          h(Elements, {
+            stripe: mockStripe,
+            options: options.value,
+          })
       },
     })
 

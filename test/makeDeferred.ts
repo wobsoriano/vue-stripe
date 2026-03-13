@@ -1,20 +1,21 @@
-import { vi } from 'vitest'
+import { vi } from 'vite-plus/test'
 
 function makeDeferred<T>() {
   let resolve!: (arg: T) => void
   let reject!: (arg: any) => void
-  const promise: Promise<T> = new Promise((res: any, rej: any) => {
-    resolve = vi.fn(res)
-    reject = vi.fn(rej)
+  const nextTick = () => new Promise<void>((resolve) => process.nextTick(resolve))
+  const promise: Promise<T> = new Promise((res, rej) => {
+    resolve = res
+    reject = rej
   })
   return {
     resolve: async (arg: T) => {
       resolve(arg)
-      await new Promise(process.nextTick)
+      await nextTick()
     },
     reject: async (failure: any) => {
       reject(failure)
-      await new Promise(process.nextTick)
+      await nextTick()
     },
     promise,
     getPromise: vi.fn(() => promise),

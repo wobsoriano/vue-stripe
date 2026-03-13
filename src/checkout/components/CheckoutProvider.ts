@@ -6,18 +6,18 @@ import { createSnapshot } from '../../utils/createSnapshot'
 import { isEqual } from '../../utils/isEqual'
 import { parseStripeProp } from '../../utils/parseStripeProp'
 
-export type State
-  = | {
-    type: 'loading'
-    sdk: stripeJs.StripeCheckout | null
-  }
+export type State =
   | {
-    type: 'success'
-    sdk: stripeJs.StripeCheckout
-    checkoutActions: stripeJs.LoadActionsSuccess
-    session: stripeJs.StripeCheckoutSession
-  }
-  | { type: 'error', error: { message: string } }
+      type: 'loading'
+      sdk: stripeJs.StripeCheckout | null
+    }
+  | {
+      type: 'success'
+      sdk: stripeJs.StripeCheckout
+      checkoutActions: stripeJs.LoadActionsSuccess
+      session: stripeJs.StripeCheckoutSession
+    }
+  | { type: 'error'; error: { message: string } }
 
 export interface CheckoutContextValue {
   stripe: ShallowRef<stripeJs.Stripe | null>
@@ -26,7 +26,10 @@ export interface CheckoutContextValue {
 
 export const CheckoutContextKey = Symbol('Checkout Context') as InjectionKey<CheckoutContextValue>
 
-function validateCheckoutContext(ctx: CheckoutContextValue | null, useCase: string): CheckoutContextValue {
+function validateCheckoutContext(
+  ctx: CheckoutContextValue | null,
+  useCase: string,
+): CheckoutContextValue {
   if (!ctx) {
     throw new Error(
       `Could not find CheckoutProvider context; You need to wrap the part of your app that ${useCase} in a <CheckoutProvider> provider.`,
@@ -35,14 +38,13 @@ function validateCheckoutContext(ctx: CheckoutContextValue | null, useCase: stri
   return ctx
 }
 
-const INVALID_STRIPE_ERROR
-  = 'Invalid prop `stripe` supplied to `CheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.'
+const INVALID_STRIPE_ERROR =
+  'Invalid prop `stripe` supplied to `CheckoutProvider`. We recommend using the `loadStripe` utility from `@stripe/stripe-js`. See https://stripe.com/docs/stripe-js/react#elements-props-stripe for details.'
 
 function maybeSdk(state: State): stripeJs.StripeCheckout | null {
   if (state.type === 'success' || state.type === 'loading') {
     return state.sdk
-  }
-  else {
+  } else {
     return null
   }
 }
@@ -52,7 +54,9 @@ export const CheckoutProvider = defineComponent({
   name: 'CheckoutProvider',
   props: {
     stripe: {
-      type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
+      type: [Object, null] as PropType<
+        PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null
+      >,
       required: true,
     },
     options: {
@@ -69,127 +73,144 @@ export const CheckoutProvider = defineComponent({
     // Used to avoid calling initCheckout multiple times when options changes
     let initCheckoutCalled = false
 
-    watch(parsed, (currentParsed, _, onCleanup) => {
-      let cancelled = false
-      onCleanup(() => {
-        cancelled = true
-      })
+    watch(
+      parsed,
+      (currentParsed, _, onCleanup) => {
+        let cancelled = false
+        onCleanup(() => {
+          cancelled = true
+        })
 
-      const init = ({ stripe }: { stripe: stripeJs.Stripe }) => {
-        if (stripe && !cancelled && !initCheckoutCalled) {
-          // Only update context if the component is still mounted
-          // and stripe is not null. We allow stripe to be null to make
-          // handling SSR easier.
-          initCheckoutCalled = true
-          const sdk = stripe.initCheckout(props.options)
-          state.value = {
-            type: 'loading',
-            sdk,
-          }
-
-          sdk.loadActions()
-            .then((result) => {
-              if (cancelled) {
-                return
-              }
-
-              if (result.type === 'success') {
-                const { actions } = result
-                state.value = {
-                  type: 'success',
-                  sdk,
-                  checkoutActions: actions,
-                  session: actions.getSession(),
-                }
-
-                sdk.on('change', (session) => {
-                  if (state.value.type === 'success') {
-                    state.value = {
-                      ...state.value,
-                      session,
-                    }
-                  }
-                })
-              }
-              else {
-                state.value = {
-                  type: 'error',
-                  error: result.error,
-                }
-              }
-            })
-            .catch((error) => {
-              if (cancelled) {
-                return
-              }
-
-              state.value = {
-                type: 'error',
-                error,
-              }
-            })
-        }
-      }
-
-      if (currentParsed.tag === 'async') {
-        currentParsed.stripePromise.then((newStripe) => {
-          if (cancelled) {
-            return
-          }
-
-          stripe.value = newStripe
-          if (newStripe) {
-            init({ stripe: newStripe })
-          }
-          else {
+        const init = ({ stripe }: { stripe: stripeJs.Stripe }) => {
+          if (stripe && !cancelled && !initCheckoutCalled) {
             // Only update context if the component is still mounted
             // and stripe is not null. We allow stripe to be null to make
             // handling SSR easier.
+            initCheckoutCalled = true
+            const sdk = stripe.initCheckout(props.options)
+            state.value = {
+              type: 'loading',
+              sdk,
+            }
+
+            sdk
+              .loadActions()
+              .then((result) => {
+                if (cancelled) {
+                  return
+                }
+
+                if (result.type === 'success') {
+                  const { actions } = result
+                  state.value = {
+                    type: 'success',
+                    sdk,
+                    checkoutActions: actions,
+                    session: actions.getSession(),
+                  }
+
+                  sdk.on('change', (session) => {
+                    if (state.value.type === 'success') {
+                      state.value = {
+                        ...state.value,
+                        session,
+                      }
+                    }
+                  })
+                } else {
+                  state.value = {
+                    type: 'error',
+                    error: result.error,
+                  }
+                }
+              })
+              .catch((error) => {
+                if (cancelled) {
+                  return
+                }
+
+                state.value = {
+                  type: 'error',
+                  error,
+                }
+              })
           }
-        })
-      }
-      else if (currentParsed.tag === 'sync') {
-        stripe.value = currentParsed.stripe
-        init({ stripe: currentParsed.stripe })
-      }
-    }, { immediate: true })
+        }
+
+        if (currentParsed.tag === 'async') {
+          currentParsed.stripePromise.then((newStripe) => {
+            if (cancelled) {
+              return
+            }
+
+            stripe.value = newStripe
+            if (newStripe) {
+              init({ stripe: newStripe })
+            } else {
+              // Only update context if the component is still mounted
+              // and stripe is not null. We allow stripe to be null to make
+              // handling SSR easier.
+            }
+          })
+        } else if (currentParsed.tag === 'sync') {
+          stripe.value = currentParsed.stripe
+          init({ stripe: currentParsed.stripe })
+        }
+      },
+      { immediate: true },
+    )
 
     // Warn on changes to stripe prop
-    watch(() => props.stripe, (_, prevStripe) => {
-      if (prevStripe !== null) {
-        console.warn(
-          'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.',
-        )
-      }
-    })
+    watch(
+      () => props.stripe,
+      (_, prevStripe) => {
+        if (prevStripe !== null) {
+          console.warn(
+            'Unsupported prop change on CheckoutProvider: You cannot change the `stripe` prop after setting it.',
+          )
+        }
+      },
+    )
 
     const sdk = computed(() => maybeSdk(state.value))
 
     // Handle appearance changes
     let previousAppearanceSnapshot = createSnapshot(props.options.elementsOptions?.appearance)
 
-    watch(() => props.options.elementsOptions?.appearance, (appearance) => {
-      const nextAppearanceSnapshot = createSnapshot(appearance)
+    watch(
+      () => props.options.elementsOptions?.appearance,
+      (appearance) => {
+        const nextAppearanceSnapshot = createSnapshot(appearance)
 
-      if (sdk.value && appearance && !isEqual(nextAppearanceSnapshot, previousAppearanceSnapshot)) {
-        sdk.value.changeAppearance(appearance)
-      }
+        if (
+          sdk.value &&
+          appearance &&
+          !isEqual(nextAppearanceSnapshot, previousAppearanceSnapshot)
+        ) {
+          sdk.value.changeAppearance(appearance)
+        }
 
-      previousAppearanceSnapshot = nextAppearanceSnapshot
-    }, { deep: true })
+        previousAppearanceSnapshot = nextAppearanceSnapshot
+      },
+      { deep: true },
+    )
 
     // Handle fonts changes
     let previousFontsSnapshot = createSnapshot(props.options.elementsOptions?.fonts)
 
-    watch(() => props.options.elementsOptions?.fonts, (fonts) => {
-      const nextFontsSnapshot = createSnapshot(fonts)
+    watch(
+      () => props.options.elementsOptions?.fonts,
+      (fonts) => {
+        const nextFontsSnapshot = createSnapshot(fonts)
 
-      if (sdk.value && fonts && !isEqual(nextFontsSnapshot, previousFontsSnapshot)) {
-        sdk.value.loadFonts(fonts)
-      }
+        if (sdk.value && fonts && !isEqual(nextFontsSnapshot, previousFontsSnapshot)) {
+          sdk.value.loadFonts(fonts)
+        }
 
-      previousFontsSnapshot = nextFontsSnapshot
-    }, { deep: true })
+        previousFontsSnapshot = nextFontsSnapshot
+      },
+      { deep: true },
+    )
 
     provide(CheckoutContextKey, {
       checkoutState: state,
@@ -209,32 +230,26 @@ export function useElementsOrCheckoutContextWithUseCase(useCaseString: string) {
       throw new Error(
         `You cannot wrap the part of your app that ${useCaseString} in both <CheckoutProvider> and <Elements> providers.`,
       )
-    }
-    else {
+    } else {
       return checkout
     }
-  }
-  else {
+  } else {
     return parseElementsContext(elements, useCaseString)
   }
 }
 
-type StripeCheckoutActions = Omit<
-  stripeJs.StripeCheckout,
-  'on' | 'loadActions'
->
-& Omit<stripeJs.LoadActionsSuccess, 'getSession'>
+type StripeCheckoutActions = Omit<stripeJs.StripeCheckout, 'on' | 'loadActions'> &
+  Omit<stripeJs.LoadActionsSuccess, 'getSession'>
 
-export type StripeCheckoutValue = StripeCheckoutActions
-  & stripeJs.StripeCheckoutSession
+export type StripeCheckoutValue = StripeCheckoutActions & stripeJs.StripeCheckoutSession
 
-export type StripeUseCheckoutResult
-  = | { type: 'loading' }
-    | {
+export type StripeUseCheckoutResult =
+  | { type: 'loading' }
+  | {
       type: 'success'
       checkout: StripeCheckoutValue
     }
-    | { type: 'error', error: { message: string } }
+  | { type: 'error'; error: { message: string } }
 
 function mapStateToUseCheckoutResult(checkoutState: State): StripeUseCheckoutResult {
   if (checkoutState.type === 'success') {
@@ -252,13 +267,11 @@ function mapStateToUseCheckoutResult(checkoutState: State): StripeUseCheckoutRes
         ...actions,
       },
     }
-  }
-  else if (checkoutState.type === 'loading') {
+  } else if (checkoutState.type === 'loading') {
     return {
       type: 'loading',
     }
-  }
-  else {
+  } else {
     return {
       type: 'error',
       error: checkoutState.error,
