@@ -8,9 +8,7 @@ export const FinancialAccountDisclosure = defineComponent({
   name: 'FinancialAccountDisclosure',
   props: {
     stripe: {
-      type: [Object, null] as PropType<
-        PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null
-      >,
+      type: [Object, null] as PropType<PromiseLike<stripeJs.Stripe | null> | stripeJs.Stripe | null>,
       required: true,
     },
     options: {
@@ -40,22 +38,20 @@ export const FinancialAccountDisclosure = defineComponent({
             stripeState.value = stripePromise
           }
         })
-      } else if (parsed.value.tag === 'sync') {
+      }
+      else if (parsed.value.tag === 'sync') {
         stripeState.value = parsed.value.stripe
       }
     })
 
     // Warn on changes to stripe prop
-    watch(
-      () => props.stripe,
-      (_, prevStripe) => {
-        if (prevStripe !== null && prevStripe !== props.stripe) {
-          console.warn(
-            'Unsupported prop change on FinancialAccountDisclosure: You cannot change the `stripe` prop after setting it.',
-          )
-        }
-      },
-    )
+    watch(() => props.stripe, (_, prevStripe) => {
+      if (prevStripe !== null && prevStripe !== props.stripe) {
+        console.warn(
+          'Unsupported prop change on FinancialAccountDisclosure: You cannot change the `stripe` prop after setting it.',
+        )
+      }
+    })
 
     // Create disclosure
     watchEffect((onInvalidate) => {
@@ -64,16 +60,18 @@ export const FinancialAccountDisclosure = defineComponent({
           return
         }
 
-        const { htmlElement: disclosureContent, error } = await (
-          stripeState.value as any
-        ).createFinancialAccountDisclosure({
+        const {
+          htmlElement: disclosureContent,
+          error,
+        } = await (stripeState.value as any).createFinancialAccountDisclosure({
           businessName: businessName.value,
           learnMoreLink: learnMoreLink.value,
         })
 
         if (error) {
           emit('error', error)
-        } else if (disclosureContent && containerRef.value) {
+        }
+        else if (disclosureContent && containerRef.value) {
           const container = containerRef.value
           container.innerHTML = ''
           container.appendChild(disclosureContent)
@@ -87,16 +85,16 @@ export const FinancialAccountDisclosure = defineComponent({
         if (containerRef.value) {
           try {
             containerRef.value.innerHTML = ''
-          } catch {
+          }
+          catch {
             // Do nothing - element may already be removed
           }
         }
       })
     })
 
-    return () =>
-      h('div', {
-        ref: containerRef,
-      })
+    return () => h('div', {
+      ref: containerRef,
+    })
   },
 })

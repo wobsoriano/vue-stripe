@@ -1,8 +1,11 @@
 import { render } from '@testing-library/vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import * as mocks from '../../test/mocks'
-import { EmbeddedCheckoutProvider, useEmbeddedCheckoutContext } from './EmbeddedCheckoutProvider'
+import {
+  EmbeddedCheckoutProvider,
+  useEmbeddedCheckoutContext,
+} from './EmbeddedCheckoutProvider'
 
 function makeWrapper(stripe: any, options: any) {
   return defineComponent(() => {
@@ -39,10 +42,7 @@ describe('embeddedCheckoutProvider', () => {
         return () => null
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(EmbeddedCheckoutProvider, { stripe: mockStripe, options: fakeOptions }, () =>
-            h(Consumer),
-          )
+        return () => h(EmbeddedCheckoutProvider, { stripe: mockStripe, options: fakeOptions }, () => h(Consumer))
       })
 
       render(Comp)
@@ -86,10 +86,7 @@ describe('embeddedCheckoutProvider', () => {
         return () => null
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(EmbeddedCheckoutProvider, { stripe: mockStripe, options: fakeOptions }, () =>
-            h(Consumer),
-          )
+        return () => h(EmbeddedCheckoutProvider, { stripe: mockStripe, options: fakeOptions }, () => h(Consumer))
       })
 
       render(Comp)
@@ -105,10 +102,7 @@ describe('embeddedCheckoutProvider', () => {
         return () => null
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(EmbeddedCheckoutProvider, { stripe: mockStripePromise, options: fakeOptions }, () =>
-            h(Consumer),
-          )
+        return () => h(EmbeddedCheckoutProvider, { stripe: mockStripePromise, options: fakeOptions }, () => h(Consumer))
       })
 
       render(Comp)
@@ -129,10 +123,7 @@ describe('embeddedCheckoutProvider', () => {
         return () => null
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(EmbeddedCheckoutProvider, { stripe: stripe.value, options: fakeOptions }, () =>
-            h(Consumer),
-          )
+        return () => h(EmbeddedCheckoutProvider, { stripe: stripe.value, options: fakeOptions }, () => h(Consumer))
       })
 
       render(Comp)
@@ -153,10 +144,7 @@ describe('embeddedCheckoutProvider', () => {
         return () => null
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(EmbeddedCheckoutProvider, { stripe: nullPromise, options: fakeOptions }, () =>
-            h(Consumer),
-          )
+        return () => h(EmbeddedCheckoutProvider, { stripe: nullPromise, options: fakeOptions }, () => h(Consumer))
       })
 
       render(Comp)
@@ -274,9 +262,7 @@ describe('embeddedCheckoutProvider', () => {
       await nextTick()
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'You cannot change the onShippingDetailsChange option after setting it.',
-        ),
+        expect.stringContaining('You cannot change the onShippingDetailsChange option after setting it.'),
       )
     })
 
@@ -304,10 +290,9 @@ describe('embeddedCheckoutProvider', () => {
     it('destroys embedded checkout on unmount', async () => {
       const show = ref(true)
       const Comp = defineComponent(() => {
-        return () =>
-          show.value
-            ? h(EmbeddedCheckoutProvider, { stripe: mockStripe, options: fakeOptions })
-            : null
+        return () => show.value
+          ? h(EmbeddedCheckoutProvider, { stripe: mockStripe, options: fakeOptions })
+          : null
       })
 
       render(Comp)
@@ -328,10 +313,9 @@ describe('embeddedCheckoutProvider', () => {
 
       const show = ref(true)
       const Comp = defineComponent(() => {
-        return () =>
-          show.value
-            ? h(EmbeddedCheckoutProvider, { stripe: mockStripe, options: fakeOptions })
-            : null
+        return () => show.value
+          ? h(EmbeddedCheckoutProvider, { stripe: mockStripe, options: fakeOptions })
+          : null
       })
 
       render(Comp)
@@ -362,15 +346,10 @@ describe('embeddedCheckoutProvider', () => {
         return () => null
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(
-            EmbeddedCheckoutProvider,
-            {
-              stripe: slowStripePromise,
-              options: fakeOptions,
-            },
-            () => h(Consumer),
-          )
+        return () => h(EmbeddedCheckoutProvider, {
+          stripe: slowStripePromise,
+          options: fakeOptions,
+        }, () => h(Consumer))
       })
 
       const view = render(Comp)

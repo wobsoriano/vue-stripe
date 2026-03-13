@@ -1,5 +1,5 @@
 import { render, waitFor } from '@testing-library/vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { renderComposable } from 'vue-composable-testing'
 import makeDeferred from '../../../test/makeDeferred'
@@ -45,17 +45,12 @@ describe('checkout provider', () => {
       const { result } = renderComposable(() => useStripe(), {
         wrapper: defineComponent({
           setup(_, { slots }) {
-            return () =>
-              h(
-                CheckoutProvider,
-                {
-                  stripe: mockStripe,
-                  options: {
-                    clientSecret: fakeClientSecret,
-                  },
-                },
-                () => slots.default?.(),
-              )
+            return () => h(CheckoutProvider, {
+              stripe: mockStripe,
+              options: {
+                clientSecret: fakeClientSecret,
+              },
+            }, () => slots.default?.())
           },
         }),
       })
@@ -69,17 +64,12 @@ describe('checkout provider', () => {
       const { result } = renderComposable(() => useStripe(), {
         wrapper: defineComponent({
           setup(_, { slots }) {
-            return () =>
-              h(
-                CheckoutProvider,
-                {
-                  stripe: stripe.value,
-                  options: {
-                    clientSecret: fakeClientSecret,
-                  },
-                },
-                () => slots.default?.(),
-              )
+            return () => h(CheckoutProvider, {
+              stripe: stripe.value,
+              options: {
+                clientSecret: fakeClientSecret,
+              },
+            }, () => slots.default?.())
           },
         }),
       })
@@ -92,23 +82,18 @@ describe('checkout provider', () => {
     })
 
     it('works with a Promise', async () => {
-      const deferred = makeDeferred<{ type: 'success'; actions: mocks.MockCheckoutActions }>()
+      const deferred = makeDeferred()
       const stripe = ref(deferred.promise)
 
       const { result } = renderComposable(() => useStripe(), {
         wrapper: defineComponent({
           setup(_, { slots }) {
-            return () =>
-              h(
-                CheckoutProvider,
-                {
-                  stripe: stripe.value as any,
-                  options: {
-                    clientSecret: fakeClientSecret,
-                  },
-                },
-                () => slots.default?.(),
-              )
+            return () => h(CheckoutProvider, {
+              stripe: stripe.value as any,
+              options: {
+                clientSecret: fakeClientSecret,
+              },
+            }, () => slots.default?.())
           },
         }),
       })
@@ -124,7 +109,7 @@ describe('checkout provider', () => {
   describe('interaction with useCheckout()', () => {
     it('works when loadActions resolves', async () => {
       const stripe: any = mocks.mockStripe()
-      const deferred = makeDeferred<{ type: 'success'; actions: mocks.MockCheckoutActions }>()
+      const deferred = makeDeferred()
       const mockSdk = mocks.mockCheckoutSdk()
       const testMockCheckoutActions = mocks.mockCheckoutActions()
       const testMockSession = mocks.mockCheckoutSession()
@@ -135,17 +120,12 @@ describe('checkout provider', () => {
       const { result } = renderComposable(() => useCheckout(), {
         wrapper: defineComponent({
           setup(_, { slots }) {
-            return () =>
-              h(
-                CheckoutProvider,
-                {
-                  stripe,
-                  options: {
-                    clientSecret: fakeClientSecret,
-                  },
-                },
-                () => slots.default?.(),
-              )
+            return () => h(CheckoutProvider, {
+              stripe,
+              options: {
+                clientSecret: fakeClientSecret,
+              },
+            }, () => slots.default?.())
           },
         }),
       })
@@ -161,7 +141,10 @@ describe('checkout provider', () => {
       await nextTick()
 
       const { on: _on, loadActions: _loadActions, ...elementsMethods } = mockSdk
-      const { getSession: _getSession, ...otherCheckoutActions } = testMockCheckoutActions
+      const {
+        getSession: _getSession,
+        ...otherCheckoutActions
+      } = testMockCheckoutActions
 
       const expectedCheckout = {
         ...elementsMethods,
@@ -178,7 +161,7 @@ describe('checkout provider', () => {
 
     it('works when loadActions rejects', async () => {
       const stripe: any = mocks.mockStripe()
-      const deferred = makeDeferred<{ type: 'success'; actions: mocks.MockCheckoutActions }>()
+      const deferred = makeDeferred()
       const mockSdk = mocks.mockCheckoutSdk()
       mockSdk.loadActions.mockReturnValue(deferred.promise)
       stripe.initCheckout.mockReturnValue(mockSdk)
@@ -186,17 +169,12 @@ describe('checkout provider', () => {
       const { result } = renderComposable(() => useCheckout(), {
         wrapper: defineComponent({
           setup(_, { slots }) {
-            return () =>
-              h(
-                CheckoutProvider,
-                {
-                  stripe,
-                  options: {
-                    clientSecret: fakeClientSecret,
-                  },
-                },
-                () => slots.default?.(),
-              )
+            return () => h(CheckoutProvider, {
+              stripe,
+              options: {
+                clientSecret: fakeClientSecret,
+              },
+            }, () => slots.default?.())
           },
         }),
       })
@@ -219,13 +197,12 @@ describe('checkout provider', () => {
     it('does not set context if Promise resolves after CheckoutProvider is unmounted', async () => {
       const Component = defineComponent({
         setup() {
-          return () =>
-            h(CheckoutProvider, {
-              stripe: mockStripePromise,
-              options: {
-                clientSecret: Promise.resolve(fakeClientSecret),
-              },
-            })
+          return () => h(CheckoutProvider, {
+            stripe: mockStripePromise,
+            options: {
+              clientSecret: Promise.resolve(fakeClientSecret),
+            },
+          })
         },
       })
 
@@ -253,19 +230,16 @@ describe('checkout provider', () => {
 
         const Comp = defineComponent({
           setup() {
-            return () =>
-              h(
-                CheckoutProvider,
-                {
-                  stripe: stripeProp as any,
-                  options: { clientSecret: fakeClientSecret },
-                },
-                () => h('div'),
-              )
+            return () => h(CheckoutProvider, {
+              stripe: stripeProp as any,
+              options: { clientSecret: fakeClientSecret },
+            }, () => h('div'))
           },
         })
 
-        expect(() => render(Comp)).toThrow('Invalid prop `stripe` supplied to `CheckoutProvider`.')
+        expect(() =>
+          render(Comp),
+        ).toThrow('Invalid prop `stripe` supplied to `CheckoutProvider`.')
       })
     })
 
@@ -275,15 +249,10 @@ describe('checkout provider', () => {
       consoleWarn.mockImplementation(() => {})
 
       const Comp = defineComponent(() => {
-        return () =>
-          h(
-            CheckoutProvider,
-            {
-              stripe: stripe.value,
-              options: { clientSecret: fakeClientSecret },
-            },
-            () => h('div'),
-          )
+        return () => h(CheckoutProvider, {
+          stripe: stripe.value,
+          options: { clientSecret: fakeClientSecret },
+        }, () => h('div'))
       })
       render(Comp)
 
@@ -307,11 +276,10 @@ describe('checkout provider', () => {
         },
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: options.value as any,
-          })
+        return () => h(CheckoutProvider, {
+          stripe: mockStripe,
+          options: options.value as any,
+        })
       })
       render(Comp)
 
@@ -348,11 +316,10 @@ describe('checkout provider', () => {
         },
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: options.value,
-          })
+        return () => h(CheckoutProvider, {
+          stripe: mockStripe,
+          options: options.value,
+        })
       })
 
       render(Comp)
@@ -380,11 +347,10 @@ describe('checkout provider', () => {
         },
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: options.value as any,
-          })
+        return () => h(CheckoutProvider, {
+          stripe: mockStripe,
+          options: options.value as any,
+        })
       })
       render(Comp)
 
@@ -436,11 +402,10 @@ describe('checkout provider', () => {
         elementsOptions: {},
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: options.value as any,
-          })
+        return () => h(CheckoutProvider, {
+          stripe: mockStripe,
+          options: options.value as any,
+        })
       })
       render(Comp)
 
@@ -485,11 +450,10 @@ describe('checkout provider', () => {
         },
       })
       const Comp = defineComponent(() => {
-        return () =>
-          h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: options.value,
-          })
+        return () => h(CheckoutProvider, {
+          stripe: mockStripe,
+          options: options.value,
+        })
       })
 
       render(Comp)
@@ -511,20 +475,21 @@ describe('checkout provider', () => {
       const stripe = ref(null)
 
       const Comp = defineComponent(() => {
-        return () =>
-          h(CheckoutProvider, {
-            stripe: stripe.value,
-            options: {
-              clientSecret: fakeClientSecret,
-              elementsOptions: {
-                appearance: { theme: 'stripe' },
-              },
+        return () => h(CheckoutProvider, {
+          stripe: stripe.value,
+          options: {
+            clientSecret: fakeClientSecret,
+            elementsOptions: {
+              appearance: { theme: 'stripe' },
             },
-          })
+          },
+        })
       })
       render(Comp)
 
-      await waitFor(() => expect(mockStripe.initCheckout).toHaveBeenCalledTimes(0))
+      await waitFor(() =>
+        expect(mockStripe.initCheckout).toHaveBeenCalledTimes(0),
+      )
 
       stripe.value = mockStripe
 
@@ -543,62 +508,39 @@ describe('checkout provider', () => {
     it('throws when trying to call useCheckout outside of CheckoutProvider context', () => {
       expect(() => {
         renderComposable(() => useCheckout())
-      }).toThrow(
-        'Could not find CheckoutProvider context; You need to wrap the part of your app that calls useCheckout() in a <CheckoutProvider> provider.',
-      )
+      }).toThrow('Could not find CheckoutProvider context; You need to wrap the part of your app that calls useCheckout() in a <CheckoutProvider> provider.')
     })
 
     it('throws when trying to call useStripe outside of CheckoutProvider context', () => {
       expect(() => {
         renderComposable(() => useStripe())
-      }).toThrow(
-        'Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.',
-      )
+      }).toThrow('Could not find Elements context; You need to wrap the part of your app that calls useStripe() in an <Elements> provider.')
     })
 
     it('throws when trying to call useStripe in Elements -> CheckoutProvider nested context', () => {
       const wrapper = defineComponent({
         setup(_, { slots }) {
-          return () =>
-            h(
-              Elements,
-              {
-                stripe: mockStripe,
-              },
-              () =>
-                h(
-                  CheckoutProvider,
-                  { stripe: mockStripe, options: { clientSecret: fakeClientSecret } },
-                  () => slots.default?.(),
-                ),
-            )
+          return () => h(Elements, {
+            stripe: mockStripe,
+          }, () => h(CheckoutProvider, { stripe: mockStripe, options: { clientSecret: fakeClientSecret } }, () => slots.default?.()))
         },
       })
 
       expect(() => {
         renderComposable(() => useStripe(), { wrapper })
-      }).toThrow(
-        'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.',
-      )
+      }).toThrow('You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.')
     })
 
     it('throws when trying to call useStripe in CheckoutProvider -> Elements nested context', () => {
       const wrapper = defineComponent({
         setup(_, { slots }) {
-          return () =>
-            h(
-              CheckoutProvider,
-              { stripe: mockStripe, options: { clientSecret: fakeClientSecret } },
-              () => h(Elements, { stripe: mockStripe }, () => slots.default?.()),
-            )
+          return () => h(CheckoutProvider, { stripe: mockStripe, options: { clientSecret: fakeClientSecret } }, () => h(Elements, { stripe: mockStripe }, () => slots.default?.()))
         },
       })
 
       expect(() => {
         renderComposable(() => useStripe(), { wrapper })
-      }).toThrow(
-        'You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.',
-      )
+      }).toThrow('You cannot wrap the part of your app that calls useStripe() in both <CheckoutProvider> and <Elements> providers.')
     })
   })
 })
