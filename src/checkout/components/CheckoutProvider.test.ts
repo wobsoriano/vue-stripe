@@ -92,7 +92,7 @@ describe('checkout provider', () => {
     })
 
     it('works with a Promise', async () => {
-      const deferred = makeDeferred()
+      const deferred = makeDeferred<{ type: 'success'; actions: mocks.MockCheckoutActions }>()
       const stripe = ref(deferred.promise)
 
       const { result } = renderComposable(() => useStripe(), {
@@ -124,7 +124,7 @@ describe('checkout provider', () => {
   describe('interaction with useCheckout()', () => {
     it('works when loadActions resolves', async () => {
       const stripe: any = mocks.mockStripe()
-      const deferred = makeDeferred()
+      const deferred = makeDeferred<{ type: 'success'; actions: mocks.MockCheckoutActions }>()
       const mockSdk = mocks.mockCheckoutSdk()
       const testMockCheckoutActions = mocks.mockCheckoutActions()
       const testMockSession = mocks.mockCheckoutSession()
@@ -178,7 +178,7 @@ describe('checkout provider', () => {
 
     it('works when loadActions rejects', async () => {
       const stripe: any = mocks.mockStripe()
-      const deferred = makeDeferred()
+      const deferred = makeDeferred<{ type: 'success'; actions: mocks.MockCheckoutActions }>()
       const mockSdk = mocks.mockCheckoutSdk()
       mockSdk.loadActions.mockReturnValue(deferred.promise)
       stripe.initCheckout.mockReturnValue(mockSdk)
