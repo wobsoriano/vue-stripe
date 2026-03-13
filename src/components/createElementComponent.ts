@@ -13,146 +13,171 @@ interface Props {
   options?: any
 }
 
-export function createElementComponent<ElementProps extends Props, ElementEmits extends EmitsOptions>(
-  type: stripeJs.StripeElementType,
-) {
+export function createElementComponent<
+  ElementProps extends Props,
+  ElementEmits extends EmitsOptions,
+>(type: stripeJs.StripeElementType) {
   const displayName = `${capitalized(type)}Element`
 
-  const Element = defineComponent<ElementProps, ElementEmits>((props, { attrs, emit }) => {
-    const ctx = useElementsOrCheckoutContextWithUseCase(`mounts <${displayName}>`)
-    const elements = 'elements' in ctx ? ctx.elements : null
-    const checkoutState = 'checkoutState' in ctx ? ctx.checkoutState : null
-    const checkoutSdk = computed(() => checkoutState?.value.type === 'success' || checkoutState?.value.type === 'loading'
-      ? checkoutState.value.sdk
-      : null)
-    const elementRef = shallowRef<stripeJs.StripeElement | null>(null)
-    const domNode = ref<HTMLDivElement | null>(null)
+  const Element = defineComponent<ElementProps, ElementEmits>(
+    (props, { attrs, emit }) => {
+      const ctx = useElementsOrCheckoutContextWithUseCase(`mounts <${displayName}>`)
+      const elements = 'elements' in ctx ? ctx.elements : null
+      const checkoutState = 'checkoutState' in ctx ? ctx.checkoutState : null
+      const checkoutSdk = computed(() =>
+        checkoutState?.value.type === 'success' || checkoutState?.value.type === 'loading'
+          ? checkoutState.value.sdk
+          : null,
+      )
+      const elementRef = shallowRef<stripeJs.StripeElement | null>(null)
+      const domNode = ref<HTMLDivElement | null>(null)
 
-    watchEffect(() => {
-      if (elementRef.value === null && domNode.value !== null && (elements?.value || checkoutSdk.value)) {
-        let newElement: stripeJs.StripeElement | null = null
-        const options = props.options || {}
+      watchEffect(() => {
+        if (
+          elementRef.value === null &&
+          domNode.value !== null &&
+          (elements?.value || checkoutSdk.value)
+        ) {
+          let newElement: stripeJs.StripeElement | null = null
+          const options = props.options || {}
 
-        if (checkoutSdk.value) {
-          switch (type) {
-            case 'paymentForm':
-              newElement = checkoutSdk.value.createPaymentFormElement(options)
-              break
-            case 'payment':
-              newElement = checkoutSdk.value.createPaymentElement(options)
-              break
-            case 'address':
-              if ('mode' in options) {
-                const { mode, ...restOptions } = options
-                if (mode === 'shipping') {
-                  newElement = checkoutSdk.value.createShippingAddressElement(restOptions)
+          if (checkoutSdk.value) {
+            switch (type) {
+              case 'paymentForm':
+                newElement = checkoutSdk.value.createPaymentFormElement(options)
+                break
+              case 'payment':
+                newElement = checkoutSdk.value.createPaymentElement(options)
+                break
+              case 'address':
+                if ('mode' in options) {
+                  const { mode, ...restOptions } = options
+                  if (mode === 'shipping') {
+                    newElement = checkoutSdk.value.createShippingAddressElement(restOptions)
+                  } else if (mode === 'billing') {
+                    newElement = checkoutSdk.value.createBillingAddressElement(restOptions)
+                  } else {
+                    throw new Error("Invalid options.mode. mode must be 'billing' or 'shipping'.")
+                  }
+                } else {
+                  throw new Error(
+                    "You must supply options.mode. mode must be 'billing' or 'shipping'.",
+                  )
                 }
-                else if (mode === 'billing') {
-                  newElement = checkoutSdk.value.createBillingAddressElement(restOptions)
-                }
-                else {
-                  throw new Error('Invalid options.mode. mode must be \'billing\' or \'shipping\'.')
-                }
-              }
-              else {
+                break
+              case 'expressCheckout':
+                newElement = checkoutSdk.value.createExpressCheckoutElement(
+                  props.options as unknown as stripeJs.StripeCheckoutExpressCheckoutElementOptions,
+                ) as stripeJs.StripeExpressCheckoutElement
+                break
+              case 'currencySelector':
+                newElement = checkoutSdk.value.createCurrencySelectorElement()
+                break
+              case 'taxId':
+                newElement = checkoutSdk.value.createTaxIdElement(options)
+                break
+              default:
                 throw new Error(
-                  'You must supply options.mode. mode must be \'billing\' or \'shipping\'.',
+                  `Invalid Element type ${displayName}. You must use either the <PaymentElement />, <AddressElement options={{mode: 'shipping'}} />, <AddressElement options={{mode: 'billing'}} />, or <ExpressCheckoutElement />.`,
                 )
-              }
-              break
-            case 'expressCheckout':
-              newElement = checkoutSdk.value.createExpressCheckoutElement(
-                props.options as unknown as stripeJs.StripeCheckoutExpressCheckoutElementOptions,
-              ) as stripeJs.StripeExpressCheckoutElement
-              break
-            case 'currencySelector':
-              newElement = checkoutSdk.value.createCurrencySelectorElement()
-              break
-            case 'taxId':
-              newElement = checkoutSdk.value.createTaxIdElement(options)
-              break
-            default:
-              throw new Error(
-                `Invalid Element type ${displayName}. You must use either the <PaymentElement />, <AddressElement options={{mode: 'shipping'}} />, <AddressElement options={{mode: 'billing'}} />, or <ExpressCheckoutElement />.`,
-              )
+            }
+          } else if (elements?.value) {
+            newElement = elements.value.create(type as any, options)
+          }
+
+          // Store element in state to facilitate event listener attachment
+          elementRef.value = newElement
+
+          if (newElement) {
+            newElement.mount(domNode.value)
           }
         }
-        else if (elements?.value) {
-          newElement = elements.value.create(type as any, options)
-        }
+      })
 
-        // Store element in state to facilitate event listener attachment
-        elementRef.value = newElement
+      let previousOptionsSnapshot = createSnapshot(props.options || {})
 
-        if (newElement) {
-          newElement.mount(domNode.value)
-        }
-      }
-    })
+      watch(
+        () => props.options,
+        (options) => {
+          if (!elementRef.value || !('update' in elementRef.value)) {
+            previousOptionsSnapshot = createSnapshot(options || {})
+            return
+          }
 
-    let previousOptionsSnapshot = createSnapshot(props.options || {})
+          const nextOptionsSnapshot = createSnapshot(options || {})
+          const updates = extractAllowedOptionsUpdates(
+            nextOptionsSnapshot,
+            previousOptionsSnapshot,
+            ['paymentRequest'],
+          )
 
-    watch(() => props.options, (options) => {
-      if (!elementRef.value || !('update' in elementRef.value)) {
-        previousOptionsSnapshot = createSnapshot(options || {})
-        return
-      }
+          if (updates) {
+            elementRef.value.update(updates)
+          }
 
-      const nextOptionsSnapshot = createSnapshot(options || {})
-      const updates = extractAllowedOptionsUpdates(
-        nextOptionsSnapshot,
-        previousOptionsSnapshot,
-        ['paymentRequest'],
+          previousOptionsSnapshot = nextOptionsSnapshot
+        },
+        { deep: true },
       )
 
-      if (updates) {
-        elementRef.value.update(updates)
-      }
+      // For every event where the merchant provides a callback, call element.on
+      // with that callback. If the merchant ever changes the callback, removes
+      // the old callback with element.off and then call element.on with the new one.
+      useAttachEvent(elementRef, 'blur', emit, Boolean(attrs.onBlur))
+      useAttachEvent(elementRef, 'focus', emit, Boolean(attrs.onFocus))
+      useAttachEvent(elementRef, 'escape', emit, Boolean(attrs.onEscape))
+      useAttachEvent(elementRef, 'click', emit, Boolean(attrs.onClick))
+      useAttachEvent(elementRef, 'loaderror', emit, Boolean(attrs.onLoaderror))
+      useAttachEvent(elementRef, 'loaderstart', emit, Boolean(attrs.onLoaderstart))
+      useAttachEvent(elementRef, 'networkschange', emit, Boolean(attrs.onNetworkschange))
+      useAttachEvent(elementRef, 'confirm', emit, Boolean(attrs.onConfirm))
+      useAttachEvent(elementRef, 'cancel', emit, Boolean(attrs.onCancel))
+      useAttachEvent(
+        elementRef,
+        'shippingaddresschange',
+        emit,
+        Boolean(attrs.onShippingaddresschange),
+      )
+      useAttachEvent(elementRef, 'shippingratechange', emit, Boolean(attrs.onShippingratechange))
+      useAttachEvent(elementRef, 'change', emit, Boolean(attrs.onChange))
+      useAttachEvent(
+        elementRef,
+        'savedpaymentmethodremove',
+        emit,
+        Boolean(attrs.onSavedpaymentmethodremove),
+      )
+      useAttachEvent(
+        elementRef,
+        'savedpaymentmethodupdate',
+        emit,
+        Boolean(attrs.onSavedpaymentmethodupdate),
+      )
 
-      previousOptionsSnapshot = nextOptionsSnapshot
-    }, { deep: true })
+      const shouldEmitElement = type !== 'expressCheckout'
+      useAttachEvent(elementRef, 'ready', emit, Boolean(attrs.onReady), shouldEmitElement)
 
-    // For every event where the merchant provides a callback, call element.on
-    // with that callback. If the merchant ever changes the callback, removes
-    // the old callback with element.off and then call element.on with the new one.
-    useAttachEvent(elementRef, 'blur', emit, Boolean(attrs.onBlur))
-    useAttachEvent(elementRef, 'focus', emit, Boolean(attrs.onFocus))
-    useAttachEvent(elementRef, 'escape', emit, Boolean(attrs.onEscape))
-    useAttachEvent(elementRef, 'click', emit, Boolean(attrs.onClick))
-    useAttachEvent(elementRef, 'loaderror', emit, Boolean(attrs.onLoaderror))
-    useAttachEvent(elementRef, 'loaderstart', emit, Boolean(attrs.onLoaderstart))
-    useAttachEvent(elementRef, 'networkschange', emit, Boolean(attrs.onNetworkschange))
-    useAttachEvent(elementRef, 'confirm', emit, Boolean(attrs.onConfirm))
-    useAttachEvent(elementRef, 'cancel', emit, Boolean(attrs.onCancel))
-    useAttachEvent(elementRef, 'shippingaddresschange', emit, Boolean(attrs.onShippingaddresschange))
-    useAttachEvent(elementRef, 'shippingratechange', emit, Boolean(attrs.onShippingratechange))
-    useAttachEvent(elementRef, 'change', emit, Boolean(attrs.onChange))
-    useAttachEvent(elementRef, 'savedpaymentmethodremove', emit, Boolean(attrs.onSavedpaymentmethodremove))
-    useAttachEvent(elementRef, 'savedpaymentmethodupdate', emit, Boolean(attrs.onSavedpaymentmethodupdate))
-
-    const shouldEmitElement = type !== 'expressCheckout'
-    useAttachEvent(elementRef, 'ready', emit, Boolean(attrs.onReady), shouldEmitElement)
-
-    onUnmounted(() => {
-      const currentElement = elementRef.value
-      if (currentElement && typeof currentElement.destroy === 'function') {
-        try {
-          currentElement.destroy()
+      onUnmounted(() => {
+        const currentElement = elementRef.value
+        if (currentElement && typeof currentElement.destroy === 'function') {
+          try {
+            currentElement.destroy()
+          } catch {}
         }
-        catch {}
-      }
-    })
+      })
 
-    return () => h('div', {
-      id: props.id,
-      class: props.class,
-      ref: domNode,
-    })
-  }, {
-    props: ['id', 'class', 'options'],
-    name: displayName,
-    inheritAttrs: false,
-  })
+      return () =>
+        h('div', {
+          id: props.id,
+          class: props.class,
+          ref: domNode,
+        })
+    },
+    {
+      props: ['id', 'class', 'options'],
+      name: displayName,
+      inheritAttrs: false,
+    },
+  )
 
   /**
    * Stripe's elements.getElement() method requires the component to be a function
@@ -192,8 +217,7 @@ export function useAttachEvent(
     function cbWithEmit(...args: unknown[]) {
       if (shouldEmitElement) {
         emit(event, element.value)
-      }
-      else {
+      } else {
         emit(event, ...args)
       }
     }

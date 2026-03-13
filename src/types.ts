@@ -34,7 +34,7 @@ export type CardElementEmits = WithBaseElementEmits<{
   ready: (element: stripeJs.StripeCardElement) => void
   escape: () => void
   networkschange: (event: { elementType: 'card' }) => void
-  loaderror: (event: { elementType: 'card', error: stripeJs.StripeError }) => void
+  loaderror: (event: { elementType: 'card'; error: stripeJs.StripeError }) => void
 }>
 
 export type CardNumberElementProps = WithBaseElementProps<{
@@ -46,7 +46,7 @@ export type CardNumberElementEmits = WithBaseElementEmits<{
   ready: (element: stripeJs.StripeCardNumberElement) => void
   escape: () => void
   networkschange: (event: { elementType: 'cardNumber' }) => void
-  loaderror: (event: { elementType: 'cardNumber', error: stripeJs.StripeError }) => void
+  loaderror: (event: { elementType: 'cardNumber'; error: stripeJs.StripeError }) => void
 }>
 
 export type CardExpiryElementProps = WithBaseElementProps<{
@@ -87,7 +87,7 @@ export type LinkAuthenticationElementEmits = WithBaseElementEmits<{
   change: (event: stripeJs.StripeLinkAuthenticationElementChangeEvent) => void
   ready: (element: stripeJs.StripeLinkAuthenticationElement) => void
   escape: () => void
-  loaderror: (event: { elementType: 'linkAuthentication', error: stripeJs.StripeError }) => void
+  loaderror: (event: { elementType: 'linkAuthentication'; error: stripeJs.StripeError }) => void
   loaderstart: (event: { elementType: 'linkAuthentication' }) => void
 }>
 
@@ -117,7 +117,7 @@ export type PaymentFormElementEmits = WithBaseElementEmits<{
   /**
    * Triggered when the Element fails to load.
    */
-  loaderror: (event: { elementType: 'paymentForm', error: stripeJs.StripeError }) => void
+  loaderror: (event: { elementType: 'paymentForm'; error: stripeJs.StripeError }) => void
   /**
    * Triggered when a buyer authorizes a payment within a supported payment method.
    */
@@ -136,7 +136,7 @@ export type PaymentElementEmits = WithBaseElementEmits<{
   change: (event: stripeJs.StripePaymentElementChangeEvent) => void
   ready: (element: stripeJs.StripePaymentElement) => void
   escape: () => void
-  loaderror: (event: { elementType: 'payment', error: stripeJs.StripeError }) => void
+  loaderror: (event: { elementType: 'payment'; error: stripeJs.StripeError }) => void
   /**
    * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
    */
@@ -174,11 +174,13 @@ export type ExpressCheckoutElementProps = WithBaseElementProps<{
 export type ExpressCheckoutElementEmits = WithBaseElementEmits<{
   ready: (event: stripeJs.StripeExpressCheckoutElementReadyEvent) => void
   escape: () => void
-  loaderror: (event: { elementType: 'expressCheckout', error: stripeJs.StripeError }) => void
+  loaderror: (event: { elementType: 'expressCheckout'; error: stripeJs.StripeError }) => void
   click: (event: stripeJs.StripeExpressCheckoutElementClickEvent) => void
   confirm: (event: stripeJs.StripeExpressCheckoutElementConfirmEvent) => void
   cancel: (event: { elementType: 'expressCheckout' }) => void
-  shippingaddresschange: (event: stripeJs.StripeExpressCheckoutElementShippingAddressChangeEvent) => void
+  shippingaddresschange: (
+    event: stripeJs.StripeExpressCheckoutElementShippingAddressChangeEvent,
+  ) => void
   shippingratechange: (event: stripeJs.StripeExpressCheckoutElementShippingRateChangeEvent) => void
 }>
 
@@ -199,7 +201,7 @@ export type AddressElementEmits = WithBaseElementEmits<{
   change: (event: stripeJs.StripeAddressElementChangeEvent) => void
   ready: (element: stripeJs.StripeAddressElement) => void
   escape: () => void
-  loaderror: (event: { elementType: 'address', error: stripeJs.StripeError }) => void
+  loaderror: (event: { elementType: 'address'; error: stripeJs.StripeError }) => void
   loaderstart: (event: { elementType: 'address' }) => void
 }>
 
@@ -234,7 +236,7 @@ export type TaxIdElementEmits = WithBaseElementEmits<{
   /**
    * Triggered when the Element fails to load.
    */
-  loaderror: (event: { elementType: 'taxId', error: stripeJs.StripeError }) => void
+  loaderror: (event: { elementType: 'taxId'; error: stripeJs.StripeError }) => void
   /**
    * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
    */

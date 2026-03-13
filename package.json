@@ -1,23 +1,28 @@
 {
   "name": "vue-stripe",
-  "type": "module",
   "version": "2.4.0",
-  "packageManager": "pnpm@10.24.0",
   "description": "Vue components for Stripe.js and Stripe Elements",
-  "author": "Robert Soriano <sorianorobertc@gmail.com>",
-  "license": "MIT",
+  "keywords": [
+    "elements",
+    "stripe",
+    "vue"
+  ],
   "homepage": "https://github.com/wobsoriano/vue-stripe#readme",
+  "bugs": "https://github.com/wobsoriano/vue-stripe/issues",
+  "license": "MIT",
+  "author": "Robert Soriano <sorianorobertc@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wobsoriano/vue-stripe.git"
   },
-  "bugs": "https://github.com/wobsoriano/vue-stripe/issues",
-  "keywords": [
-    "vue",
-    "stripe",
-    "elements"
+  "files": [
+    "dist"
   ],
+  "type": "module",
   "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -28,44 +33,41 @@
       "import": "./dist/checkout/index.js"
     }
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "dev": "tsdown --watch --onSuccess \"pnpm build:dts\"",
-    "build": "tsdown --env.NODE_ENV production",
+    "dev": "vp pack --watch",
+    "build": "vp pack",
+    "check": "vp check src test vite.config.ts package.json",
+    "check:fix": "vp check --fix src test vite.config.ts package.json",
+    "fmt": "vp fmt src test vite.config.ts package.json",
+    "fmt:check": "vp fmt src test vite.config.ts package.json --check",
     "prepublishOnly": "pnpm build",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "release": "pnpm build && changeset publish",
-    "typecheck": "tsc --noEmit"
-  },
-  "peerDependencies": {
-    "@stripe/stripe-js": ">=8.0.0 <9.0.0",
-    "vue": "^3.2.0"
+    "test": "vp test",
+    "test:run": "vp test run",
+    "test:watch": "vp test watch",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
+    "release": "changeset publish",
+    "typecheck": "tsc --noEmit",
+    "prepare": "vp config"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.4.1",
     "@changesets/cli": "^2.29.8",
     "@stripe/stripe-js": "^8.7.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/vue": "^8.1.0",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.2",
-    "@vue/compiler-dom": "^3.5.29",
     "@vue/compiler-sfc": "^3.5.29",
-    "@vue/server-renderer": "^3.5.29",
-    "eslint": "^9.39.1",
     "jsdom": "^27.2.0",
-    "tsdown": "^0.15.12",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:",
     "vue": "^3.5.25",
     "vue-composable-testing": "^0.2.0"
-  }
+  },
+  "peerDependencies": {
+    "@stripe/stripe-js": ">=8.0.0 <9.0.0",
+    "vue": "^3.2.0"
+  },
+  "packageManager": "pnpm@10.24.0"
 }

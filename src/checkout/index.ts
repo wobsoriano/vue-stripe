@@ -1,30 +1,55 @@
 import type { FunctionalComponent } from 'vue'
 import type { PaymentElementEmits } from '../types'
-import type { BillingAddressElementEmits, BillingAddressElementProps, CurrencySelectorElementEmits, CurrencySelectorElementProps, ExpressCheckoutElementEmits, ExpressCheckoutElementProps, PaymentElementProps, PaymentFormElementEmits, PaymentFormElementProps, ShippingAddressElementEmits, ShippingAddressElementProps, TaxIdElementEmits, TaxIdElementProps } from './types'
+import type {
+  BillingAddressElementEmits,
+  BillingAddressElementProps,
+  CurrencySelectorElementEmits,
+  CurrencySelectorElementProps,
+  ExpressCheckoutElementEmits,
+  ExpressCheckoutElementProps,
+  PaymentElementProps,
+  PaymentFormElementEmits,
+  PaymentFormElementProps,
+  ShippingAddressElementEmits,
+  ShippingAddressElementProps,
+  TaxIdElementEmits,
+  TaxIdElementProps,
+} from './types'
 import { h } from 'vue'
 import { createElementComponent } from '../components/createElementComponent'
 
-export {
-  CheckoutProvider,
-  useCheckout,
-} from './components/CheckoutProvider'
+export { CheckoutProvider, useCheckout } from './components/CheckoutProvider'
 
-export const CurrencySelectorElement = createElementComponent<CurrencySelectorElementProps, CurrencySelectorElementEmits>('currencySelector')
+export const CurrencySelectorElement = createElementComponent<
+  CurrencySelectorElementProps,
+  CurrencySelectorElementEmits
+>('currencySelector')
 
-export const PaymentElement = createElementComponent<PaymentElementProps, PaymentElementEmits>('payment')
+export const PaymentElement = createElementComponent<PaymentElementProps, PaymentElementEmits>(
+  'payment',
+)
 
-export const PaymentFormElement = createElementComponent<PaymentFormElementProps, PaymentFormElementEmits>('paymentForm')
+export const PaymentFormElement = createElementComponent<
+  PaymentFormElementProps,
+  PaymentFormElementEmits
+>('paymentForm')
 
 /**
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
  */
-export const ExpressCheckoutElement = createElementComponent<ExpressCheckoutElementProps, ExpressCheckoutElementEmits>('expressCheckout')
+export const ExpressCheckoutElement = createElementComponent<
+  ExpressCheckoutElementProps,
+  ExpressCheckoutElementEmits
+>('expressCheckout')
 
 export const TaxIdElement = createElementComponent<TaxIdElementProps, TaxIdElementEmits>('taxId')
 
 const AddressElementBase = createElementComponent('address')
 
-export const BillingAddressElement: FunctionalComponent<BillingAddressElementProps, BillingAddressElementEmits> = (props) => {
+export const BillingAddressElement: FunctionalComponent<
+  BillingAddressElementProps,
+  BillingAddressElementEmits
+> = (props) => {
   const { options, ...rest } = props
 
   return h(AddressElementBase, {
@@ -36,7 +61,10 @@ export const BillingAddressElement: FunctionalComponent<BillingAddressElementPro
   })
 }
 
-export const ShippingAddressElement: FunctionalComponent<ShippingAddressElementProps, ShippingAddressElementEmits> = (props) => {
+export const ShippingAddressElement: FunctionalComponent<
+  ShippingAddressElementProps,
+  ShippingAddressElementEmits
+> = (props) => {
   const { options, ...rest } = props
 
   return h(AddressElementBase, {

@@ -1,6 +1,6 @@
 import type { UnknownOptions } from '../types'
 import { render, waitFor } from '@testing-library/vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
 import { AddressElement, PaymentElement, PaymentFormElement, PaymentRequestButtonElement } from '..'
 import * as mocks from '../../test/mocks'
@@ -21,7 +21,7 @@ describe('createElementComponent', () => {
   let simulateOn: any
   let simulateOff: any
   const simulateEvent = (event: string, ...args: any[]) => {
-    simulateElementsEvents[event].forEach(fn => fn(...args))
+    simulateElementsEvents[event].forEach((fn) => fn(...args))
   }
 
   beforeEach(() => {
@@ -40,14 +40,11 @@ describe('createElementComponent', () => {
 
     simulateElementsEvents = {}
     simulateOn = vi.fn((event, fn) => {
-      simulateElementsEvents[event] = [
-        ...(simulateElementsEvents[event] || []),
-        fn,
-      ]
+      simulateElementsEvents[event] = [...(simulateElementsEvents[event] || []), fn]
     })
     simulateOff = vi.fn((event, fn) => {
       simulateElementsEvents[event] = simulateElementsEvents[event].filter(
-        previouslyAddedFn => previouslyAddedFn !== fn,
+        (previouslyAddedFn) => previouslyAddedFn !== fn,
       )
     })
 
@@ -76,10 +73,15 @@ describe('createElementComponent', () => {
     const key = ref(1)
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-          key: key.value,
-        }, () => h(CardElement))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+              key: key.value,
+            },
+            () => h(CardElement),
+          )
       },
     })
 
@@ -125,9 +127,14 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, { options }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () => h(CardElement, { options }),
+          )
       },
     })
 
@@ -144,9 +151,14 @@ describe('createElementComponent', () => {
   it('mounts the element', async () => {
     const component = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () => h(CardElement),
+          )
       },
     })
 
@@ -165,9 +177,14 @@ describe('createElementComponent', () => {
 
     const component = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: stripe.value,
-        }, () => h(CardElement))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: stripe.value,
+            },
+            () => h(CardElement),
+          )
       },
     })
 
@@ -185,8 +202,8 @@ describe('createElementComponent', () => {
 
   it('throws when the Element is mounted outside of Elements context', () => {
     // Prevent the console.errors to keep the test output clean
-    vi.spyOn(console, 'error');
-    (console.error as any).mockImplementation(() => {})
+    vi.spyOn(console, 'error')
+    ;(console.error as any).mockImplementation(() => {})
 
     expect(() => {
       render(CardElement)
@@ -200,11 +217,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onChange: mockHandler,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onChange: mockHandler,
+              }),
+          )
       },
     })
 
@@ -220,18 +243,27 @@ describe('createElementComponent', () => {
     const elementsRef = shallowRef(null)
     const stripeRef = shallowRef(null)
 
-    vi.spyOn(CheckoutModule, 'useElementsOrCheckoutContextWithUseCase').mockReturnValue({ elements: elementsRef, stripe: stripeRef })
+    vi.spyOn(CheckoutModule, 'useElementsOrCheckoutContextWithUseCase').mockReturnValue({
+      elements: elementsRef,
+      stripe: stripeRef,
+    })
 
     const mockHandler = vi.fn()
 
     // This won't create the element, since elements is undefined on this render
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onChange: mockHandler,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onChange: mockHandler,
+              }),
+          )
       },
     })
     // This won't create the element, since elements is undefined on this render
@@ -245,10 +277,10 @@ describe('createElementComponent', () => {
     stripeRef.value = mockStripe
     await nextTick()
 
-    expect(mockElements.create).toBeCalled()
+    expect(mockElements.create).toHaveBeenCalled()
 
-    expect(simulateOn).toBeCalledWith('change', expect.any(Function))
-    expect(simulateOff).not.toBeCalled()
+    expect(simulateOn).toHaveBeenCalledWith('change', expect.any(Function))
+    expect(simulateOff).not.toHaveBeenCalled()
 
     const changeEventMock = Symbol('change')
     simulateEvent('change', changeEventMock)
@@ -261,12 +293,18 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onChange: mockHandler,
-          key: key.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onChange: mockHandler,
+                key: key.value,
+              }),
+          )
       },
     })
 
@@ -289,11 +327,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onChange: onChange.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onChange: onChange.value,
+              }),
+          )
       },
     })
 
@@ -316,11 +360,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onReady: onReady.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onReady: onReady.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -342,11 +392,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(PaymentFormElement, {
-          onReady: onReady.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(PaymentFormElement, {
+                onReady: onReady.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -368,11 +424,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onChange: onChange.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onChange: onChange.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -394,11 +456,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onBlur: onBlur.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onBlur: onBlur.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -419,11 +487,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onFocus: onFocus.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onFocus: onFocus.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -444,11 +518,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onEscape: onEscape.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onEscape: onEscape.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -469,11 +549,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onClick: onClick.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onClick: onClick.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -494,11 +580,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onLoaderror: onLoadError.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onLoaderror: onLoadError.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -520,11 +612,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onLoaderstart: onLoaderStart.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onLoaderstart: onLoaderStart.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -545,11 +643,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onNetworkschange: onNetworksChange.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onNetworkschange: onNetworksChange.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -570,11 +674,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onConfirm: onConfirm.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onConfirm: onConfirm.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -596,11 +706,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onCancel: onCancel.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onCancel: onCancel.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -622,11 +738,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onShippingaddresschange: onShippingAddressChange.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onShippingaddresschange: onShippingAddressChange.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -648,11 +770,17 @@ describe('createElementComponent', () => {
 
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, {
-          onShippingratechange: onShippingRateChange.value,
-        }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () =>
+              h(CardElement, {
+                onShippingratechange: onShippingRateChange.value,
+              }),
+          )
       },
     })
     render(parent)
@@ -671,9 +799,14 @@ describe('createElementComponent', () => {
     const options = ref({ style: { base: { fontSize: '20px' } } })
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, { options: options.value }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () => h(CardElement, { options: options.value }),
+          )
       },
     })
 
@@ -698,9 +831,14 @@ describe('createElementComponent', () => {
     const options = ref({ style: { base: { fontSize: '20px' } } })
     const parent = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, { options: options.value }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () => h(CardElement, { options: options.value }),
+          )
       },
     })
 
@@ -712,14 +850,19 @@ describe('createElementComponent', () => {
     expect(mockElement.update).not.toHaveBeenCalled()
   })
 
-  it.todo('warns on changes to non-updatable options', () => { })
+  it.todo('warns on changes to non-updatable options', () => {})
 
   it('destroys an existing Element when the component unmounts', async () => {
     const component = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: null,
-        }, () => h(CardElement))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: null,
+            },
+            () => h(CardElement),
+          )
       },
     })
     const { unmount } = render(component)
@@ -730,9 +873,14 @@ describe('createElementComponent', () => {
 
     const component2 = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () => h(CardElement),
+          )
       },
     })
     const { unmount: unmount2 } = render(component2)
@@ -746,9 +894,14 @@ describe('createElementComponent', () => {
 
     const component = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: stripePromise,
-        }, () => h(CardElement))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: stripePromise,
+            },
+            () => h(CardElement),
+          )
       },
     })
     const { unmount } = render(component)
@@ -764,9 +917,14 @@ describe('createElementComponent', () => {
     const options = ref<UnknownOptions | null>(null)
     const component = defineComponent({
       setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(CardElement, { options: options.value }))
+        return () =>
+          h(
+            Elements,
+            {
+              stripe: mockStripe,
+            },
+            () => h(CardElement, { options: options.value }),
+          )
       },
     })
     render(component)
@@ -807,12 +965,18 @@ describe('createElementComponent', () => {
           },
         },
         setup(props) {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, {
-            key: props.rerenderKey,
-          }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () =>
+                h(PaymentElement, {
+                  key: props.rerenderKey,
+                }),
+            )
         },
       })
 
@@ -828,10 +992,15 @@ describe('createElementComponent', () => {
     it('passes id to the wrapping DOM element', async () => {
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { id: 'foo' }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { id: 'foo' }),
+            )
         },
       })
 
@@ -847,10 +1016,15 @@ describe('createElementComponent', () => {
     it('passes className to the wrapping DOM element', async () => {
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { class: 'bar' }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { class: 'bar' }),
+            )
         },
       })
 
@@ -867,10 +1041,15 @@ describe('createElementComponent', () => {
       const options: any = { foo: 'foo' }
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { options }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { options }),
+            )
         },
       })
 
@@ -886,10 +1065,15 @@ describe('createElementComponent', () => {
       const options: any = { defaultValues: { billingDetails: { name: 'Jenny Rosen' } } }
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentFormElement, { options }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentFormElement, { options }),
+            )
         },
       })
 
@@ -903,10 +1087,15 @@ describe('createElementComponent', () => {
     it('mounts the element', async () => {
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement),
+            )
         },
       })
       result = render(parent)
@@ -926,10 +1115,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: stripe.value,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: stripe.value,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement),
+            )
         },
       })
       result = render(parent)
@@ -949,10 +1143,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onChange: mockHandler }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onChange: mockHandler }),
+            )
         },
       })
       result = render(parent)
@@ -970,10 +1169,15 @@ describe('createElementComponent', () => {
       // This won't create the element, since checkoutSdk is undefined on this render
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: stripe.value,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onChange: mockHandler }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: stripe.value,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onChange: mockHandler }),
+            )
         },
       })
       result = render(parent)
@@ -1001,10 +1205,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onChange: mockHandler, key: key.value }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onChange: mockHandler, key: key.value }),
+            )
         },
       })
       result = render(parent)
@@ -1030,10 +1239,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onChange: onChange.value }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onChange: onChange.value }),
+            )
         },
       })
       result = render(parent)
@@ -1055,10 +1269,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onReady: onReady.value }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onReady: onReady.value }),
+            )
         },
       })
       result = render(parent)
@@ -1080,10 +1299,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onChange: onChange.value }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onChange: onChange.value }),
+            )
         },
       })
       result = render(parent)
@@ -1105,10 +1329,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onBlur: onBlur.value }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onBlur: onBlur.value }),
+            )
         },
       })
       result = render(parent)
@@ -1129,10 +1358,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onFocus: onFocus.value }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onFocus: onFocus.value }),
+            )
         },
       })
       result = render(parent)
@@ -1153,10 +1387,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onEscape: onEscape.value }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onEscape: onEscape.value }),
+            )
         },
       })
       result = render(parent)
@@ -1177,10 +1416,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onLoaderror: onLoadError.value }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onLoaderror: onLoadError.value }),
+            )
         },
       })
       result = render(parent)
@@ -1201,10 +1445,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { onLoaderstart: onLoaderStart.value }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { onLoaderstart: onLoaderStart.value }),
+            )
         },
       })
       result = render(parent)
@@ -1222,10 +1471,15 @@ describe('createElementComponent', () => {
       const options = ref({ layout: 'accordion' })
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { options: options.value as any }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { options: options.value as any }),
+            )
         },
       })
 
@@ -1244,10 +1498,15 @@ describe('createElementComponent', () => {
       const options = ref({ layout: 'accordion' })
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { options: options.value as any }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { options: options.value as any }),
+            )
         },
       })
 
@@ -1268,9 +1527,14 @@ describe('createElementComponent', () => {
       })
       const parent = defineComponent({
         setup() {
-          return () => h(Elements, {
-            stripe: mockStripe,
-          }, () => h(PaymentRequestButtonElement, { options: options.value }))
+          return () =>
+            h(
+              Elements,
+              {
+                stripe: mockStripe,
+              },
+              () => h(PaymentRequestButtonElement, { options: options.value }),
+            )
         },
       })
 
@@ -1297,10 +1561,15 @@ describe('createElementComponent', () => {
       const options = ref<UnknownOptions | null>(null)
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement, { options: options.value as any }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement, { options: options.value as any }),
+            )
         },
       })
 
@@ -1318,10 +1587,15 @@ describe('createElementComponent', () => {
     it('destroys an existing Element when the component unmounts', async () => {
       const component = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: null,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: null,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement),
+            )
         },
       })
       result = render(component)
@@ -1332,10 +1606,15 @@ describe('createElementComponent', () => {
 
       const component2 = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement),
+            )
         },
       })
       result = render(component2)
@@ -1350,10 +1629,15 @@ describe('createElementComponent', () => {
 
       const component = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: stripePromise,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentElement))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: stripePromise,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(PaymentElement),
+            )
         },
       })
       result = render(component)
@@ -1373,10 +1657,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(CardElement))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(CardElement),
+            )
         },
       })
 
@@ -1393,11 +1682,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-            // @ts-expect-error: Testing invalid mode
-          }, () => h(AddressElement, { options: { mode: 'foo' } }))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(AddressElement, { options: { mode: 'foo' as never } }),
+            )
         },
       })
 
@@ -1414,10 +1707,15 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(AddressElement))
+          return () =>
+            h(
+              CheckoutProvider,
+              {
+                stripe: mockStripe,
+                options: { clientSecret: 'cs_123' },
+              },
+              () => h(AddressElement),
+            )
         },
       })
 
