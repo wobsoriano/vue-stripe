@@ -113,12 +113,6 @@ export default defineNuxtModule<ModuleOptions>({
       ...(privateConfig.stripe as Record<string, unknown> | undefined),
     }
 
-    if (!options.publishableKey) {
-      console.warn(
-        '[vue-stripe] No publishable key configured. Set `stripe.publishableKey` in nuxt.config or provide NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY at runtime.',
-      )
-    }
-
     const componentsEnabled = options.components !== false
     const prefix = typeof options.components === 'object' ? options.components.prefix ?? '' : ''
 

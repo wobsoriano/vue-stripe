@@ -80,7 +80,7 @@ Features
   Checkout Integration
 
   #description
-  Support for both Elements and Embedded Checkout. Use `CheckoutProvider` for Elements with Checkout Sessions or `EmbeddedCheckout` for pre-built checkout UI.
+  Support for both Elements and Embedded Checkout. Use `CheckoutElementsProvider` or `CheckoutFormProvider` for Checkout Sessions, or `EmbeddedCheckout` for pre-built checkout UI.
   :::
 
   :::u-page-feature

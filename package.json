@@ -75,7 +75,6 @@
     "@vitejs/plugin-vue": "^6.0.2",
     "@vue/compiler-dom": "^3.5.29",
     "@vue/compiler-sfc": "^3.5.29",
-    "@vue/server-renderer": "^3.5.29",
     "eslint": "^9.39.1",
     "h3": "^1.15.4",
     "jsdom": "^27.2.0",

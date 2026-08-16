@@ -38,9 +38,6 @@ importers:
       '@vue/compiler-sfc':
         specifier: ^3.5.29
         version: 3.5.29
-      '@vue/server-renderer':
-        specifier: ^3.5.29
-        version: 3.5.29(vue@3.5.25(typescript@5.9.3))
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.7.0)
@@ -2582,11 +2579,6 @@ packages:
     resolution: {integrity: sha512-UJaXR54vMG61i8XNIzTSf2Q7MOqZHpp8+x3XLGtE3+fL+nQd+k7O5+X3D/uWrnQXOdMw5VPih+Uremcw+u1woQ==}
     peerDependencies:
       vue: 3.5.25
-
-  '@vue/server-renderer@3.5.29':
-    resolution: {integrity: sha512-G/1k6WK5MusLlbxSE2YTcqAAezS+VuwHhOvLx2KnQU7G2zCH6KIb+5Wyt6UjMq7a3qPzNEjJXs1hvAxDclQH+g==}
-    peerDependencies:
-      vue: 3.5.29
 
   '@vue/shared@3.5.25':
     resolution: {integrity: sha512-AbOPdQQnAnzs58H2FrrDxYj/TJfmeS2jdfEEhgiKINy+bnOANmVizIEgq1r+C5zsbs6l1CCQxtcj71rwNQ4jWg==}
@@ -10272,12 +10264,6 @@ snapshots:
     dependencies:
       '@vue/compiler-ssr': 3.5.25
       '@vue/shared': 3.5.25
-      vue: 3.5.25(typescript@5.9.3)
-
-  '@vue/server-renderer@3.5.29(vue@3.5.25(typescript@5.9.3))':
-    dependencies:
-      '@vue/compiler-ssr': 3.5.29
-      '@vue/shared': 3.5.29
       vue: 3.5.25(typescript@5.9.3)
 
   '@vue/shared@3.5.25': {}
