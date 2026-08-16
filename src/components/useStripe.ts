@@ -1,5 +1,5 @@
 import { readonly } from 'vue'
-import { useElementsOrCheckoutContextWithUseCase } from '../checkout/components/CheckoutProvider'
+import { useElementsOrCheckoutContextWithUseCase } from '../checkout/components/CheckoutContext'
 
 /**
  * The useStripe composable returns a reference to the [Stripe](https://docs.stripe.com/js/initializing)

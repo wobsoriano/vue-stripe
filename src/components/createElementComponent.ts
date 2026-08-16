@@ -1,7 +1,7 @@
 import type * as stripeJs from '@stripe/stripe-js'
 import type { EmitsOptions, FunctionalComponent, ShallowRef } from 'vue'
 import { computed, defineComponent, h, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue'
-import { useElementsOrCheckoutContextWithUseCase } from '../checkout/components/CheckoutProvider'
+import { useElementsOrCheckoutContextWithUseCase } from '../checkout/components/CheckoutContext'
 import { createSnapshot } from '../utils/createSnapshot'
 import { extractAllowedOptionsUpdates } from '../utils/extractAllowedOptionsUpdates'
 
@@ -35,21 +35,24 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
         const options = props.options || {}
 
         if (checkoutSdk.value) {
+          const elementsSdk = checkoutSdk.value as stripeJs.StripeCheckoutElementsSdk
+          const formSdk = checkoutSdk.value as stripeJs.StripeCheckoutFormSdk
+
           switch (type) {
             case 'paymentForm':
-              newElement = checkoutSdk.value.createPaymentFormElement(options)
+              newElement = formSdk.createForm(options)
               break
             case 'payment':
-              newElement = checkoutSdk.value.createPaymentElement(options)
+              newElement = elementsSdk.createPaymentElement(options)
               break
             case 'address':
               if ('mode' in options) {
                 const { mode, ...restOptions } = options
                 if (mode === 'shipping') {
-                  newElement = checkoutSdk.value.createShippingAddressElement(restOptions)
+                  newElement = elementsSdk.createShippingAddressElement(restOptions)
                 }
                 else if (mode === 'billing') {
-                  newElement = checkoutSdk.value.createBillingAddressElement(restOptions)
+                  newElement = elementsSdk.createBillingAddressElement(restOptions)
                 }
                 else {
                   throw new Error('Invalid options.mode. mode must be \'billing\' or \'shipping\'.')
@@ -62,19 +65,27 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
               }
               break
             case 'expressCheckout':
-              newElement = checkoutSdk.value.createExpressCheckoutElement(
-                props.options as unknown as stripeJs.StripeCheckoutExpressCheckoutElementOptions,
-              ) as stripeJs.StripeExpressCheckoutElement
+              newElement = elementsSdk.createExpressCheckoutElement(
+                options as stripeJs.StripeCheckoutExpressCheckoutElementOptions,
+              ) as unknown as stripeJs.StripeExpressCheckoutElement
               break
             case 'currencySelector':
-              newElement = checkoutSdk.value.createCurrencySelectorElement()
+              newElement = elementsSdk.createCurrencySelectorElement()
               break
             case 'taxId':
-              newElement = checkoutSdk.value.createTaxIdElement(options)
+              newElement = elementsSdk.createTaxIdElement(options)
+              break
+            case 'contactDetails':
+              newElement = elementsSdk.createContactDetailsElement()
+              break
+            case 'terms':
+              newElement = elementsSdk.createTermsElement(
+                options as stripeJs.StripeCheckoutTermsElementOptions,
+              )
               break
             default:
               throw new Error(
-                `Invalid Element type ${displayName}. You must use either the <PaymentElement />, <AddressElement options={{mode: 'shipping'}} />, <AddressElement options={{mode: 'billing'}} />, or <ExpressCheckoutElement />.`,
+                `<${displayName}> is not supported inside a checkout provider. Use an <Elements> provider instead.`,
               )
           }
         }

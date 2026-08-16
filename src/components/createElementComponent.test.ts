@@ -1,9 +1,10 @@
 import type { UnknownOptions } from '../types'
 import { render, waitFor } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
+import { defineComponent, h, nextTick, provide, ref, shallowRef } from 'vue'
 import { AddressElement, PaymentElement, PaymentFormElement, PaymentRequestButtonElement } from '..'
 import * as mocks from '../../test/mocks'
+import { CheckoutContextKey } from '../checkout/components/CheckoutContext'
 import * as CheckoutModule from '../checkout/components/CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
 import * as ElementsModule from './Elements'
@@ -1466,6 +1467,53 @@ describe('createElementComponent', () => {
         render(parent)
         await nextTick()
       }).rejects.toThrow('You must supply options.mode.')
+    })
+  })
+
+  describe('checkout sdk element creation', () => {
+    function renderInCheckout(component: any, sdk: any, props: Record<string, unknown> = {}) {
+      const Wrapper = defineComponent({
+        setup(_, { slots }) {
+          provide(CheckoutContextKey, {
+            stripe: shallowRef(mocks.mockStripe()),
+            checkoutState: shallowRef({ type: 'loading' as const, sdk }),
+          } as any)
+          return () => slots.default?.()
+        },
+      })
+      return render(Wrapper, { slots: { default: () => h(component, props) } })
+    }
+
+    it('creates the checkout form through createForm', async () => {
+      const sdk = mocks.mockCheckoutFormSdk()
+      renderInCheckout(createElementComponent('paymentForm', 'CheckoutForm'), sdk)
+      await nextTick()
+      expect(sdk.createForm).toHaveBeenCalled()
+    })
+
+    it('creates a contact details element', async () => {
+      const sdk = mocks.mockCheckoutElementsSdk()
+      renderInCheckout(createElementComponent('contactDetails'), sdk)
+      await nextTick()
+      expect(sdk.createContactDetailsElement).toHaveBeenCalled()
+    })
+
+    it('creates a terms element with its options', async () => {
+      const sdk = mocks.mockCheckoutElementsSdk()
+      renderInCheckout(createElementComponent('terms'), sdk, { options: { termsType: 'cancellation' } })
+      await nextTick()
+      expect(sdk.createTermsElement).toHaveBeenCalledWith({ termsType: 'cancellation' })
+    })
+
+    it('rejects an element the checkout sdk does not support', async () => {
+      const sdk = mocks.mockCheckoutElementsSdk()
+      // Prevent the console.errors to keep the test output clean
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      await expect(async () => {
+        renderInCheckout(createElementComponent('cardCvc'), sdk)
+        await nextTick()
+      }).rejects.toThrow(/is not supported inside a checkout provider/)
     })
   })
 })
