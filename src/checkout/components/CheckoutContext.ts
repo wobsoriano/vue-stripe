@@ -1,6 +1,6 @@
 import type * as stripeJs from '@stripe/stripe-js'
-import type { InjectionKey, ShallowRef } from 'vue'
-import { inject } from 'vue'
+import type { ComputedRef, InjectionKey, ShallowRef } from 'vue'
+import { computed, inject } from 'vue'
 import { ElementsContextKey, parseElementsContext } from '../../components/Elements'
 
 type CheckoutSdk = stripeJs.StripeCheckoutElementsSdk | stripeJs.StripeCheckoutFormSdk
@@ -56,4 +56,101 @@ export function useElementsOrCheckoutContextWithUseCase(useCaseString: string) {
   }
 
   return parseElementsContext(elements, useCaseString)
+}
+
+type ElementsLoadActionsSuccess = Extract<stripeJs.StripeCheckoutLoadActionsResult, { type: 'success' }>['actions']
+type FormLoadActionsSuccess = Extract<stripeJs.StripeCheckoutFormLoadActionsResult, { type: 'success' }>['actions']
+
+type StripeCheckoutElementsActions
+  = Omit<stripeJs.StripeCheckoutElementsSdk, 'on' | 'loadActions'>
+    & Omit<ElementsLoadActionsSuccess, 'getSession'>
+
+type StripeCheckoutFormActions
+  = Omit<stripeJs.StripeCheckoutFormSdk, 'on' | 'loadActions'>
+    & Omit<FormLoadActionsSuccess, 'getSession'>
+
+export type StripeCheckoutElementsValue = StripeCheckoutElementsActions & stripeJs.StripeCheckoutSession
+export type StripeCheckoutFormValue = StripeCheckoutFormActions & stripeJs.StripeCheckoutSession
+
+/**
+ * Back-compat alias. Existing consumers see the Elements shape, unchanged.
+ */
+export type StripeCheckoutValue = StripeCheckoutElementsValue
+
+export type StripeUseCheckoutElementsResult
+  = | { type: 'loading' }
+    | { type: 'success', checkout: StripeCheckoutElementsValue }
+    | { type: 'error', error: { message: string } }
+
+export type StripeUseCheckoutFormResult
+  = | { type: 'loading' }
+    | { type: 'success', checkout: StripeCheckoutFormValue }
+    | { type: 'error', error: { message: string } }
+
+export type StripeUseCheckoutResult = StripeUseCheckoutElementsResult
+
+function mapStateToCheckoutResult<T extends StripeCheckoutElementsValue | StripeCheckoutFormValue>(
+  checkoutState: CheckoutState,
+): { type: 'loading' } | { type: 'success', checkout: T } | { type: 'error', error: { message: string } } {
+  if (checkoutState.type === 'success') {
+    const { sdk, session, checkoutActions } = checkoutState
+    const { on: _on, loadActions: _loadActions, ...sdkMethods } = sdk
+    const { getSession: _getSession, ...otherCheckoutActions } = checkoutActions
+    return {
+      type: 'success',
+      checkout: {
+        ...session,
+        ...sdkMethods,
+        ...otherCheckoutActions,
+      } as unknown as T,
+    }
+  }
+
+  if (checkoutState.type === 'loading') {
+    return { type: 'loading' }
+  }
+
+  return { type: 'error', error: checkoutState.error }
+}
+
+/**
+ * @deprecated Since v3.0.0. Prefer the provider-specific composables.
+ * Inside `<CheckoutElementsProvider>` use `useCheckoutElements()`.
+ * Inside `<CheckoutFormProvider>` use `useCheckoutForm()`.
+ *
+ * This keeps working under both providers and returns the Elements-shaped
+ * result for backward compatibility.
+ */
+export function useCheckout(): ComputedRef<StripeUseCheckoutResult> {
+  const ctx = inject(CheckoutContextKey, null)
+  const { checkoutState } = validateCheckoutContext(ctx, 'calls useCheckout()')
+  return computed(() => mapStateToCheckoutResult<StripeCheckoutElementsValue>(checkoutState.value))
+}
+
+export function useCheckoutElements(): ComputedRef<StripeUseCheckoutElementsResult> {
+  const ctx = inject(CheckoutContextKey, null)
+  const { checkoutState } = validateCheckoutContext(ctx, 'calls useCheckoutElements()')
+  return computed(() => {
+    const state = checkoutState.value
+    if (state.type === 'success' && state.sdkKind !== 'elements') {
+      throw new Error(
+        'useCheckoutElements() must be used inside <CheckoutElementsProvider>. Inside <CheckoutFormProvider>, use useCheckoutForm() instead.',
+      )
+    }
+    return mapStateToCheckoutResult<StripeCheckoutElementsValue>(state)
+  })
+}
+
+export function useCheckoutForm(): ComputedRef<StripeUseCheckoutFormResult> {
+  const ctx = inject(CheckoutContextKey, null)
+  const { checkoutState } = validateCheckoutContext(ctx, 'calls useCheckoutForm()')
+  return computed(() => {
+    const state = checkoutState.value
+    if (state.type === 'success' && state.sdkKind !== 'form') {
+      throw new Error(
+        'useCheckoutForm() must be used inside <CheckoutFormProvider>. Inside <CheckoutElementsProvider>, use useCheckoutElements() instead.',
+      )
+    }
+    return mapStateToCheckoutResult<StripeCheckoutFormValue>(state)
+  })
 }
