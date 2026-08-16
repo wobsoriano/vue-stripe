@@ -8,7 +8,6 @@ export default defineConfig({
     './src/index.ts',
     './src/checkout/index.ts',
     './src/nuxt/module.ts',
-    './src/nuxt/runtime/composables/useClientStripe.ts',
     './src/nuxt/runtime/server/utils/useServerStripe.ts',
   ],
   platform: 'neutral',
