@@ -4,3 +4,7 @@ declare module '#imports' {
   export function useRuntimeConfig(event?: H3Event): any
   export function useNuxtApp(): any
 }
+
+interface ImportMeta {
+  server: boolean
+}
