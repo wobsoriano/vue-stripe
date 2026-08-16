@@ -15,8 +15,9 @@ interface Props {
 
 export function createElementComponent<ElementProps extends Props, ElementEmits extends EmitsOptions>(
   type: stripeJs.StripeElementType,
+  customDisplayName?: string,
 ) {
-  const displayName = `${capitalized(type)}Element`
+  const displayName = customDisplayName || `${capitalized(type)}Element`
 
   const Element = defineComponent<ElementProps, ElementEmits>((props, { attrs, emit }) => {
     const ctx = useElementsOrCheckoutContextWithUseCase(`mounts <${displayName}>`)
@@ -129,6 +130,7 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
     useAttachEvent(elementRef, 'change', emit, Boolean(attrs.onChange))
     useAttachEvent(elementRef, 'savedpaymentmethodremove', emit, Boolean(attrs.onSavedpaymentmethodremove))
     useAttachEvent(elementRef, 'savedpaymentmethodupdate', emit, Boolean(attrs.onSavedpaymentmethodupdate))
+    useAttachEvent(elementRef, 'availablepaymentmethodschange', emit, Boolean(attrs.onAvailablepaymentmethodschange))
 
     const shouldEmitElement = type !== 'expressCheckout'
     useAttachEvent(elementRef, 'ready', emit, Boolean(attrs.onReady), shouldEmitElement)

@@ -27,11 +27,33 @@ describe('createElementComponent', () => {
   beforeEach(() => {
     mockStripe = mocks.mockStripe()
     mockElements = mocks.mockElements()
-    mockCheckoutSdk = mocks.mockCheckoutSdk()
+    // @ts-expect-error mockCheckoutSdk might not exist yet, provide fallback
+    mockCheckoutSdk = typeof mocks.mockCheckoutSdk === 'function' ? mocks.mockCheckoutSdk() : {
+      createPaymentElement: vi.fn(),
+      createPaymentFormElement: vi.fn(),
+      createBillingAddressElement: vi.fn(),
+      createShippingAddressElement: vi.fn(),
+      createExpressCheckoutElement: vi.fn(),
+      loadActions: vi.fn().mockResolvedValue({
+        type: 'success',
+        actions: {
+          getSession: vi.fn(),
+          applyPromotionCode: vi.fn(),
+          removePromotionCode: vi.fn(),
+          updateShippingAddress: vi.fn(),
+          updateBillingAddress: vi.fn(),
+          updatePhoneNumber: vi.fn(),
+          updateEmail: vi.fn(),
+          updateLineItemQuantity: vi.fn(),
+          updateShippingOption: vi.fn(),
+          confirm: vi.fn(),
+        },
+      }),
+    }
     mockElement = mocks.mockElement()
     mockStripe.elements.mockReturnValue(mockElements)
     mockElements.create.mockReturnValue(mockElement)
-    mockStripe.initCheckout.mockReturnValue(mockCheckoutSdk)
+    mockStripe.initCheckout = vi.fn().mockReturnValue(mockCheckoutSdk)
     mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement)
     mockCheckoutSdk.createPaymentFormElement.mockReturnValue(mockElement)
     mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement)
@@ -776,6 +798,48 @@ describe('createElementComponent', () => {
 
     expect(mockElement.update).toHaveBeenCalledWith({
       style: { base: { fontSize: '30px' } },
+    })
+  })
+
+  describe('customDisplayName', () => {
+    it('uses the element type for the display name by default', () => {
+      const Component = createElementComponent('payment')
+      expect((Component as any).__elementType).toBe('payment')
+    })
+
+    it('reports the custom display name in the missing-provider error', () => {
+      const Component = createElementComponent('paymentForm', 'CheckoutForm')
+      expect(() => render(Component)).toThrow(/mounts <CheckoutForm>/)
+    })
+
+    it('falls back to the capitalized type in the missing-provider error', () => {
+      const Component = createElementComponent('payment')
+      expect(() => render(Component)).toThrow(/mounts <PaymentElement>/)
+    })
+  })
+
+  describe('availablepaymentmethodschange event', () => {
+    it('attaches the handler when a listener is present', async () => {
+      const onEvent = vi.fn()
+      const ExpressCheckoutElement = createElementComponent('expressCheckout')
+
+      const parent = defineComponent({
+        setup() {
+          return () => h(Elements, {
+            stripe: mockStripe,
+          }, () => h(ExpressCheckoutElement, {
+            onAvailablepaymentmethodschange: onEvent,
+          }))
+        },
+      })
+
+      render(parent)
+      await nextTick()
+
+      expect(simulateOn).toHaveBeenCalledWith(
+        'availablepaymentmethodschange',
+        expect.any(Function),
+      )
     })
   })
 
