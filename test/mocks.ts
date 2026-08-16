@@ -137,6 +137,6 @@ export function mockStripe() {
     _registerWrapper: vi.fn(),
     initCheckoutElementsSdk: vi.fn(() => checkoutElementsSdk),
     initCheckoutFormSdk: vi.fn(() => checkoutFormSdk),
-    initEmbeddedCheckout: vi.fn(() => Promise.resolve(mockEmbeddedCheckout())),
+    createEmbeddedCheckoutPage: vi.fn(() => Promise.resolve(mockEmbeddedCheckout())),
   }
 }
