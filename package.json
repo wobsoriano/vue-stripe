@@ -1,7 +1,7 @@
 {
   "name": "vue-stripe",
   "type": "module",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "packageManager": "pnpm@10.24.0",
   "description": "Vue components for Stripe.js and Stripe Elements",
   "author": "Robert Soriano <sorianorobertc@gmail.com>",
@@ -46,13 +46,13 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@stripe/stripe-js": ">=8.0.0 <9.0.0",
+    "@stripe/stripe-js": ">=9.5.0 <10.0.0",
     "vue": "^3.2.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.4.1",
     "@changesets/cli": "^2.29.8",
-    "@stripe/stripe-js": "^8.7.0",
+    "@stripe/stripe-js": "^9.13.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/vue": "^8.1.0",
     "@types/node": "^24.10.1",

@@ -15,8 +15,8 @@ importers:
         specifier: ^2.29.8
         version: 2.29.8(@types/node@24.10.1)
       '@stripe/stripe-js':
-        specifier: ^8.7.0
-        version: 8.9.0
+        specifier: ^9.13.0
+        version: 9.13.0
       '@testing-library/jest-dom':
         specifier: ^6.9.1
         version: 6.9.1
@@ -2116,8 +2116,8 @@ packages:
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
 
-  '@stripe/stripe-js@8.9.0':
-    resolution: {integrity: sha512-OJkXvUI5GAc56QdiSRimQDvWYEqn475J+oj8RzRtFTCPtkJNO2TWW619oDY+nn1ExR+2tCVTQuRQBbR4dRugww==}
+  '@stripe/stripe-js@9.13.0':
+    resolution: {integrity: sha512-/0c72BUgzzVkVTlsw5uBn8x3waTdVJ/PZGfQ6jY1eu6K7olUPf4d9lgDPA9/0sIdsR8j7o3QIG8fOCO6ItcL7A==}
     engines: {node: '>=12.16'}
 
   '@stylistic/eslint-plugin@5.6.1':
@@ -9321,7 +9321,7 @@ snapshots:
 
   '@standard-schema/spec@1.0.0': {}
 
-  '@stripe/stripe-js@8.9.0': {}
+  '@stripe/stripe-js@9.13.0': {}
 
   '@stylistic/eslint-plugin@5.6.1(eslint@9.39.1(jiti@2.6.1))':
     dependencies:
