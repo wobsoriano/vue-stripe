@@ -1,7 +1,5 @@
 import type { H3Event } from 'h3'
 import type Stripe from 'stripe'
-// eslint-disable-next-line ts/ban-ts-comment
-// @ts-ignore `#imports` is provided by Nitro at build time.
 import { useRuntimeConfig } from '#imports'
 
 interface ServerStripeConfig {

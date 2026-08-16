@@ -83,4 +83,18 @@ describe('useServerStripe', () => {
     const useServerStripe = await importFresh()
     await expect(useServerStripe(fakeEvent)).rejects.toThrow(/Missing Stripe secret key/)
   })
+
+  it('throws a directed error naming the install command when the stripe package is not installed', async () => {
+    runtimeConfig.mockReturnValue({ stripe: { secretKey: 'sk_test_1' } })
+    vi.doMock('stripe', () => {
+      throw new Error('Cannot find module \'stripe\'')
+    })
+    try {
+      const useServerStripe = await importFresh()
+      await expect(useServerStripe(fakeEvent)).rejects.toThrow(/npm install stripe/)
+    }
+    finally {
+      vi.doUnmock('stripe')
+    }
+  })
 })
