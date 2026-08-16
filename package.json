@@ -41,6 +41,7 @@
   "scripts": {
     "dev": "tsdown --watch --onSuccess \"pnpm build:dts\"",
     "build": "tsdown --env.NODE_ENV production",
+    "postbuild": "node scripts/check-nuxt-build-artifacts.mjs",
     "prepublishOnly": "pnpm build",
     "test": "vitest run",
     "test:watch": "vitest",

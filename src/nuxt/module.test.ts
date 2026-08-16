@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import * as checkoutExports from '../checkout'
+import * as rootExports from '../index'
 
 const added = {
   components: [] as any[],
@@ -23,11 +25,43 @@ async function run(options: any = {}) {
   const nuxt = { options: { runtimeConfig: { public: {} } } }
   const merged = { ...mod.defaults, ...options }
   await mod.setup(merged, nuxt)
-  return { nuxt, added }
+  return { nuxt, added, meta: mod.meta }
 }
 
 describe('nuxt module', () => {
   beforeEach(() => vi.clearAllMocks())
+
+  it('exposes the exact configKey and module name consumers configure against', async () => {
+    const { meta } = await run()
+    expect(meta.name).toBe('vue-stripe')
+    expect(meta.configKey).toBe('stripe')
+  })
+
+  it('declares the Nuxt 4 compatibility requirement', async () => {
+    const { meta } = await run()
+    expect(meta.compatibility.nuxt).toBe('>=4.0.0')
+  })
+
+  it('registers every runtime export of both entry points exactly once', async () => {
+    const { added } = await run()
+    const registered = new Set([
+      ...added.components.map(c => `${c.filePath}:${c.export}`),
+      ...added.imports.map(i => `${i.from}:${i.name}`),
+    ])
+
+    const rootNames = Object.keys(rootExports)
+    const checkoutNames = Object.keys(checkoutExports)
+
+    expect(rootNames).toHaveLength(29)
+    expect(checkoutNames).toHaveLength(14)
+
+    for (const name of rootNames) {
+      expect(registered.has(`vue-stripe:${name}`), `root export ${name} is not registered`).toBe(true)
+    }
+    for (const name of checkoutNames) {
+      expect(registered.has(`vue-stripe/checkout:${name}`), `checkout export ${name} is not registered`).toBe(true)
+    }
+  })
 
   it('writes the publishable key to public runtime config', async () => {
     const { nuxt } = await run({ publishableKey: 'pk_test_1' })
