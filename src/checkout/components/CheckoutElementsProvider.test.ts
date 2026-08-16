@@ -39,6 +39,32 @@ describe('checkoutElementsProvider', () => {
     expect(mockStripe.initCheckoutFormSdk).not.toHaveBeenCalled()
   })
 
+  it('does not re-initialize the sdk when the stripe prop transitions through the parsed watcher again', async () => {
+    const stripeProp = ref<any>(null)
+    render(defineComponent({
+      setup: () => () => h(CheckoutElementsProvider, { stripe: stripeProp.value, options }),
+    }))
+    await nextTick()
+    expect(mockStripe.initCheckoutElementsSdk).not.toHaveBeenCalled()
+
+    // null -> stripe: the parsed watcher's tag goes 'empty' -> 'sync', so it
+    // fires and initializes the sdk.
+    stripeProp.value = mockStripe
+    await nextTick()
+    expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1)
+
+    // stripe -> null -> stripe: two more genuine value changes, so the
+    // parsed watcher fires twice more. The `initCalled` guard (module-level
+    // for the component instance, not reset per watcher run) must still
+    // prevent a second initCheckoutElementsSdk call.
+    stripeProp.value = null
+    await nextTick()
+    stripeProp.value = mockStripe
+    await nextTick()
+
+    expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1)
+  })
+
   it('exposes the stripe instance through useStripe', async () => {
     const { result } = renderComposable(() => useStripe(), {
       wrapper: wrapper({ stripe: mockStripe, options }),
@@ -69,7 +95,6 @@ describe('checkoutElementsProvider', () => {
   })
 
   it('does not set context if the stripe Promise resolves after CheckoutElementsProvider is unmounted', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
     const stripePromise = Promise.resolve(mockStripe)
 
     const Component = defineComponent({
@@ -85,10 +110,16 @@ describe('checkoutElementsProvider', () => {
 
     unmount()
 
+    // parseStripeProp wraps the raw promise in an extra `Promise.resolve(raw).then(validate)`
+    // hop before the provider's own `.then` runs, so a single `await stripePromise; await
+    // nextTick()` returns before the provider ever reaches its cancellation check. Wait out
+    // several microtask/macrotask turns so we actually reach the code under test.
     await stripePromise
     await nextTick()
+    await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
 
-    expect(consoleError).not.toHaveBeenCalled()
+    expect(mockStripe.initCheckoutElementsSdk).not.toHaveBeenCalled()
   })
 
   it('resolves to a success state tagged as elements', async () => {
@@ -185,6 +216,14 @@ describe('checkoutElementsProvider', () => {
         fonts: [{ cssSrc: 'https://example.com/font.css' }],
       },
     }
+
+    // Two ticks so the deep watcher on options.elementsOptions.fonts has a
+    // chance to actually flush before we assert. Without these, waitFor's
+    // first attempt runs before Vue flushes the watcher, so the spy would
+    // still read 0 calls and the assertion below would pass vacuously even
+    // if loadFonts were wrongly called.
+    await nextTick()
+    await nextTick()
 
     await waitFor(() => {
       expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1)
