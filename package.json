@@ -77,7 +77,7 @@
     "@vue/compiler-sfc": "^3.5.29",
     "@vue/server-renderer": "^3.5.29",
     "eslint": "^9.39.1",
-    "h3": "2.0.1-rc.26",
+    "h3": "^1.15.4",
     "jsdom": "^27.2.0",
     "nuxt": "^4.2.1",
     "stripe": "^22.5.0",
