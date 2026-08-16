@@ -6,6 +6,7 @@ import type {
   ExpressCheckoutElementProps as RootExpressCheckoutElementProps,
   PaymentElementProps as RootPaymentElementProps,
   WithBaseElementEmits,
+  WithBaseElementProps,
 } from '../../types'
 
 export type CurrencySelectorElementProps = BaseElementProps
@@ -78,39 +79,49 @@ export type PaymentElementProps = Omit<RootPaymentElementProps, 'options'> & {
   options?: stripeJs.StripeCheckoutPaymentElementOptions
 }
 
-export interface PaymentFormElementProps extends BaseElementProps {
+export type CheckoutFormProps = WithBaseElementProps<{
   /**
-   * An object containing Element configuration options.
+   * An object containing Checkout form configuration options.
    *
    * Requires beta access:
    * Contact [Stripe support](https://support.stripe.com/) for more information.
    */
-  options?: stripeJs.StripeCheckoutPaymentFormElementOptions
-}
+  options?: stripeJs.StripeCheckoutFormOptions
+}>
 
-export type PaymentFormElementEmits = WithBaseElementEmits<{
-  /**
-   * Triggered when data exposed by this Element is changed.
-   */
-  change: (event: stripeJs.StripePaymentFormElementChangeEvent) => void
-  /**
-   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
-   */
-  ready: (element: stripeJs.StripePaymentFormElement) => void
-  /**
-   * Triggered when the escape key is pressed within the Element.
-   */
+export type CheckoutFormEmits = WithBaseElementEmits<{
+  change: (event: stripeJs.StripeCheckoutFormChangeEvent) => void
+  ready: (element: stripeJs.StripeCheckoutForm) => void
   escape: () => void
+  loaderror: (event: { elementType: 'checkoutForm', error: stripeJs.StripeError }) => void
+  loaderstart: (event: { elementType: 'checkoutForm' }) => void
+  confirm: (event: stripeJs.StripeCheckoutFormConfirmEvent) => void
+  cancel: (event: { elementType: 'checkoutForm' }) => void
+}>
+
+export type ContactDetailsElementProps = WithBaseElementProps<{
+  options?: stripeJs.StripeContactDetailsElementOptions
+}>
+
+export type ContactDetailsElementEmits = WithBaseElementEmits<{
+  change: (event: stripeJs.StripeContactDetailsElementChangeEvent) => void
+  ready: (element: stripeJs.StripeContactDetailsElement) => void
+  escape: () => void
+  loaderror: (event: { elementType: 'contactDetails', error: stripeJs.StripeError }) => void
+  loaderstart: (event: { elementType: 'contactDetails' }) => void
+}>
+
+export type TermsElementProps = WithBaseElementProps<{
   /**
-   * Triggered when the Element fails to load.
+   * Requires beta access:
+   * Contact [Stripe support](https://support.stripe.com/) for more information.
    */
-  loaderror: (event: { elementType: 'paymentForm', error: StripeError }) => void
-  /**
-   * Triggered when a buyer authorizes a payment within a supported payment method.
-   */
-  confirm: (event: stripeJs.StripePaymentFormElementConfirmEvent) => void
-  /**
-   * Triggered when a payment interface is dismissed.
-   */
-  cancel: (event: { elementType: 'paymentForm' }) => void
+  options?: stripeJs.StripeCheckoutTermsElementOptions
+}>
+
+export type TermsElementEmits = WithBaseElementEmits<{
+  ready: (element: stripeJs.StripeTermsElement) => void
+  escape: () => void
+  loaderror: (event: { elementType: 'terms', error: stripeJs.StripeError }) => void
+  loaderstart: (event: { elementType: 'terms' }) => void
 }>
