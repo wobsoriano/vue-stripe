@@ -266,6 +266,66 @@ describe('checkoutFormProvider', () => {
     })
   })
 
+  it('reacts to nested appearance mutations', async () => {
+    const opts = ref<any>({
+      clientSecret: 'cs_123',
+      appearance: { theme: 'stripe' },
+    })
+    const Comp = defineComponent(() => {
+      return () => h(CheckoutFormProvider, {
+        stripe: mockStripe,
+        options: opts.value,
+      })
+    })
+
+    render(Comp)
+
+    await waitFor(() => expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1))
+
+    mockSdk.changeAppearance.mockClear()
+    opts.value.appearance.theme = 'night'
+
+    // Two ticks so the deep watcher on options.appearance has a chance to
+    // actually flush before we assert. Without these, a single nextTick
+    // (or a waitFor that resolves on its first attempt) could pass
+    // vacuously even if the deep watcher were wrongly dropped.
+    await nextTick()
+    await nextTick()
+
+    expect(mockSdk.changeAppearance).toHaveBeenCalledWith({ theme: 'night' })
+  })
+
+  it('reacts to nested font mutations', async () => {
+    const opts = ref<any>({
+      clientSecret: 'cs_123',
+      fonts: [{ cssSrc: 'https://example.com/font.css' }],
+    })
+    const Comp = defineComponent(() => {
+      return () => h(CheckoutFormProvider, {
+        stripe: mockStripe,
+        options: opts.value,
+      })
+    })
+
+    render(Comp)
+
+    await waitFor(() => expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1))
+
+    mockSdk.loadFonts.mockClear()
+    opts.value.fonts[0].cssSrc = 'https://example.com/font-2.css'
+
+    // Two ticks so the deep watcher on options.fonts has a chance to
+    // actually flush before we assert. Without these, a single nextTick
+    // (or a waitFor that resolves on its first attempt) could pass
+    // vacuously even if the deep watcher were wrongly dropped.
+    await nextTick()
+    await nextTick()
+
+    expect(mockSdk.loadFonts).toHaveBeenCalledWith([
+      { cssSrc: 'https://example.com/font-2.css' },
+    ])
+  })
+
   describe('stripe prop', () => {
     describe.each([
       ['undefined', undefined],
