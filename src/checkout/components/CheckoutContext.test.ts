@@ -3,12 +3,15 @@ import { describe, expect, it } from 'vitest'
 import { defineComponent, h, provide, shallowRef } from 'vue'
 import { renderComposable } from 'vue-composable-testing'
 import * as mocks from '../../../test/mocks'
+import { Elements } from '../../components/Elements'
+import { useStripe } from '../../components/useStripe'
 import {
   CheckoutContextKey,
   useCheckout,
   useCheckoutElements,
   useCheckoutForm,
 } from './CheckoutContext'
+import { CheckoutElementsProvider } from './CheckoutElementsProvider'
 
 function wrapperFor(state: any) {
   return defineComponent({
@@ -110,5 +113,39 @@ describe('checkout context', () => {
       })
       expect(result.value.type).toBe('success')
     }
+  })
+
+  it('throws when useStripe is called in Elements -> CheckoutElementsProvider nested context', () => {
+    const wrapper = defineComponent({
+      setup(_, { slots }) {
+        return () => h(Elements, {
+          stripe: mocks.mockStripe() as any,
+        }, () => h(CheckoutElementsProvider, {
+          stripe: mocks.mockStripe() as any,
+          options: { clientSecret: 'cs_123' },
+        }, () => slots.default?.()))
+      },
+    })
+
+    expect(() => {
+      renderComposable(() => useStripe(), { wrapper })
+    }).toThrow('You cannot wrap the part of your app that calls useStripe() in both a checkout provider and <Elements> provider.')
+  })
+
+  it('throws when useStripe is called in CheckoutElementsProvider -> Elements nested context', () => {
+    const wrapper = defineComponent({
+      setup(_, { slots }) {
+        return () => h(CheckoutElementsProvider, {
+          stripe: mocks.mockStripe() as any,
+          options: { clientSecret: 'cs_123' },
+        }, () => h(Elements, {
+          stripe: mocks.mockStripe() as any,
+        }, () => slots.default?.()))
+      },
+    })
+
+    expect(() => {
+      renderComposable(() => useStripe(), { wrapper })
+    }).toThrow('You cannot wrap the part of your app that calls useStripe() in both a checkout provider and <Elements> provider.')
   })
 })

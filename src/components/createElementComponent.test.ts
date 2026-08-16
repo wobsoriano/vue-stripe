@@ -17,7 +17,7 @@ describe('createElementComponent', () => {
   let mockStripe: any
   let mockElements: any
   let mockElement: any
-  let mockCheckoutSdk: any
+  let mockCheckoutElementsSdk: any
 
   let simulateElementsEvents: Record<string, any[]>
   let simulateOn: any
@@ -29,15 +29,15 @@ describe('createElementComponent', () => {
   beforeEach(() => {
     mockStripe = mocks.mockStripe()
     mockElements = mocks.mockElements()
-    mockCheckoutSdk = mocks.mockCheckoutElementsSdk()
+    mockCheckoutElementsSdk = mocks.mockCheckoutElementsSdk()
     mockElement = mocks.mockElement()
     mockStripe.elements.mockReturnValue(mockElements)
     mockElements.create.mockReturnValue(mockElement)
-    mockStripe.initCheckoutElementsSdk.mockReturnValue(mockCheckoutSdk)
-    mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement)
-    mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement)
-    mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement)
-    mockCheckoutSdk.createExpressCheckoutElement.mockReturnValue(mockElement)
+    mockStripe.initCheckoutElementsSdk.mockReturnValue(mockCheckoutElementsSdk)
+    mockCheckoutElementsSdk.createPaymentElement.mockReturnValue(mockElement)
+    mockCheckoutElementsSdk.createBillingAddressElement.mockReturnValue(mockElement)
+    mockCheckoutElementsSdk.createShippingAddressElement.mockReturnValue(mockElement)
+    mockCheckoutElementsSdk.createExpressCheckoutElement.mockReturnValue(mockElement)
 
     simulateElementsEvents = {}
     simulateOn = vi.fn((event, fn) => {
@@ -922,11 +922,14 @@ describe('createElementComponent', () => {
       result = render(parent)
 
       await waitFor(() => expect(peMounted).toBeTruthy())
-      expect(mockCheckoutSdk.createPaymentElement).toHaveBeenCalledWith(options)
+      expect(mockCheckoutElementsSdk.createPaymentElement).toHaveBeenCalledWith(options)
       expect(simulateOn).not.toBeCalled()
       expect(simulateOff).not.toBeCalled()
     })
 
+    // Known-red: PaymentFormElement belongs under CheckoutFormProvider, not
+    // CheckoutElementsProvider, in the v9 SDK shape. Task 8 owns moving this
+    // case to a form-provider harness (or removing it). Do not re-diagnose.
     it('passes options to PaymentFormElement on initial mount', async () => {
       const options: any = { defaultValues: { billingDetails: { name: 'Jenny Rosen' } } }
       const parent = defineComponent({
@@ -942,7 +945,7 @@ describe('createElementComponent', () => {
 
       await waitFor(() => expect(peMounted).toBeTruthy())
 
-      expect(mockCheckoutSdk.createPaymentFormElement).toHaveBeenCalledWith(options)
+      expect(mockCheckoutElementsSdk.createPaymentFormElement).toHaveBeenCalledWith(options)
     })
 
     it('mounts the element', async () => {
@@ -986,7 +989,7 @@ describe('createElementComponent', () => {
       await waitFor(() => expect(peMounted).toBeTruthy())
 
       expect(mockElement.mount).toHaveBeenCalled()
-      expect(mockCheckoutSdk.createPaymentElement).toHaveBeenCalled()
+      expect(mockCheckoutElementsSdk.createPaymentElement).toHaveBeenCalled()
     })
 
     it('adds an event handlers to an Element', async () => {
@@ -1022,7 +1025,7 @@ describe('createElementComponent', () => {
         },
       })
       result = render(parent)
-      expect(mockCheckoutSdk.createPaymentElement).not.toBeCalled()
+      expect(mockCheckoutElementsSdk.createPaymentElement).not.toBeCalled()
 
       expect(simulateOn).not.toBeCalled()
 
@@ -1030,7 +1033,7 @@ describe('createElementComponent', () => {
       stripe.value = mockStripe
 
       await waitFor(() => expect(peMounted).toBeTruthy())
-      expect(mockCheckoutSdk.createPaymentElement).toBeCalled()
+      expect(mockCheckoutElementsSdk.createPaymentElement).toBeCalled()
 
       expect(simulateOn).toBeCalledWith('change', expect.any(Function))
       expect(simulateOff).not.toBeCalled()
