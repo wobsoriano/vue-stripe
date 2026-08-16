@@ -120,6 +120,7 @@ describe('checkoutElementsProvider', () => {
     await new Promise(resolve => setTimeout(resolve, 0))
 
     expect(mockStripe.initCheckoutElementsSdk).not.toHaveBeenCalled()
+    expect(mockStripe._registerWrapper).not.toHaveBeenCalled()
   })
 
   it('resolves to a success state tagged as elements', async () => {

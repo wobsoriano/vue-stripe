@@ -36,7 +36,9 @@ export const CheckoutElementsProvider = defineComponent({
     const state = shallowRef<CheckoutState>({ type: 'loading', sdk: null })
     const stripe = shallowRef<stripeJs.Stripe | null>(null)
 
-    // Guards against re-initializing when the options prop changes.
+    // Guards against re-initializing when the `parsed` watcher re-fires, which
+    // happens on a `stripe` prop transition, not on an options change (the
+    // watcher only tracks `parsed`, which is derived from `props.stripe`).
     let initCalled = false
 
     watch(parsed, (currentParsed, _, onCleanup) => {
@@ -46,7 +48,7 @@ export const CheckoutElementsProvider = defineComponent({
       })
 
       const init = (loadedStripe: stripeJs.Stripe) => {
-        if (!loadedStripe || cancelled || initCalled) {
+        if (!loadedStripe || initCalled) {
           return
         }
 
