@@ -1450,6 +1450,14 @@ describe('createElementComponent', () => {
       expect(sdk.createForm).toHaveBeenCalled()
     })
 
+    it('creates the checkout form with its options', async () => {
+      const sdk = mocks.mockCheckoutFormSdk()
+      const options = { layout: 'compact' }
+      renderInCheckout(createElementComponent('paymentForm', 'CheckoutForm'), sdk, { options })
+      await nextTick()
+      expect(sdk.createForm).toHaveBeenCalledWith(options)
+    })
+
     it('creates a contact details element', async () => {
       const sdk = mocks.mockCheckoutElementsSdk()
       renderInCheckout(createElementComponent('contactDetails'), sdk)

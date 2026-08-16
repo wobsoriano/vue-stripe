@@ -119,6 +119,10 @@ export type CheckoutFormEmits = WithBaseElementEmits<{
    */
   loaderror: (event: { elementType: 'checkoutForm', error: stripeJs.StripeError }) => void
   /**
+   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
+   */
+  loaderstart: (event: { elementType: 'checkoutForm' }) => void
+  /**
    * Triggered when a buyer authorizes a payment within a supported payment method.
    */
   confirm: (event: stripeJs.StripeCheckoutFormConfirmEvent) => void
