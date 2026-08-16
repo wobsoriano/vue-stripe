@@ -13,10 +13,24 @@ import type {
   CardExpiryElementProps,
   CardNumberElementEmits,
   CardNumberElementProps,
+  ContactDetailsElementEmits,
+  ContactDetailsElementProps,
+  CurrencySelectorElementEmits,
+  CurrencySelectorElementProps,
   ExpressCheckoutElementEmits,
   ExpressCheckoutElementProps,
   IbanElementEmits,
   IbanElementProps,
+  IssuingCardCopyButtonElementEmits,
+  IssuingCardCopyButtonElementProps,
+  IssuingCardCvcDisplayElementEmits,
+  IssuingCardCvcDisplayElementProps,
+  IssuingCardExpiryDisplayElementEmits,
+  IssuingCardExpiryDisplayElementProps,
+  IssuingCardNumberDisplayElementEmits,
+  IssuingCardNumberDisplayElementProps,
+  IssuingCardPinDisplayElementEmits,
+  IssuingCardPinDisplayElementProps,
   LinkAuthenticationElementEmits,
   LinkAuthenticationElementProps,
   PaymentElementEmits,
@@ -25,8 +39,12 @@ import type {
   PaymentMethodMessagingElementProps,
   PaymentRequestButtonElementEmits,
   PaymentRequestButtonElementProps,
+  ShippingAddressElementEmits,
+  ShippingAddressElementProps,
   TaxIdElementEmits,
   TaxIdElementProps,
+  TermsElementEmits,
+  TermsElementProps,
 } from './types'
 import { createElementComponent } from './components/createElementComponent'
 
@@ -95,6 +113,50 @@ export const PaymentMethodMessagingElement = createElementComponent<PaymentMetho
  * Contact [Stripe support](https://support.stripe.com/) for more information.
  */
 export const TaxIdElement = createElementComponent<TaxIdElementProps, TaxIdElementEmits>('taxId')
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const CurrencySelectorElement = createElementComponent<CurrencySelectorElementProps, CurrencySelectorElementEmits>('currencySelector')
+
+export const ContactDetailsElement = createElementComponent<ContactDetailsElementProps, ContactDetailsElementEmits>('contactDetails')
+
+/**
+ * @deprecated Use `AddressElement` instead.
+ */
+export const ShippingAddressElement = createElementComponent<ShippingAddressElementProps, ShippingAddressElementEmits>('shippingAddress')
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const TermsElement = createElementComponent<TermsElementProps, TermsElementEmits>('terms')
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardNumberDisplayElement = createElementComponent<IssuingCardNumberDisplayElementProps, IssuingCardNumberDisplayElementEmits>('issuingCardNumberDisplay')
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardCvcDisplayElement = createElementComponent<IssuingCardCvcDisplayElementProps, IssuingCardCvcDisplayElementEmits>('issuingCardCvcDisplay')
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardExpiryDisplayElement = createElementComponent<IssuingCardExpiryDisplayElementProps, IssuingCardExpiryDisplayElementEmits>('issuingCardExpiryDisplay')
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardPinDisplayElement = createElementComponent<IssuingCardPinDisplayElementProps, IssuingCardPinDisplayElementEmits>('issuingCardPinDisplay')
+
+/**
+ * @docs https://stripe.com/docs/issuing/elements
+ */
+export const IssuingCardCopyButtonElement = createElementComponent<IssuingCardCopyButtonElementProps, IssuingCardCopyButtonElementEmits>('issuingCardCopyButton')
 
 declare module '@stripe/stripe-js' {
   interface StripeElements {
@@ -196,6 +258,78 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: typeof PaymentMethodMessagingElement
     ): stripeJs.StripePaymentMethodMessagingElement | null
+
+    /**
+     * Returns the underlying element instance for the `CurrencySelectorElement` component
+     * in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof CurrencySelectorElement
+    ): stripeJs.StripeCurrencySelectorElement | null
+
+    /**
+     * Returns the underlying element instance for the `ContactDetailsElement` component
+     * in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof ContactDetailsElement
+    ): stripeJs.StripeContactDetailsElement | null
+
+    /**
+     * Returns the underlying element instance for the `ShippingAddressElement` component
+     * in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof ShippingAddressElement
+    ): stripeJs.StripeShippingAddressElement | null
+
+    /**
+     * Returns the underlying element instance for the `TermsElement` component
+     * in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof TermsElement
+    ): stripeJs.StripeTermsElement | null
+
+    /**
+     * Returns the underlying element instance for the `IssuingCardNumberDisplayElement`
+     * component in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof IssuingCardNumberDisplayElement
+    ): stripeJs.StripeIssuingCardNumberDisplayElement | null
+
+    /**
+     * Returns the underlying element instance for the `IssuingCardCvcDisplayElement`
+     * component in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof IssuingCardCvcDisplayElement
+    ): stripeJs.StripeIssuingCardCvcDisplayElement | null
+
+    /**
+     * Returns the underlying element instance for the `IssuingCardExpiryDisplayElement`
+     * component in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof IssuingCardExpiryDisplayElement
+    ): stripeJs.StripeIssuingCardExpiryDisplayElement | null
+
+    /**
+     * Returns the underlying element instance for the `IssuingCardPinDisplayElement`
+     * component in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof IssuingCardPinDisplayElement
+    ): stripeJs.StripeIssuingCardPinDisplayElement | null
+
+    /**
+     * Returns the underlying element instance for the `IssuingCardCopyButtonElement`
+     * component in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof IssuingCardCopyButtonElement
+    ): stripeJs.StripeIssuingCardCopyButtonElement | null
   }
 }
 
