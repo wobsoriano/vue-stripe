@@ -26,6 +26,10 @@
     "./checkout": {
       "types": "./dist/checkout/index.d.ts",
       "import": "./dist/checkout/index.js"
+    },
+    "./nuxt": {
+      "types": "./dist/nuxt/module.d.ts",
+      "import": "./dist/nuxt/module.js"
     }
   },
   "main": "./dist/index.js",
@@ -46,12 +50,23 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
+    "@nuxt/kit": "^4.0.0",
     "@stripe/stripe-js": ">=9.5.0 <10.0.0",
+    "stripe": ">=17.0.0",
     "vue": "^3.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@nuxt/kit": {
+      "optional": true
+    },
+    "stripe": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.4.1",
     "@changesets/cli": "^2.29.8",
+    "@nuxt/kit": "^4.5.2",
     "@stripe/stripe-js": "^9.13.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/vue": "^8.1.0",
@@ -63,6 +78,8 @@
     "eslint": "^9.39.1",
     "h3": "2.0.1-rc.26",
     "jsdom": "^27.2.0",
+    "nuxt": "^4.2.1",
+    "stripe": "^22.5.0",
     "tsdown": "^0.15.12",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4",

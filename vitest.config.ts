@@ -11,6 +11,11 @@ export default defineConfig({
     setupFiles: ['node_modules/@testing-library/jest-dom/vitest'],
   },
   plugins: [vue()],
+  resolve: {
+    alias: {
+      '#imports': new URL('./test/stubs/nuxt-imports.ts', import.meta.url).pathname,
+    },
+  },
   define: {
     _VERSION: JSON.stringify(pkg.version),
     _NAME: JSON.stringify(pkg.name),
