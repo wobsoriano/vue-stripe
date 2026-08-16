@@ -1,0 +1,15 @@
+{
+  "name": "playground",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^9.13.0",
+    "nuxt": "^4.2.1",
+    "stripe": "^22.5.0",
+    "vue-stripe": "workspace:*"
+  }
+}
