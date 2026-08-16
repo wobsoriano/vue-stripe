@@ -4,10 +4,8 @@ import type { BillingAddressElementEmits, BillingAddressElementProps, CurrencySe
 import { h } from 'vue'
 import { createElementComponent } from '../components/createElementComponent'
 
-export {
-  CheckoutProvider,
-  useCheckout,
-} from './components/CheckoutProvider'
+export { useCheckout } from './components/CheckoutContext'
+export { CheckoutElementsProvider } from './components/CheckoutElementsProvider'
 
 export const CurrencySelectorElement = createElementComponent<CurrencySelectorElementProps, CurrencySelectorElementEmits>('currencySelector')
 
