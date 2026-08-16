@@ -5,6 +5,7 @@ import { defineComponent, h, nextTick, provide, ref, shallowRef } from 'vue'
 import { AddressElement, PaymentElement, PaymentFormElement, PaymentRequestButtonElement } from '..'
 import * as mocks from '../../test/mocks'
 import { CheckoutContextKey } from '../checkout/components/CheckoutContext'
+import * as CheckoutContextModule from '../checkout/components/CheckoutContext'
 import * as CheckoutModule from '../checkout/components/CheckoutProvider'
 import { createElementComponent } from './createElementComponent'
 import * as ElementsModule from './Elements'
@@ -220,11 +221,12 @@ describe('createElementComponent', () => {
     const elementsRef = shallowRef(null)
     const stripeRef = shallowRef(null)
 
-    vi.spyOn(CheckoutModule, 'useElementsOrCheckoutContextWithUseCase').mockReturnValue({ elements: elementsRef, stripe: stripeRef })
+    vi.spyOn(CheckoutContextModule, 'useElementsOrCheckoutContextWithUseCase').mockReturnValue({ elements: elementsRef, stripe: stripeRef })
 
     const mockHandler = vi.fn()
 
-    // This won't create the element, since elements is undefined on this render
+    // The mocked context starts with elements/stripe as null refs, so this
+    // component tree renders with nothing to create an Element from yet.
     const parent = defineComponent({
       setup() {
         return () => h(Elements, {
@@ -234,7 +236,8 @@ describe('createElementComponent', () => {
         }))
       },
     })
-    // This won't create the element, since elements is undefined on this render
+    // Element creation happens inside a watchEffect, which only (re)runs on
+    // the next flush, so nothing is created synchronously by render() itself.
     render(parent)
     expect(mockElements.create).not.toBeCalled()
 
