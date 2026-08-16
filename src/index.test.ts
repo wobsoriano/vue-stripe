@@ -27,6 +27,16 @@ const EXPECTED_ELEMENTS = [
   'TermsElement',
 ]
 
+const EXPECTED_PROVIDERS_AND_COMPOSABLES = [
+  'Elements',
+  'useElements',
+  'useStripe',
+  'EmbeddedCheckout',
+  'EmbeddedCheckoutProvider',
+  'FinancialAccountDisclosure',
+  'IssuingDisclosure',
+]
+
 describe('root exports', () => {
   it('exports every element component react-stripe-js exports', () => {
     for (const name of EXPECTED_ELEMENTS) {
@@ -47,9 +57,14 @@ describe('root exports', () => {
   })
 
   it('exports the providers and composables', () => {
-    for (const name of ['Elements', 'useElements', 'useStripe', 'EmbeddedCheckout', 'EmbeddedCheckoutProvider', 'FinancialAccountDisclosure', 'IssuingDisclosure']) {
+    for (const name of EXPECTED_PROVIDERS_AND_COMPOSABLES) {
       expect(root, `missing export ${name}`).toHaveProperty(name)
     }
+  })
+
+  it('exports nothing beyond the documented surface', () => {
+    const expected = [...EXPECTED_ELEMENTS, ...EXPECTED_PROVIDERS_AND_COMPOSABLES].sort()
+    expect(Object.keys(root).sort()).toEqual(expected)
   })
 })
 
@@ -86,5 +101,9 @@ describe('checkout exports', () => {
     expect((checkout.CheckoutForm as any).__elementType).toBe('paymentForm')
     expect((checkout.ContactDetailsElement as any).__elementType).toBe('contactDetails')
     expect((checkout.TermsElement as any).__elementType).toBe('terms')
+  })
+
+  it('exports nothing beyond the documented surface', () => {
+    expect(Object.keys(checkout).sort()).toEqual([...EXPECTED_CHECKOUT].sort())
   })
 })
