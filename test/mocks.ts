@@ -113,6 +113,38 @@ export function mockCheckoutFormSdk() {
   }
 }
 
+export function mockCheckoutSdk() {
+  const elements: Record<string, ReturnType<typeof mockElement>> = {}
+
+  const create = (key: string) => vi.fn(() => {
+    elements[key] = mockElement()
+    return elements[key]
+  })
+
+  return {
+    changeAppearance: vi.fn(),
+    loadFonts: vi.fn(),
+    createPaymentElement: create('payment'),
+    createPaymentFormElement: create('paymentForm'),
+    createBillingAddressElement: create('billingAddress'),
+    createShippingAddressElement: create('shippingAddress'),
+    createExpressCheckoutElement: create('expressCheckout'),
+    createCurrencySelectorElement: create('currencySelector'),
+    createTaxIdElement: create('taxId'),
+    getPaymentElement: vi.fn(() => elements.payment || null),
+    getBillingAddressElement: vi.fn(() => elements.billingAddress || null),
+    getShippingAddressElement: vi.fn(() => elements.shippingAddress || null),
+    getExpressCheckoutElement: vi.fn(() => elements.expressCheckout || null),
+    getCurrencySelectorElement: vi.fn(() => elements.currencySelector || null),
+    getTaxIdElement: vi.fn(() => elements.taxId || null),
+    on: vi.fn(),
+    loadActions: vi.fn().mockResolvedValue({
+      type: 'success',
+      actions: mockCheckoutActions(),
+    }),
+  }
+}
+
 export function mockEmbeddedCheckout() {
   return {
     mount: vi.fn(),
@@ -124,6 +156,7 @@ export function mockEmbeddedCheckout() {
 export function mockStripe() {
   const checkoutElementsSdk = mockCheckoutElementsSdk()
   const checkoutFormSdk = mockCheckoutFormSdk()
+  const checkoutSdk = mockCheckoutSdk()
 
   return {
     elements: vi.fn(() => mockElements()),
@@ -135,6 +168,7 @@ export function mockStripe() {
     paymentRequest: vi.fn(),
     registerAppInfo: vi.fn(),
     _registerWrapper: vi.fn(),
+    initCheckout: vi.fn(() => checkoutSdk),
     initCheckoutElementsSdk: vi.fn(() => checkoutElementsSdk),
     initCheckoutFormSdk: vi.fn(() => checkoutFormSdk),
     createEmbeddedCheckoutPage: vi.fn(() => Promise.resolve(mockEmbeddedCheckout())),
