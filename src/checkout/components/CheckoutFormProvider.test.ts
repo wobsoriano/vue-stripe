@@ -64,6 +64,13 @@ describe('checkoutFormProvider', () => {
     expect(mockStripe.initCheckoutFormSdk).toHaveBeenCalledTimes(1)
   })
 
+  it('exposes the stripe instance through useStripe', async () => {
+    const { result } = renderComposable(() => useStripe(), {
+      wrapper: wrapper({ stripe: mockStripe, options }),
+    })
+    await waitFor(() => expect(result.value).toEqual(mockStripe))
+  })
+
   it('works with a Promise', async () => {
     const deferred = makeDeferred()
     const stripePromise = ref(deferred.promise)

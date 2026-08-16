@@ -180,6 +180,51 @@ describe('checkoutElementsProvider', () => {
     expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1)
   })
 
+  it('does not call changeAppearance a 2nd time if it does not change', async () => {
+    const opts = ref<stripeJs.StripeCheckoutElementsSdkOptions>({
+      clientSecret: 'cs_123',
+      elementsOptions: { appearance: { theme: 'stripe' } },
+    })
+    const Comp = defineComponent(() => {
+      return () => h(CheckoutElementsProvider, {
+        stripe: mockStripe,
+        options: opts.value,
+      })
+    })
+    render(Comp)
+
+    await waitFor(() =>
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledWith({
+        clientSecret: 'cs_123',
+        elementsOptions: { appearance: { theme: 'stripe' } },
+      }),
+    )
+
+    opts.value = {
+      clientSecret: 'cs_123',
+      elementsOptions: { appearance: { theme: 'stripe' } },
+    }
+
+    opts.value = {
+      clientSecret: 'cs_123',
+      elementsOptions: { appearance: { theme: 'stripe' } },
+    }
+
+    // Two ticks so the deep watcher on options.elementsOptions.appearance has a
+    // chance to actually flush before we assert. Without these, waitFor's
+    // first attempt runs before Vue flushes the watcher, so the spy would
+    // still read 0 calls and the assertion below would pass vacuously even
+    // if changeAppearance were wrongly called.
+    await nextTick()
+    await nextTick()
+
+    await waitFor(() => {
+      expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1)
+      // This is not called because the appearance value did not change.
+      expect(mockSdk.changeAppearance).toHaveBeenCalledTimes(0)
+    })
+  })
+
   it('does not call loadFonts a 2nd time if they do not change', async () => {
     const opts = ref<stripeJs.StripeCheckoutElementsSdkOptions>({
       clientSecret: 'cs_123',
@@ -267,6 +312,35 @@ describe('checkoutElementsProvider', () => {
         { cssSrc: 'https://example.com/font.css' },
       ])
     })
+  })
+
+  it('reacts to nested appearance mutations', async () => {
+    const opts = ref<any>({
+      clientSecret: 'cs_123',
+      elementsOptions: { appearance: { theme: 'stripe' } },
+    })
+    const Comp = defineComponent(() => {
+      return () => h(CheckoutElementsProvider, {
+        stripe: mockStripe,
+        options: opts.value,
+      })
+    })
+
+    render(Comp)
+
+    await waitFor(() => expect(mockStripe.initCheckoutElementsSdk).toHaveBeenCalledTimes(1))
+
+    mockSdk.changeAppearance.mockClear()
+    opts.value.elementsOptions.appearance.theme = 'night'
+
+    // Two ticks so the deep watcher on options.elementsOptions.appearance has a
+    // chance to actually flush before we assert. Without these, a single nextTick
+    // (or a waitFor that resolves on its first attempt) could pass
+    // vacuously even if the deep watcher were wrongly dropped.
+    await nextTick()
+    await nextTick()
+
+    expect(mockSdk.changeAppearance).toHaveBeenCalledWith({ theme: 'night' })
   })
 
   it('reacts to nested font mutations', async () => {

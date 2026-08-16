@@ -2,13 +2,13 @@ import { renderToString } from '@vue/server-renderer'
 import { describe, expect, it } from 'vitest'
 import { createSSRApp, defineComponent, h } from 'vue'
 import * as mocks from '../test/mocks'
-import { CheckoutElementsProvider } from './checkout/components/CheckoutElementsProvider'
+import { CheckoutFormProvider } from './checkout/components/CheckoutFormProvider'
 import { CheckoutForm } from './checkout/index'
 import { Elements } from './components/Elements'
 import { PaymentElement } from './index'
 
 describe('server rendering', () => {
-  it('renders the element container without touching the dom', async () => {
+  it('renders the container while stripe is still loading', async () => {
     const app = createSSRApp(defineComponent({
       setup: () => () => h(Elements, { stripe: null }, () => h(PaymentElement, { id: 'pay' })),
     }))
@@ -37,7 +37,7 @@ describe('server rendering', () => {
     const stripe: any = mocks.mockStripe()
     const app = createSSRApp(defineComponent({
       setup: () => () => h(
-        CheckoutElementsProvider,
+        CheckoutFormProvider,
         { stripe, options: { clientSecret: 'cs_123' } },
         () => h(CheckoutForm, { id: 'form' }),
       ),

@@ -91,47 +91,6 @@ export type LinkAuthenticationElementEmits = WithBaseElementEmits<{
   loaderstart: (event: { elementType: 'linkAuthentication' }) => void
 }>
 
-export type CheckoutFormProps = WithBaseElementProps<{
-  /**
-   * An object containing Element configuration options.
-   *
-   * Requires beta access:
-   * Contact [Stripe support](https://support.stripe.com/) for more information.
-   */
-  options?: stripeJs.StripeCheckoutFormOptions
-}>
-
-export type CheckoutFormEmits = WithBaseElementEmits<{
-  /**
-   * Triggered when data exposed by this Element is changed.
-   */
-  change: (event: stripeJs.StripeCheckoutFormChangeEvent) => void
-  /**
-   * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
-   */
-  ready: (element: stripeJs.StripeCheckoutForm) => void
-  /**
-   * Triggered when the escape key is pressed within the Element.
-   */
-  escape: () => void
-  /**
-   * Triggered when the Element fails to load.
-   */
-  loaderror: (event: { elementType: 'checkoutForm', error: stripeJs.StripeError }) => void
-  /**
-   * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
-   */
-  loaderstart: (event: { elementType: 'checkoutForm' }) => void
-  /**
-   * Triggered when a buyer authorizes a payment within a supported payment method.
-   */
-  confirm: (event: stripeJs.StripeCheckoutFormConfirmEvent) => void
-  /**
-   * Triggered when a payment interface is dismissed.
-   */
-  cancel: (event: { elementType: 'checkoutForm' }) => void
-}>
-
 export type PaymentElementProps = WithBaseElementProps<{
   options?: stripeJs.StripePaymentElementOptions
 }>
