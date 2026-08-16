@@ -17,8 +17,8 @@ npm install vue-stripe @stripe/stripe-js
 ```
 
 > [!IMPORTANT]
-> v3 requires `@stripe/stripe-js` v9 or later. Upgrading from v2? See the
-> [migration guide](https://vue-stripe.dev/migration/v2-to-v3).
+> v3 requires `@stripe/stripe-js` 9.5 or newer, and not v10. Upgrading from v2?
+> See the [migration guide](https://vue-stripe.dev/migration/v2-to-v3).
 
 ## Nuxt
 
