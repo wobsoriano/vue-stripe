@@ -63,6 +63,21 @@ describe('nuxt module', () => {
     }
   })
 
+  it('registers nothing the library does not export', async () => {
+    const { added } = await run()
+    const rootNames = new Set(Object.keys(rootExports))
+    const checkoutNames = new Set(Object.keys(checkoutExports))
+
+    for (const c of added.components) {
+      const source = c.filePath === 'vue-stripe' ? rootNames : checkoutNames
+      expect(source.has(c.export), `registered component ${c.export} is not exported by ${c.filePath}`).toBe(true)
+    }
+    for (const i of added.imports) {
+      const source = i.from === 'vue-stripe' ? rootNames : checkoutNames
+      expect(source.has(i.name), `registered composable ${i.name} is not exported by ${i.from}`).toBe(true)
+    }
+  })
+
   it('writes the publishable key to public runtime config', async () => {
     const { nuxt } = await run({ publishableKey: 'pk_test_1' })
     expect((nuxt.options.runtimeConfig.public as any).stripe.publishableKey).toBe('pk_test_1')
