@@ -91,25 +91,25 @@ export type LinkAuthenticationElementEmits = WithBaseElementEmits<{
   loaderstart: (event: { elementType: 'linkAuthentication' }) => void
 }>
 
-export type PaymentFormElementProps = WithBaseElementProps<{
+export type CheckoutFormProps = WithBaseElementProps<{
   /**
    * An object containing Element configuration options.
    *
    * Requires beta access:
    * Contact [Stripe support](https://support.stripe.com/) for more information.
    */
-  options?: stripeJs.StripeCheckoutPaymentFormElementOptions
+  options?: stripeJs.StripeCheckoutFormOptions
 }>
 
-export type PaymentFormElementEmits = WithBaseElementEmits<{
+export type CheckoutFormEmits = WithBaseElementEmits<{
   /**
    * Triggered when data exposed by this Element is changed.
    */
-  change: (event: stripeJs.StripePaymentFormElementChangeEvent) => void
+  change: (event: stripeJs.StripeCheckoutFormChangeEvent) => void
   /**
    * Triggered when the Element is fully rendered and can accept imperative `element.focus()` calls.
    */
-  ready: (element: stripeJs.StripePaymentFormElement) => void
+  ready: (element: stripeJs.StripeCheckoutForm) => void
   /**
    * Triggered when the escape key is pressed within the Element.
    */
@@ -117,15 +117,15 @@ export type PaymentFormElementEmits = WithBaseElementEmits<{
   /**
    * Triggered when the Element fails to load.
    */
-  loaderror: (event: { elementType: 'paymentForm', error: stripeJs.StripeError }) => void
+  loaderror: (event: { elementType: 'checkoutForm', error: stripeJs.StripeError }) => void
   /**
    * Triggered when a buyer authorizes a payment within a supported payment method.
    */
-  confirm: (event: stripeJs.StripePaymentFormElementConfirmEvent) => void
+  confirm: (event: stripeJs.StripeCheckoutFormConfirmEvent) => void
   /**
    * Triggered when a payment interface is dismissed.
    */
-  cancel: (event: { elementType: 'paymentForm' }) => void
+  cancel: (event: { elementType: 'checkoutForm' }) => void
 }>
 
 export type PaymentElementProps = WithBaseElementProps<{
@@ -239,6 +239,99 @@ export type TaxIdElementEmits = WithBaseElementEmits<{
    * Triggered when the [loader](https://stripe.com/docs/js/elements_object/create#stripe_elements-options-loader) UI is mounted to the DOM and ready to be displayed.
    */
   loaderstart: (event: { elementType: 'taxId' }) => void
+}>
+
+export type CurrencySelectorElementProps = WithBaseElementProps<{
+  options?: stripeJs.StripeCurrencySelectorElementOptions
+}>
+
+export type CurrencySelectorElementEmits = WithBaseElementEmits<{
+  ready: (element: stripeJs.StripeCurrencySelectorElement) => void
+  escape: () => void
+  loaderror: (event: { elementType: 'currencySelector', error: stripeJs.StripeError }) => void
+  loaderstart: (event: { elementType: 'currencySelector' }) => void
+}>
+
+export type ContactDetailsElementProps = WithBaseElementProps<{
+  options?: stripeJs.StripeContactDetailsElementOptions
+}>
+
+export type ContactDetailsElementEmits = WithBaseElementEmits<{
+  change: (event: stripeJs.StripeContactDetailsElementChangeEvent) => void
+  ready: (element: stripeJs.StripeContactDetailsElement) => void
+  escape: () => void
+  loaderror: (event: { elementType: 'contactDetails', error: stripeJs.StripeError }) => void
+  loaderstart: (event: { elementType: 'contactDetails' }) => void
+}>
+
+/**
+ * @deprecated Use `AddressElement` instead.
+ */
+export type ShippingAddressElementProps = WithBaseElementProps<{
+  options?: stripeJs.StripeShippingAddressElementOptions
+}>
+
+/**
+ * @deprecated Use `AddressElement` instead.
+ */
+export type ShippingAddressElementEmits = WithBaseElementEmits<{
+  change: (event: stripeJs.StripeShippingAddressElementChangeEvent) => void
+  ready: (element: stripeJs.StripeShippingAddressElement) => void
+  escape: () => void
+  loaderror: (event: { elementType: 'shippingAddress', error: stripeJs.StripeError }) => void
+  loaderstart: (event: { elementType: 'shippingAddress' }) => void
+}>
+
+export type TermsElementProps = WithBaseElementProps<{
+  options?: stripeJs.StripeTermsElementOptions
+}>
+
+export type TermsElementEmits = WithBaseElementEmits<{
+  ready: (element: stripeJs.StripeTermsElement) => void
+  escape: () => void
+  loaderror: (event: { elementType: 'terms', error: stripeJs.StripeError }) => void
+  loaderstart: (event: { elementType: 'terms' }) => void
+}>
+
+export type IssuingCardNumberDisplayElementProps = WithBaseElementProps<{
+  options: stripeJs.StripeIssuingCardNumberDisplayElementOptions
+}>
+
+export type IssuingCardNumberDisplayElementEmits = WithBaseElementEmits<{
+  ready: (element: stripeJs.StripeIssuingCardNumberDisplayElement) => void
+}>
+
+export type IssuingCardCvcDisplayElementProps = WithBaseElementProps<{
+  options: stripeJs.StripeIssuingCardCvcDisplayElementOptions
+}>
+
+export type IssuingCardCvcDisplayElementEmits = WithBaseElementEmits<{
+  ready: (element: stripeJs.StripeIssuingCardCvcDisplayElement) => void
+}>
+
+export type IssuingCardExpiryDisplayElementProps = WithBaseElementProps<{
+  options: stripeJs.StripeIssuingCardExpiryDisplayElementOptions
+}>
+
+export type IssuingCardExpiryDisplayElementEmits = WithBaseElementEmits<{
+  ready: (element: stripeJs.StripeIssuingCardExpiryDisplayElement) => void
+}>
+
+export type IssuingCardPinDisplayElementProps = WithBaseElementProps<{
+  options: stripeJs.StripeIssuingCardPinDisplayElementOptions
+}>
+
+export type IssuingCardPinDisplayElementEmits = WithBaseElementEmits<{
+  ready: (element: stripeJs.StripeIssuingCardPinDisplayElement) => void
+}>
+
+export type IssuingCardCopyButtonElementProps = WithBaseElementProps<{
+  options: stripeJs.StripeIssuingCardCopyButtonElementOptions
+}>
+
+export type IssuingCardCopyButtonElementEmits = WithBaseElementEmits<{
+  click: (event: { elementType: 'issuingCardCopyButton' }) => void
+  ready: (element: stripeJs.StripeIssuingCardCopyButtonElement) => void
 }>
 
 export type UnknownOptions = { [k: string]: unknown }

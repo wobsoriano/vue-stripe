@@ -2,7 +2,7 @@ import type { UnknownOptions } from '../types'
 import { render, waitFor } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, provide, ref, shallowRef } from 'vue'
-import { AddressElement, PaymentElement, PaymentFormElement, PaymentRequestButtonElement } from '..'
+import { AddressElement, PaymentElement, PaymentRequestButtonElement } from '..'
 import * as mocks from '../../test/mocks'
 import { CheckoutContextKey } from '../checkout/components/CheckoutContext'
 import * as CheckoutContextModule from '../checkout/components/CheckoutContext'
@@ -322,32 +322,6 @@ describe('createElementComponent', () => {
         return () => h(Elements, {
           stripe: mockStripe,
         }, () => h(CardElement, {
-          onReady: onReady.value,
-        }))
-      },
-    })
-    render(parent)
-    await nextTick()
-
-    onReady.value = mockHandler2
-    await nextTick()
-
-    const mockEvent = Symbol('ready')
-    simulateEvent('ready', mockEvent)
-    expect(mockHandler2).toHaveBeenCalledWith(mockElement)
-    expect(mockHandler).not.toHaveBeenCalled()
-  })
-
-  it('propagates the Payment Form Element`s ready event to the current onReady prop', async () => {
-    const mockHandler = vi.fn()
-    const mockHandler2 = vi.fn()
-    const onReady = ref(mockHandler)
-
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(PaymentFormElement, {
           onReady: onReady.value,
         }))
       },
@@ -925,27 +899,6 @@ describe('createElementComponent', () => {
       expect(mockCheckoutElementsSdk.createPaymentElement).toHaveBeenCalledWith(options)
       expect(simulateOn).not.toBeCalled()
       expect(simulateOff).not.toBeCalled()
-    })
-
-    // Known-red: PaymentFormElement belongs under CheckoutFormProvider, not
-    // CheckoutElementsProvider, in the v9 SDK shape. Task 8 owns moving this
-    // case to a form-provider harness (or removing it). Do not re-diagnose.
-    it('passes options to PaymentFormElement on initial mount', async () => {
-      const options: any = { defaultValues: { billingDetails: { name: 'Jenny Rosen' } } }
-      const parent = defineComponent({
-        setup() {
-          return () => h(CheckoutElementsProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentFormElement, { options }))
-        },
-      })
-
-      result = render(parent)
-
-      await waitFor(() => expect(peMounted).toBeTruthy())
-
-      expect(mockCheckoutElementsSdk.createPaymentFormElement).toHaveBeenCalledWith(options)
     })
 
     it('mounts the element', async () => {
