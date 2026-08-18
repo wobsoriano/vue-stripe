@@ -4,39 +4,28 @@
 
 Sync with `@stripe/react-stripe-js@6.8.1` and upgrade to `@stripe/stripe-js` v9.
 
-**Breaking changes**
+Stripe.js v9 removed `stripe.initCheckout()`, so upgrading is required rather than optional. Full walkthrough in the [migration guide](https://vue-stripe.dev/migration/v2-to-v3).
 
-- The `@stripe/stripe-js` peer dependency is now `>=9.5.0 <10.0.0`. Stripe.js v9 removed
-  `stripe.initCheckout()`, so this upgrade is required rather than optional.
-- `CheckoutProvider` is removed. Use `CheckoutElementsProvider` for the Elements based
-  checkout flow, or `CheckoutFormProvider` for the form based flow.
-- `PaymentFormElement` is removed from both entry points, root and `vue-stripe/checkout`.
-  Use `CheckoutForm` from `vue-stripe/checkout` instead. Its `elementType` is now reported
-  as `checkoutForm`. The component's internal `__elementType` still reports `'paymentForm'`.
-  These are two different axes, `elementType` is the public event field, `__elementType` is
-  the internal tag used for `getElement()` lookups, so one does not contradict the other.
-- `useCheckout()` still works under both providers and still returns the Elements shaped
-  result, but is deprecated. Prefer `useCheckoutElements()` or `useCheckoutForm()`.
-- The checkout provider's missing-context error changed. It used to read
-  `Could not find CheckoutProvider context; ...`. It now reads `Could not find checkout
-  context; You need to wrap the part of your app that ... in a <CheckoutElementsProvider>
-  or <CheckoutFormProvider> provider.`
-- `createElementComponent`'s error for an unsupported element rendered inside a checkout
-  provider changed wording entirely. It now reads `<X> is not supported inside a checkout
-  provider. Use an <Elements> provider instead.`
+**Breaking**
+
+- `@stripe/stripe-js` peer is now `>=9.5.0 <10.0.0`.
+- `CheckoutProvider` is removed. Use `CheckoutElementsProvider` to build a checkout from individual Elements, or `CheckoutFormProvider` for Stripe's prebuilt form.
+- `PaymentFormElement` is removed from both entry points. Use `CheckoutForm` from `vue-stripe/checkout`. Its `elementType` is now `checkoutForm`.
+- `CheckoutFormProvider` takes `appearance` and `fonts` at the top level of `options`, where `CheckoutElementsProvider` nests them under `options.elementsOptions`.
+- `useCheckout()` is deprecated. It still works under both providers. Prefer `useCheckoutElements()` or `useCheckoutForm()`.
+- Two error messages changed wording: the checkout provider's missing-context error, and the error for an unsupported element inside a checkout provider.
 
 **New**
 
-- `CheckoutElementsProvider`, `CheckoutFormProvider`, `useCheckoutElements`, `useCheckoutForm`.
-- Root elements `CurrencySelectorElement`, `ContactDetailsElement`, `ShippingAddressElement`,
-  `TermsElement`, and the five Issuing card display elements.
-- Checkout elements `CheckoutForm`, `ContactDetailsElement`, `TermsElement`.
-- Elements now emit `availablepaymentmethodschange`.
+- `CheckoutElementsProvider`, `CheckoutFormProvider`, `useCheckoutElements()`, `useCheckoutForm()`.
+- Root elements: `CurrencySelectorElement`, `ContactDetailsElement`, `ShippingAddressElement`, `TermsElement`, and the five Issuing card display elements.
+- Checkout elements: `CheckoutForm`, `ContactDetailsElement`, `TermsElement`.
+- Elements emit `availablepaymentmethodschange`.
+- Prop and emit types are now exported from the root entry point.
 
 **Fixed**
 
-- The checkout form element called `createPaymentFormElement`, which Stripe.js v9 renamed
-  to `createForm`. It now calls the correct method.
-- Embedded Checkout called `initEmbeddedCheckout`, which Stripe.js v9 renamed to
-  `createEmbeddedCheckoutPage`. It now calls the correct method. This was silently broken
-  on v9 until now.
+Two Stripe.js v9 renames that silently broke features on v9:
+
+- The checkout form called `createPaymentFormElement`, now `createForm`.
+- Embedded Checkout called `initEmbeddedCheckout`, now `createEmbeddedCheckoutPage`.
