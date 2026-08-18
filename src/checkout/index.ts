@@ -1,26 +1,73 @@
 import type { FunctionalComponent } from 'vue'
+// `PaymentElementEmits` is defined in the root types, not the checkout types.
+// This matches the existing import in v2. Do not move it to './types'.
 import type { PaymentElementEmits } from '../types'
-import type { BillingAddressElementEmits, BillingAddressElementProps, CurrencySelectorElementEmits, CurrencySelectorElementProps, ExpressCheckoutElementEmits, ExpressCheckoutElementProps, PaymentElementProps, PaymentFormElementEmits, PaymentFormElementProps, ShippingAddressElementEmits, ShippingAddressElementProps, TaxIdElementEmits, TaxIdElementProps } from './types'
+import type {
+  BillingAddressElementEmits,
+  BillingAddressElementProps,
+  CheckoutFormEmits,
+  CheckoutFormProps,
+  ContactDetailsElementEmits,
+  ContactDetailsElementProps,
+  CurrencySelectorElementEmits,
+  CurrencySelectorElementProps,
+  ExpressCheckoutElementEmits,
+  ExpressCheckoutElementProps,
+  PaymentElementProps,
+  ShippingAddressElementEmits,
+  ShippingAddressElementProps,
+  TaxIdElementEmits,
+  TaxIdElementProps,
+  TermsElementEmits,
+  TermsElementProps,
+} from './types'
 import { h } from 'vue'
 import { createElementComponent } from '../components/createElementComponent'
 
 export {
-  CheckoutProvider,
   useCheckout,
-} from './components/CheckoutProvider'
+  useCheckoutElements,
+  useCheckoutForm,
+} from './components/CheckoutContext'
+export type {
+  StripeCheckoutElementsValue,
+  StripeCheckoutFormValue,
+  StripeCheckoutValue,
+  StripeUseCheckoutElementsResult,
+  StripeUseCheckoutFormResult,
+  StripeUseCheckoutResult,
+} from './components/CheckoutContext'
+export { CheckoutElementsProvider } from './components/CheckoutElementsProvider'
+export { CheckoutFormProvider } from './components/CheckoutFormProvider'
+export * from './types'
 
+/**
+ * The Checkout form. Valid inside `<CheckoutFormProvider>`.
+ *
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const CheckoutForm = createElementComponent<CheckoutFormProps, CheckoutFormEmits>('paymentForm', 'CheckoutForm')
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
 export const CurrencySelectorElement = createElementComponent<CurrencySelectorElementProps, CurrencySelectorElementEmits>('currencySelector')
 
 export const PaymentElement = createElementComponent<PaymentElementProps, PaymentElementEmits>('payment')
 
-export const PaymentFormElement = createElementComponent<PaymentFormElementProps, PaymentFormElementEmits>('paymentForm')
-
-/**
- * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
- */
 export const ExpressCheckoutElement = createElementComponent<ExpressCheckoutElementProps, ExpressCheckoutElementEmits>('expressCheckout')
 
 export const TaxIdElement = createElementComponent<TaxIdElementProps, TaxIdElementEmits>('taxId')
+
+export const ContactDetailsElement = createElementComponent<ContactDetailsElementProps, ContactDetailsElementEmits>('contactDetails')
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const TermsElement = createElementComponent<TermsElementProps, TermsElementEmits>('terms')
 
 const AddressElementBase = createElementComponent('address')
 
@@ -29,10 +76,7 @@ export const BillingAddressElement: FunctionalComponent<BillingAddressElementPro
 
   return h(AddressElementBase, {
     ...rest,
-    options: {
-      ...options,
-      mode: 'billing',
-    } as any,
+    options: { ...options, mode: 'billing' } as any,
   })
 }
 
@@ -41,9 +85,6 @@ export const ShippingAddressElement: FunctionalComponent<ShippingAddressElementP
 
   return h(AddressElementBase, {
     ...rest,
-    options: {
-      ...options,
-      mode: 'shipping',
-    } as any,
+    options: { ...options, mode: 'shipping' } as any,
   })
 }

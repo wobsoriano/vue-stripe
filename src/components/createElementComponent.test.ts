@@ -1,21 +1,23 @@
 import type { UnknownOptions } from '../types'
 import { render, waitFor } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, ref, shallowRef } from 'vue'
-import { AddressElement, PaymentElement, PaymentFormElement, PaymentRequestButtonElement } from '..'
+import { defineComponent, h, nextTick, provide, ref, shallowRef } from 'vue'
+import { AddressElement, PaymentElement, PaymentRequestButtonElement } from '..'
 import * as mocks from '../../test/mocks'
-import * as CheckoutModule from '../checkout/components/CheckoutProvider'
+import { CheckoutContextKey } from '../checkout/components/CheckoutContext'
+import * as CheckoutContextModule from '../checkout/components/CheckoutContext'
+import * as CheckoutModule from '../checkout/components/CheckoutElementsProvider'
 import { createElementComponent } from './createElementComponent'
 import * as ElementsModule from './Elements'
 
 const { Elements } = ElementsModule
-const { CheckoutProvider } = CheckoutModule
+const { CheckoutElementsProvider } = CheckoutModule
 
 describe('createElementComponent', () => {
   let mockStripe: any
   let mockElements: any
   let mockElement: any
-  let mockCheckoutSdk: any
+  let mockCheckoutElementsSdk: any
 
   let simulateElementsEvents: Record<string, any[]>
   let simulateOn: any
@@ -27,16 +29,15 @@ describe('createElementComponent', () => {
   beforeEach(() => {
     mockStripe = mocks.mockStripe()
     mockElements = mocks.mockElements()
-    mockCheckoutSdk = mocks.mockCheckoutSdk()
+    mockCheckoutElementsSdk = mocks.mockCheckoutElementsSdk()
     mockElement = mocks.mockElement()
     mockStripe.elements.mockReturnValue(mockElements)
     mockElements.create.mockReturnValue(mockElement)
-    mockStripe.initCheckout.mockReturnValue(mockCheckoutSdk)
-    mockCheckoutSdk.createPaymentElement.mockReturnValue(mockElement)
-    mockCheckoutSdk.createPaymentFormElement.mockReturnValue(mockElement)
-    mockCheckoutSdk.createBillingAddressElement.mockReturnValue(mockElement)
-    mockCheckoutSdk.createShippingAddressElement.mockReturnValue(mockElement)
-    mockCheckoutSdk.createExpressCheckoutElement.mockReturnValue(mockElement)
+    mockStripe.initCheckoutElementsSdk.mockReturnValue(mockCheckoutElementsSdk)
+    mockCheckoutElementsSdk.createPaymentElement.mockReturnValue(mockElement)
+    mockCheckoutElementsSdk.createBillingAddressElement.mockReturnValue(mockElement)
+    mockCheckoutElementsSdk.createShippingAddressElement.mockReturnValue(mockElement)
+    mockCheckoutElementsSdk.createExpressCheckoutElement.mockReturnValue(mockElement)
 
     simulateElementsEvents = {}
     simulateOn = vi.fn((event, fn) => {
@@ -220,11 +221,12 @@ describe('createElementComponent', () => {
     const elementsRef = shallowRef(null)
     const stripeRef = shallowRef(null)
 
-    vi.spyOn(CheckoutModule, 'useElementsOrCheckoutContextWithUseCase').mockReturnValue({ elements: elementsRef, stripe: stripeRef })
+    vi.spyOn(CheckoutContextModule, 'useElementsOrCheckoutContextWithUseCase').mockReturnValue({ elements: elementsRef, stripe: stripeRef })
 
     const mockHandler = vi.fn()
 
-    // This won't create the element, since elements is undefined on this render
+    // The mocked context starts with elements/stripe as null refs, so this
+    // component tree renders with nothing to create an Element from yet.
     const parent = defineComponent({
       setup() {
         return () => h(Elements, {
@@ -234,7 +236,8 @@ describe('createElementComponent', () => {
         }))
       },
     })
-    // This won't create the element, since elements is undefined on this render
+    // Element creation happens inside a watchEffect, which only (re)runs on
+    // the next flush, so nothing is created synchronously by render() itself.
     render(parent)
     expect(mockElements.create).not.toBeCalled()
 
@@ -319,32 +322,6 @@ describe('createElementComponent', () => {
         return () => h(Elements, {
           stripe: mockStripe,
         }, () => h(CardElement, {
-          onReady: onReady.value,
-        }))
-      },
-    })
-    render(parent)
-    await nextTick()
-
-    onReady.value = mockHandler2
-    await nextTick()
-
-    const mockEvent = Symbol('ready')
-    simulateEvent('ready', mockEvent)
-    expect(mockHandler2).toHaveBeenCalledWith(mockElement)
-    expect(mockHandler).not.toHaveBeenCalled()
-  })
-
-  it('propagates the Payment Form Element`s ready event to the current onReady prop', async () => {
-    const mockHandler = vi.fn()
-    const mockHandler2 = vi.fn()
-    const onReady = ref(mockHandler)
-
-    const parent = defineComponent({
-      setup() {
-        return () => h(Elements, {
-          stripe: mockStripe,
-        }, () => h(PaymentFormElement, {
           onReady: onReady.value,
         }))
       },
@@ -779,7 +756,49 @@ describe('createElementComponent', () => {
     })
   })
 
-  describe('within a CheckoutProvider', () => {
+  describe('customDisplayName', () => {
+    it('uses the element type for the display name by default', () => {
+      const Component = createElementComponent('payment')
+      expect((Component as any).__elementType).toBe('payment')
+    })
+
+    it('reports the custom display name in the missing-provider error', () => {
+      const Component = createElementComponent('paymentForm', 'CheckoutForm')
+      expect(() => render(Component)).toThrow(/mounts <CheckoutForm>/)
+    })
+
+    it('falls back to the capitalized type in the missing-provider error', () => {
+      const Component = createElementComponent('payment')
+      expect(() => render(Component)).toThrow(/mounts <PaymentElement>/)
+    })
+  })
+
+  describe('availablepaymentmethodschange event', () => {
+    it('attaches the handler when a listener is present', async () => {
+      const onEvent = vi.fn()
+      const ExpressCheckoutElement = createElementComponent('expressCheckout')
+
+      const parent = defineComponent({
+        setup() {
+          return () => h(Elements, {
+            stripe: mockStripe,
+          }, () => h(ExpressCheckoutElement, {
+            onAvailablepaymentmethodschange: onEvent,
+          }))
+        },
+      })
+
+      render(parent)
+      await nextTick()
+
+      expect(simulateOn).toHaveBeenCalledWith(
+        'availablepaymentmethodschange',
+        expect.any(Function),
+      )
+    })
+  })
+
+  describe('within a CheckoutElementsProvider', () => {
     let peMounted = false
     let result: any
 
@@ -807,7 +826,7 @@ describe('createElementComponent', () => {
           },
         },
         setup(props) {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, {
@@ -828,7 +847,7 @@ describe('createElementComponent', () => {
     it('passes id to the wrapping DOM element', async () => {
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { id: 'foo' }))
@@ -847,7 +866,7 @@ describe('createElementComponent', () => {
     it('passes className to the wrapping DOM element', async () => {
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { class: 'bar' }))
@@ -867,7 +886,7 @@ describe('createElementComponent', () => {
       const options: any = { foo: 'foo' }
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { options }))
@@ -877,33 +896,15 @@ describe('createElementComponent', () => {
       result = render(parent)
 
       await waitFor(() => expect(peMounted).toBeTruthy())
-      expect(mockCheckoutSdk.createPaymentElement).toHaveBeenCalledWith(options)
+      expect(mockCheckoutElementsSdk.createPaymentElement).toHaveBeenCalledWith(options)
       expect(simulateOn).not.toBeCalled()
       expect(simulateOff).not.toBeCalled()
-    })
-
-    it('passes options to PaymentFormElement on initial mount', async () => {
-      const options: any = { defaultValues: { billingDetails: { name: 'Jenny Rosen' } } }
-      const parent = defineComponent({
-        setup() {
-          return () => h(CheckoutProvider, {
-            stripe: mockStripe,
-            options: { clientSecret: 'cs_123' },
-          }, () => h(PaymentFormElement, { options }))
-        },
-      })
-
-      result = render(parent)
-
-      await waitFor(() => expect(peMounted).toBeTruthy())
-
-      expect(mockCheckoutSdk.createPaymentFormElement).toHaveBeenCalledWith(options)
     })
 
     it('mounts the element', async () => {
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
@@ -926,7 +927,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: stripe.value,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
@@ -941,7 +942,7 @@ describe('createElementComponent', () => {
       await waitFor(() => expect(peMounted).toBeTruthy())
 
       expect(mockElement.mount).toHaveBeenCalled()
-      expect(mockCheckoutSdk.createPaymentElement).toHaveBeenCalled()
+      expect(mockCheckoutElementsSdk.createPaymentElement).toHaveBeenCalled()
     })
 
     it('adds an event handlers to an Element', async () => {
@@ -949,7 +950,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: mockHandler }))
@@ -970,14 +971,14 @@ describe('createElementComponent', () => {
       // This won't create the element, since checkoutSdk is undefined on this render
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: stripe.value,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: mockHandler }))
         },
       })
       result = render(parent)
-      expect(mockCheckoutSdk.createPaymentElement).not.toBeCalled()
+      expect(mockCheckoutElementsSdk.createPaymentElement).not.toBeCalled()
 
       expect(simulateOn).not.toBeCalled()
 
@@ -985,7 +986,7 @@ describe('createElementComponent', () => {
       stripe.value = mockStripe
 
       await waitFor(() => expect(peMounted).toBeTruthy())
-      expect(mockCheckoutSdk.createPaymentElement).toBeCalled()
+      expect(mockCheckoutElementsSdk.createPaymentElement).toBeCalled()
 
       expect(simulateOn).toBeCalledWith('change', expect.any(Function))
       expect(simulateOff).not.toBeCalled()
@@ -1001,7 +1002,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: mockHandler, key: key.value }))
@@ -1030,7 +1031,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: onChange.value }))
@@ -1055,7 +1056,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onReady: onReady.value }))
@@ -1080,7 +1081,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onChange: onChange.value }))
@@ -1105,7 +1106,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onBlur: onBlur.value }))
@@ -1129,7 +1130,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onFocus: onFocus.value }))
@@ -1153,7 +1154,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onEscape: onEscape.value }))
@@ -1177,7 +1178,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onLoaderror: onLoadError.value }))
@@ -1201,7 +1202,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { onLoaderstart: onLoaderStart.value }))
@@ -1222,7 +1223,7 @@ describe('createElementComponent', () => {
       const options = ref({ layout: 'accordion' })
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { options: options.value as any }))
@@ -1244,7 +1245,7 @@ describe('createElementComponent', () => {
       const options = ref({ layout: 'accordion' })
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { options: options.value as any }))
@@ -1297,7 +1298,7 @@ describe('createElementComponent', () => {
       const options = ref<UnknownOptions | null>(null)
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement, { options: options.value as any }))
@@ -1318,7 +1319,7 @@ describe('createElementComponent', () => {
     it('destroys an existing Element when the component unmounts', async () => {
       const component = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: null,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
@@ -1332,7 +1333,7 @@ describe('createElementComponent', () => {
 
       const component2 = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
@@ -1350,7 +1351,7 @@ describe('createElementComponent', () => {
 
       const component = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: stripePromise,
             options: { clientSecret: 'cs_123' },
           }, () => h(PaymentElement))
@@ -1373,7 +1374,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(CardElement))
@@ -1383,7 +1384,7 @@ describe('createElementComponent', () => {
       await expect(async () => {
         render(parent)
         await nextTick()
-      }).rejects.toThrow('Invalid Element type CardElement')
+      }).rejects.toThrow('<CardElement> is not supported inside a checkout provider. Use an <Elements> provider instead.')
     })
 
     it('throws on invalid AddressElement mode', async () => {
@@ -1393,7 +1394,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
             // @ts-expect-error: Testing invalid mode
@@ -1414,7 +1415,7 @@ describe('createElementComponent', () => {
 
       const parent = defineComponent({
         setup() {
-          return () => h(CheckoutProvider, {
+          return () => h(CheckoutElementsProvider, {
             stripe: mockStripe,
             options: { clientSecret: 'cs_123' },
           }, () => h(AddressElement))
@@ -1425,6 +1426,61 @@ describe('createElementComponent', () => {
         render(parent)
         await nextTick()
       }).rejects.toThrow('You must supply options.mode.')
+    })
+  })
+
+  describe('checkout sdk element creation', () => {
+    function renderInCheckout(component: any, sdk: any, props: Record<string, unknown> = {}) {
+      const Wrapper = defineComponent({
+        setup(_, { slots }) {
+          provide(CheckoutContextKey, {
+            stripe: shallowRef(mocks.mockStripe()),
+            checkoutState: shallowRef({ type: 'loading' as const, sdk }),
+          } as any)
+          return () => slots.default?.()
+        },
+      })
+      return render(Wrapper, { slots: { default: () => h(component, props) } })
+    }
+
+    it('creates the checkout form through createForm', async () => {
+      const sdk = mocks.mockCheckoutFormSdk()
+      renderInCheckout(createElementComponent('paymentForm', 'CheckoutForm'), sdk)
+      await nextTick()
+      expect(sdk.createForm).toHaveBeenCalled()
+    })
+
+    it('creates the checkout form with its options', async () => {
+      const sdk = mocks.mockCheckoutFormSdk()
+      const options = { layout: 'compact' }
+      renderInCheckout(createElementComponent('paymentForm', 'CheckoutForm'), sdk, { options })
+      await nextTick()
+      expect(sdk.createForm).toHaveBeenCalledWith(options)
+    })
+
+    it('creates a contact details element', async () => {
+      const sdk = mocks.mockCheckoutElementsSdk()
+      renderInCheckout(createElementComponent('contactDetails'), sdk)
+      await nextTick()
+      expect(sdk.createContactDetailsElement).toHaveBeenCalled()
+    })
+
+    it('creates a terms element with its options', async () => {
+      const sdk = mocks.mockCheckoutElementsSdk()
+      renderInCheckout(createElementComponent('terms'), sdk, { options: { termsType: 'cancellation' } })
+      await nextTick()
+      expect(sdk.createTermsElement).toHaveBeenCalledWith({ termsType: 'cancellation' })
+    })
+
+    it('rejects an element the checkout sdk does not support', async () => {
+      const sdk = mocks.mockCheckoutElementsSdk()
+      // Prevent the console.errors to keep the test output clean
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      await expect(async () => {
+        renderInCheckout(createElementComponent('cardCvc'), sdk)
+        await nextTick()
+      }).rejects.toThrow(/is not supported inside a checkout provider/)
     })
   })
 })

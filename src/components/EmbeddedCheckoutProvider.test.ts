@@ -27,7 +27,7 @@ describe('embeddedCheckoutProvider', () => {
     mockStripePromise = Promise.resolve(mockStripe)
     mockEmbeddedCheckout = mocks.mockEmbeddedCheckout()
     mockEmbeddedCheckoutPromise = Promise.resolve(mockEmbeddedCheckout)
-    mockStripe.initEmbeddedCheckout.mockReturnValue(mockEmbeddedCheckoutPromise)
+    mockStripe.createEmbeddedCheckoutPage.mockReturnValue(mockEmbeddedCheckoutPromise)
   })
 
   afterEach(() => {
@@ -63,7 +63,7 @@ describe('embeddedCheckoutProvider', () => {
       stripe.value = mockStripe
       await nextTick()
 
-      expect(mockStripe.initEmbeddedCheckout).toHaveBeenCalledTimes(1)
+      expect(mockStripe.createEmbeddedCheckoutPage).toHaveBeenCalledTimes(1)
     })
 
     it('throws when useEmbeddedCheckoutContext is used outside provider', () => {
@@ -151,7 +151,7 @@ describe('embeddedCheckoutProvider', () => {
       await nullPromise
 
       expect(ctx.embeddedCheckout.value).toBeNull()
-      expect(mockStripe.initEmbeddedCheckout).not.toHaveBeenCalled()
+      expect(mockStripe.createEmbeddedCheckoutPage).not.toHaveBeenCalled()
     })
 
     it('warns when the stripe prop changes after being set', async () => {
@@ -309,7 +309,7 @@ describe('embeddedCheckoutProvider', () => {
       const slowCheckoutPromise = new Promise((resolve) => {
         resolveCheckout = resolve
       })
-      mockStripe.initEmbeddedCheckout.mockReturnValue(slowCheckoutPromise)
+      mockStripe.createEmbeddedCheckoutPage.mockReturnValue(slowCheckoutPromise)
 
       const show = ref(true)
       const Comp = defineComponent(() => {

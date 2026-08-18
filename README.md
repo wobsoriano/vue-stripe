@@ -7,7 +7,7 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 
 ## Getting started
 
-- [Add Vue Stripe.js to your Vue app](https://vue-stripe.vercel.app/getting-started/installation)
+- [Add Vue Stripe.js to your Vue app](https://vue-stripe.dev/getting-started/installation)
 - [Try it out using CodeSandbox](https://codesandbox.io/p/devbox/vue-stripe-demo-nds3jv)
 
 ## Installation
@@ -15,6 +15,10 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 ```bash
 npm install vue-stripe @stripe/stripe-js
 ```
+
+> [!IMPORTANT]
+> v3 requires `@stripe/stripe-js` v9.5 or newer, below v10. Upgrading from v2?
+> See the [migration guide](https://vue-stripe.dev/migration/v2-to-v3).
 
 ## Minimal example
 

@@ -80,7 +80,7 @@ export const EmbeddedCheckoutProvider = defineComponent({
 
         loadedStripe.value = stripe
         embeddedCheckoutPromise.value = loadedStripe.value
-          .initEmbeddedCheckout(currentOptions as UnknownOptions)
+          .createEmbeddedCheckoutPage(currentOptions as UnknownOptions)
           .then((embeddedCheckout) => {
             if (cancelled) {
               embeddedCheckout.destroy()
