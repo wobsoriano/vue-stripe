@@ -20,47 +20,6 @@ npm install vue-stripe @stripe/stripe-js
 > v3 requires `@stripe/stripe-js` v9.5 or newer, below v10. Upgrading from v2?
 > See the [migration guide](https://vue-stripe.dev/migration/v2-to-v3).
 
-## Nuxt
-
-Vue Stripe ships an optional Nuxt 4 module that auto-imports every component and
-composable, and gives you a server-side Stripe client.
-
-```ts
-export default defineNuxtConfig({
-  modules: ['vue-stripe/nuxt'],
-  stripe: {
-    publishableKey: process.env.NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    secretKey: process.env.NUXT_STRIPE_SECRET_KEY,
-  },
-})
-```
-
-```vue
-<script setup>
-import { loadStripe } from '@stripe/stripe-js'
-
-const config = useRuntimeConfig()
-const stripe = await loadStripe(config.public.stripe.publishableKey)
-</script>
-
-<template>
-  <Elements :stripe="stripe" :options="{ mode: 'payment', amount: 1099, currency: 'usd' }">
-    <PaymentElement />
-  </Elements>
-</template>
-```
-
-```ts
-export default defineEventHandler(async (event) => {
-  const stripe = await useServerStripe(event)
-  const intent = await stripe.paymentIntents.create({ amount: 1099, currency: 'usd' })
-  return { clientSecret: intent.client_secret }
-})
-```
-
-Install `stripe` alongside if you use the server half. See the
-[Nuxt guide](https://vue-stripe.dev/getting-started/nuxt) for all options.
-
 ## Minimal example
 
 An example `CheckoutForm` component:

@@ -1,6 +1,5 @@
 packages:
   - docs
-  - playground
   - .
 
 onlyBuiltDependencies:

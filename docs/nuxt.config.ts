@@ -14,7 +14,6 @@ export default defineNuxtConfig({
       '/getting-started/introduction',
       '/getting-started/installation',
       '/getting-started/setup-application',
-      '/getting-started/nuxt',
       '/core-concepts/elements',
       '/core-concepts/payment-element',
       '/core-concepts/express-checkout-element',
