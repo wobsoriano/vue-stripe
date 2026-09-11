@@ -91,6 +91,17 @@ export type LinkAuthenticationElementEmits = WithBaseElementEmits<{
   loaderstart: (event: { elementType: 'linkAuthentication' }) => void
 }>
 
+export type LinkSignupElementProps = WithBaseElementProps<{
+  options?: stripeJs.StripeLinkSignupElementOptions
+}>
+
+export type LinkSignupElementEmits = WithBaseElementEmits<{
+  ready: (element: stripeJs.StripeLinkSignupElement) => void
+  escape: () => void
+  loaderror: (event: { elementType: 'linkSignup', error: stripeJs.StripeError }) => void
+  loaderstart: (event: { elementType: 'linkSignup' }) => void
+}>
+
 export type PaymentElementProps = WithBaseElementProps<{
   options?: stripeJs.StripePaymentElementOptions
 }>

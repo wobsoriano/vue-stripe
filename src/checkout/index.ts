@@ -13,6 +13,8 @@ import type {
   CurrencySelectorElementProps,
   ExpressCheckoutElementEmits,
   ExpressCheckoutElementProps,
+  LinkSignupElementEmits,
+  LinkSignupElementProps,
   PaymentElementProps,
   ShippingAddressElementEmits,
   ShippingAddressElementProps,
@@ -68,6 +70,13 @@ export const ContactDetailsElement = createElementComponent<ContactDetailsElemen
  * Contact [Stripe support](https://support.stripe.com/) for more information.
  */
 export const TermsElement = createElementComponent<TermsElementProps, TermsElementEmits>('terms')
+
+/**
+ * Requires beta access and must be used inside `CheckoutElementsProvider`.
+ * It is not supported inside `CheckoutFormProvider`.
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const LinkSignupElement = createElementComponent<LinkSignupElementProps, LinkSignupElementEmits>('linkSignup')
 
 const AddressElementBase = createElementComponent('address')
 

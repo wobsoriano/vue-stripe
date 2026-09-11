@@ -10,14 +10,13 @@ export function mockElement() {
 }
 
 export function mockElements() {
-  const elements: Record<string, ReturnType<typeof mockElement>> = {}
+  const create = vi.fn<(type: string) => ReturnType<typeof mockElement>>(mockElement)
   return {
-    create: vi.fn((type) => {
-      elements[type] = mockElement()
-      return elements[type]
-    }),
-    getElement: vi.fn((type) => {
-      return elements[type] || null
+    create,
+    getElement: vi.fn((componentOrType) => {
+      const type = componentOrType.__elementType || componentOrType
+      const index = create.mock.calls.findLastIndex(([createdType]) => createdType === type)
+      return create.mock.results[index]?.value ?? null
     }),
     update: vi.fn(),
   }
@@ -75,6 +74,7 @@ export function mockCheckoutElementsSdk() {
     createTaxIdElement: create('taxId'),
     createContactDetailsElement: create('contactDetails'),
     createTermsElement: create('terms'),
+    createLinkSignupElement: create('linkSignup'),
     getPaymentElement: vi.fn(() => elements.payment || null),
     getBillingAddressElement: vi.fn(() => elements.billingAddress || null),
     getShippingAddressElement: vi.fn(() => elements.shippingAddress || null),
@@ -82,6 +82,7 @@ export function mockCheckoutElementsSdk() {
     getCurrencySelectorElement: vi.fn(() => elements.currencySelector || null),
     getTaxIdElement: vi.fn(() => elements.taxId || null),
     getTermsElement: vi.fn(() => elements.terms || null),
+    getLinkSignupElement: vi.fn(() => elements.linkSignup || null),
     on: vi.fn(),
     loadActions: vi.fn().mockResolvedValue({
       type: 'success',

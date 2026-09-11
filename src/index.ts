@@ -33,6 +33,8 @@ import type {
   IssuingCardPinDisplayElementProps,
   LinkAuthenticationElementEmits,
   LinkAuthenticationElementProps,
+  LinkSignupElementEmits,
+  LinkSignupElementProps,
   PaymentElementEmits,
   PaymentElementProps,
   PaymentMethodMessagingElementEmits,
@@ -97,6 +99,12 @@ export const ExpressCheckoutElement = createElementComponent<ExpressCheckoutElem
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
  */
 export const PaymentRequestButtonElement = createElementComponent<PaymentRequestButtonElementProps, PaymentRequestButtonElementEmits>('paymentRequestButton')
+
+/**
+ * Requires beta access:
+ * Contact [Stripe support](https://support.stripe.com/) for more information.
+ */
+export const LinkSignupElement = createElementComponent<LinkSignupElementProps, LinkSignupElementEmits>('linkSignup')
 
 /**
  * @docs https://www.vue-stripe.com/getting-started/embedded-components/#elements-components
@@ -218,6 +226,14 @@ declare module '@stripe/stripe-js' {
     getElement(
       component: typeof LinkAuthenticationElement
     ): stripeJs.StripeLinkAuthenticationElement | null
+
+    /**
+     * Returns the underlying element instance for the `LinkSignupElement` component
+     * in the current `Elements` provider tree, or `null` if none is rendered.
+     */
+    getElement(
+      component: typeof LinkSignupElement
+    ): stripeJs.StripeLinkSignupElement | null
 
     /**
      * Returns the underlying [element instance](https://stripe.com/docs/js/elements_object/create_payment_element) for the `PaymentElement` component in the current [Elements](https://www.vue-stripe.com/getting-started/advanced-integration/#elements-provider) provider tree.

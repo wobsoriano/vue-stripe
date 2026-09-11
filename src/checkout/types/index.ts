@@ -4,6 +4,8 @@ import type {
   BaseElementProps,
   ExpressCheckoutElementEmits as RootExpressCheckoutElementEmits,
   ExpressCheckoutElementProps as RootExpressCheckoutElementProps,
+  LinkSignupElementEmits as RootLinkSignupElementEmits,
+  LinkSignupElementProps as RootLinkSignupElementProps,
   PaymentElementProps as RootPaymentElementProps,
   WithBaseElementEmits,
   WithBaseElementProps,
@@ -110,6 +112,12 @@ export type ContactDetailsElementEmits = WithBaseElementEmits<{
   loaderror: (event: { elementType: 'contactDetails', error: stripeJs.StripeError }) => void
   loaderstart: (event: { elementType: 'contactDetails' }) => void
 }>
+
+export type LinkSignupElementProps = Omit<RootLinkSignupElementProps, 'options'> & {
+  options?: stripeJs.StripeCheckoutLinkSignupElementOptions
+}
+
+export type LinkSignupElementEmits = RootLinkSignupElementEmits
 
 export type TermsElementProps = WithBaseElementProps<{
   /**
