@@ -7,6 +7,7 @@ Vue components for [Stripe.js and Elements](https://stripe.com/docs/stripe-js) w
 
 ## Getting started
 
+- [Build a custom checkout page using the Checkout Sessions API](https://docs.stripe.com/payments/accept-a-payment?payment-ui=elements&api-integration=checkout)
 - [Add Vue Stripe.js to your Vue app](https://vue-stripe.dev/getting-started/installation)
 - [Try it out using CodeSandbox](https://codesandbox.io/p/devbox/vue-stripe-demo-nds3jv)
 
@@ -17,104 +18,152 @@ npm install vue-stripe @stripe/stripe-js
 ```
 
 > [!IMPORTANT]
-> v3 requires `@stripe/stripe-js` v9.5 or newer, below v10. Upgrading from v2?
-> See the [migration guide](https://vue-stripe.dev/migration/v2-to-v3).
+> Vue Stripe requires `@stripe/stripe-js` v9.16 or newer, below v10. Upgrading
+> from v2? See the [migration guide](https://vue-stripe.dev/migration/v2-to-v3).
 
-## Minimal example
+## Build a custom checkout page
 
-An example `CheckoutForm` component:
+For a new custom checkout page, we recommend the
+[Checkout Sessions API](https://docs.stripe.com/payments/accept-a-payment?payment-ui=elements&api-integration=checkout)
+with `ui_mode: 'elements'`. You place Stripe Elements in your own Vue layout,
+and the Checkout Session manages the checkout state. The lower-level
+[Payment Intents API](https://docs.stripe.com/payments/accept-a-payment?payment-ui=elements&api-integration=payment-intents)
+gives you control over every part of your checkout. It also takes much more code
+to build and maintain. For a Payment Intents example in Vue, see the
+[Payment Element docs](https://vue-stripe.dev/core-concepts/payment-element).
+
+Create a Checkout Session on your server from trusted product and pricing data.
+Then return its client secret.
+
+```js
+const session = await stripe.checkout.sessions.create({
+  ui_mode: 'elements',
+  mode: 'payment',
+  return_url: 'https://example.com/order/123/complete',
+  line_items: [
+    {
+      price_data: {
+        currency: 'usd',
+        product_data: { name: 'T-shirt' },
+        unit_amount: 1099,
+      },
+      quantity: 1,
+    },
+  ],
+})
+
+if (!session.client_secret) {
+  throw new Error('Checkout Session is missing a client secret.')
+}
+
+res.json({ clientSecret: session.client_secret })
+```
+
+On the client, import from `vue-stripe/checkout`. `useCheckoutElements()`
+returns a computed ref holding a `loading`, `success`, or `error` result.
+
+`CheckoutForm.vue`
 
 ```vue
 <script setup>
-import {
-  PaymentElement,
-  useElements,
-  useStripe,
-} from 'vue-stripe'
+import { ref } from 'vue'
+import { PaymentElement, useCheckoutElements } from 'vue-stripe/checkout'
 
-const stripe = useStripe()
-const elements = useElements()
-
+const result = useCheckoutElements()
 const errorMessage = ref(null)
+const isSubmitting = ref(false)
 
 async function handleSubmit() {
-  if (elements.value === null) {
+  if (result.value.type !== 'success' || !result.value.checkout.canConfirm) {
     return
   }
 
-  // Trigger form validation and wallet collection
-  const { error: submitError } = await elements.value.submit()
-  if (submitError) {
-    // Show error to your customer
-    errorMessage.value = submitError.message
-    return
+  isSubmitting.value = true
+  errorMessage.value = null
+
+  try {
+    const confirmResult = await result.value.checkout.confirm({
+      returnUrl: 'https://example.com/order/123/complete',
+    })
+
+    if (confirmResult.type === 'error') {
+      errorMessage.value = confirmResult.error.message
+    }
   }
-
-  // Create the PaymentIntent and obtain clientSecret from your server endpoint
-  const res = await fetch('/create-intent', {
-    method: 'POST',
-  })
-  const { client_secret: clientSecret } = await res.json()
-
-  const { error } = await stripe.value.confirmPayment({
-    // `Elements` instance that was used to create the Payment Element
-    elements: elements.value,
-    clientSecret,
-    confirmParams: {
-      return_url: 'https://example.com/order/123/complete',
-    },
-  })
-
-  if (error) {
-    // This point will only be reached if there is an immediate error when
-    // confirming the payment. Show error to your customer (for example, payment
-    // details incomplete)
-    errorMessage.value = error.message
+  catch (error) {
+    errorMessage.value = error instanceof Error
+      ? error.message
+      : 'An unexpected error occurred.'
   }
-  else {
-    // Your customer will be redirected to your `return_url`. For some payment
-    // methods like iDEAL, your customer will be redirected to an intermediate
-    // site first to authorize the payment, then redirected to the `return_url`.
+  finally {
+    isSubmitting.value = false
   }
 }
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit">
-    <PaymentElement />
-    <button type="submit" :disabled="!stripe || !elements">
-      Pay
-    </button>
-    <div v-if="errorMessage">
-      {{ errorMessage }}
-    </div>
-  </form>
+  <div v-if="result.type === 'loading'">
+    Loading checkout...
+  </div>
+  <div v-else-if="result.type === 'error'">
+    {{ result.error.message }}
+  </div>
+  <template v-else>
+    <ul>
+      <li v-for="lineItem in result.checkout.lineItems" :key="lineItem.id">
+        {{ lineItem.name }}: {{ lineItem.total.amount }}
+      </li>
+    </ul>
+    <p>Total: {{ result.checkout.total.total.amount }}</p>
+    <form @submit.prevent="handleSubmit">
+      <PaymentElement />
+      <button type="submit" :disabled="!result.checkout.canConfirm || isSubmitting">
+        {{ isSubmitting ? 'Processing...' : 'Pay' }}
+      </button>
+      <div v-if="errorMessage">
+        {{ errorMessage }}
+      </div>
+    </form>
+  </template>
 </template>
 ```
+
+`App.vue`
 
 ```vue
 <script setup>
 import { loadStripe } from '@stripe/stripe-js'
-import { Elements } from 'vue-stripe'
+import { CheckoutElementsProvider } from 'vue-stripe/checkout'
 import CheckoutForm from './CheckoutForm.vue'
 
-const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
+const stripePromise = loadStripe('pk_test_...')
+
+const clientSecretPromise = fetch('/create-checkout-session', {
+  method: 'POST',
+}).then(async (response) => {
+  const body = await response.json()
+
+  if (!response.ok) {
+    throw new Error(body.error ?? 'Unable to create a Checkout Session.')
+  }
+
+  return body.clientSecret
+})
 
 const options = {
-  mode: 'payment',
-  amount: 1099,
-  currency: 'usd',
-  // Fully customizable with appearance API.
-  appearance: {
-    /* ... */
+  clientSecret: clientSecretPromise,
+  elementsOptions: {
+    appearance: {
+      theme: 'stripe',
+    },
   },
 }
 </script>
 
 <template>
-  <Elements :stripe="stripePromise" :options>
+  <CheckoutElementsProvider :stripe="stripePromise" :options="options">
     <CheckoutForm />
-  </Elements>
+  </CheckoutElementsProvider>
 </template>
 ```
 
