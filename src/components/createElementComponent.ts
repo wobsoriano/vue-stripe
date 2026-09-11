@@ -78,6 +78,16 @@ export function createElementComponent<ElementProps extends Props, ElementEmits 
             case 'contactDetails':
               newElement = elementsSdk.createContactDetailsElement()
               break
+            case 'linkSignup':
+              if ('createLinkSignupElement' in checkoutSdk.value) {
+                newElement = checkoutSdk.value.createLinkSignupElement(options)
+              }
+              else {
+                throw new Error(
+                  '<LinkSignupElement> requires <CheckoutElementsProvider> and is not supported inside <CheckoutFormProvider>.',
+                )
+              }
+              break
             case 'terms':
               newElement = elementsSdk.createTermsElement(
                 options as stripeJs.StripeCheckoutTermsElementOptions,

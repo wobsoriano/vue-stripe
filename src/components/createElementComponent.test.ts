@@ -1,9 +1,11 @@
+import type { StripeElements, StripeLinkSignupElement } from '@stripe/stripe-js'
 import type { UnknownOptions } from '../types'
 import { render, waitFor } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, provide, ref, shallowRef } from 'vue'
-import { AddressElement, PaymentElement, PaymentRequestButtonElement } from '..'
+import { AddressElement, LinkSignupElement, PaymentElement, PaymentRequestButtonElement } from '..'
 import * as mocks from '../../test/mocks'
+import { CheckoutFormProvider, LinkSignupElement as CheckoutLinkSignupElement } from '../checkout'
 import { CheckoutContextKey } from '../checkout/components/CheckoutContext'
 import * as CheckoutContextModule from '../checkout/components/CheckoutContext'
 import * as CheckoutModule from '../checkout/components/CheckoutElementsProvider'
@@ -1481,6 +1483,94 @@ describe('createElementComponent', () => {
         renderInCheckout(createElementComponent('cardCvc'), sdk)
         await nextTick()
       }).rejects.toThrow(/is not supported inside a checkout provider/)
+    })
+  })
+
+  describe('linkSignupElement', () => {
+    const options = { defaultValues: { email: 'jenny.rosen@example.com' } }
+
+    function createHandlers() {
+      return {
+        onReady: vi.fn(),
+        onFocus: vi.fn(),
+        onBlur: vi.fn(),
+        onEscape: vi.fn(),
+        onLoaderstart: vi.fn(),
+        onLoaderror: vi.fn(),
+      }
+    }
+
+    function expectAllEventsForwarded(handlers: ReturnType<typeof createHandlers>) {
+      ['ready', 'focus', 'blur', 'escape', 'loaderstart', 'loaderror'].forEach(event => simulateEvent(event))
+      const { onReady, ...rest } = handlers
+      expect(onReady).toHaveBeenCalledWith(mockElement)
+      Object.values(rest).forEach(handler => expect(handler).toHaveBeenCalled())
+    }
+
+    it('creates a regular Element with its initial options, events, and native lookup', async () => {
+      const handlers = createHandlers()
+      const parent = defineComponent(() => () => h(Elements, {
+        stripe: mockStripe,
+      }, () => h(LinkSignupElement, { options, ...handlers })))
+
+      render(parent)
+      await nextTick()
+
+      expect(mockElements.create).toHaveBeenCalledWith('linkSignup', options)
+      expectAllEventsForwarded(handlers)
+
+      const element: StripeLinkSignupElement | null = (mockElements as StripeElements).getElement(LinkSignupElement)
+      expect(element).toBe(mockElement)
+    })
+
+    it('creates a Checkout Element with its initial options and supports all events', async () => {
+      mockCheckoutElementsSdk.createLinkSignupElement.mockReturnValue(mockElement)
+      const handlers = createHandlers()
+      const parent = defineComponent(() => () => h(CheckoutElementsProvider, {
+        stripe: mockStripe,
+        options: { clientSecret: 'cs_123' },
+      }, () => h(CheckoutLinkSignupElement, { options, ...handlers })))
+
+      render(parent)
+      await waitFor(() => expect(mockCheckoutElementsSdk.createLinkSignupElement).toHaveBeenCalledWith(options))
+
+      expectAllEventsForwarded(handlers)
+    })
+
+    it('ignores option changes when the Element has no update method', async () => {
+      const linkSignupElement = {
+        mount: vi.fn(),
+        destroy: vi.fn(),
+        on: simulateOn,
+        off: simulateOff,
+      }
+      mockElements.create.mockReturnValue(linkSignupElement)
+      const currentOptions = ref(options)
+      const parent = defineComponent(() => () => h(Elements, {
+        stripe: mockStripe,
+      }, () => h(LinkSignupElement, { options: currentOptions.value })))
+
+      render(parent)
+      await nextTick()
+
+      currentOptions.value = { defaultValues: { email: 'new@example.com' } }
+      await nextTick()
+
+      expect(mockElements.create).toHaveBeenCalledTimes(1)
+      expect(linkSignupElement.mount).toHaveBeenCalledTimes(1)
+    })
+
+    it('rejects CheckoutFormProvider with an actionable error', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+      const parent = defineComponent(() => () => h(CheckoutFormProvider, {
+        stripe: mockStripe,
+        options: { clientSecret: 'cs_123' },
+      }, () => h(CheckoutLinkSignupElement)))
+
+      await expect(async () => {
+        render(parent)
+        await nextTick()
+      }).rejects.toThrow('<LinkSignupElement> requires <CheckoutElementsProvider> and is not supported inside <CheckoutFormProvider>.')
     })
   })
 })
